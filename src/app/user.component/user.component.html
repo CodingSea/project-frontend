@@ -1,0 +1,31 @@
+@if (createMode)
+{
+    <form [formGroup]="signupForm" (ngSubmit)="signup()">
+
+        <label for="first_name">First Name: </label>
+        <input type="text" formControlName="first_name" id="first_name">
+
+        <label for="last_name">Last name: </label>
+        <input type="text" formControlName="last_name" id="last_name">
+
+        <label for="email">Email: </label>
+        <input type="text" formControlName="email" id="email">
+
+        <label for="password">Password: </label>
+        <input type="password" formControlName="password" id="password">
+
+        <button type="submit">Signup</button>
+    </form>
+}
+@else 
+{
+    <form [formGroup]="loginForm" (ngSubmit)="login()">
+        <label for="email">Email: </label>
+        <input type="text" formControlName="email" id="email">
+
+        <label for="password">Password: </label>
+        <input type="password" formControlName="password" id="password">
+
+        <button type="submit">Login</button>
+    </form>
+}
