@@ -27,11 +27,10 @@ export class UserComponent
       {
         this.createMode = true;
       }
-      else if (mode == "login")
+      else
       {
         this.createMode = false;
       }
-      console.log(mode);
     });
   }
 
@@ -76,8 +75,6 @@ export class UserComponent
   {
     const email = this.loginForm.value.email ?? '';
     const password = this.loginForm.value.password ?? '';
-
-    console.log(this.loginForm.value)
 
     this.authService.login(email, password).subscribe({
       next: () => this.router.navigate([ '/dashboard' ]),
