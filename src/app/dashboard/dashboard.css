@@ -1,0 +1,237 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+        Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue",
+        sans-serif;
+    background-color: #f9fafb;
+    color: #222;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+/* Layout */
+.app {
+    display: flex;
+    height: 100vh;
+}
+
+
+
+/* Main content */
+.main {
+    flex: 1;
+    padding: 2rem 3rem;
+    overflow-y: auto;
+}
+
+/* Header */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.header h1 {
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: #111827;
+}
+
+.header .icons {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.header .icon-btn {
+    cursor: pointer;
+    width: 22px;
+    height: 22px;
+    fill: #6b7280;
+    transition: fill 0.2s;
+}
+
+.header .icon-btn:hover {
+    fill: #2563eb;
+}
+
+.header .profile-pic {
+    width: 32px;
+    height: 32px;
+    border-radius: 9999px;
+}
+
+/* Grid */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 2rem;
+}
+
+/* Card */
+.card {
+    background: white;
+    padding: 1.5rem 2rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 1px 3px rgb(0 0 0 / 0.1);
+}
+
+/* Project Progress Chart */
+.progress-chart {
+    text-align: center;
+}
+
+.progress-chart svg {
+    margin-bottom: 1rem;
+}
+
+.progress-chart .legend {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.85rem;
+    color: #6b7280;
+}
+
+.progress-chart .legend span {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.progress-chart .legend .dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+.dot.completed {
+    background-color: #4f46e5;
+}
+
+.dot.inprogress {
+    background-color: #818cf8;
+}
+
+.dot.pending {
+    background-color: #c7d2fe;
+}
+
+.dot.atrisk {
+    background-color: #ec4899;
+}
+
+.progress-chart .percent {
+    font-weight: 700;
+    font-size: 2rem;
+    color: #111827;
+}
+
+.progress-chart .label {
+    margin-top: 0.2rem;
+    font-weight: 600;
+    color: #6b7280;
+}
+
+/* Projects Overview Table */
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+table th {
+    text-align: left;
+    font-weight: 600;
+    color: #374151;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+table td {
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #e5e7eb;
+    color: #4b5563;
+}
+
+table td .subtitle {
+    display: block;
+    font-size: 0.8rem;
+    color: #9ca3af;
+}
+
+table td.progress-bar {
+    width: 120px;
+}
+
+.progress-container {
+    background-color: #e5e7eb;
+    border-radius: 9999px;
+    overflow: hidden;
+    height: 8px;
+    margin-top: 4px;
+}
+
+.progress-bar-filled {
+    height: 8px;
+    border-radius: 9999px;
+    background: linear-gradient(90deg, #4f46e5, #818cf8);
+}
+
+/* Tasks with Deadline */
+.tasks-header {
+    font-weight: 600;
+    color: #374151;
+    margin: 2rem 0 0.75rem;
+}
+
+.tasks-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 0.75rem;
+}
+
+.tasks-table td {
+    padding: 0.5rem 0;
+    vertical-align: middle;
+}
+
+.tasks-table td.status {
+    width: 130px;
+}
+
+.status-badge {
+    font-weight: 600;
+    font-size: 0.85rem;
+    padding: 0.25rem 0.6rem;
+    border-radius: 9999px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    color: white;
+}
+
+.completed {
+    background-color: #22c55e;
+}
+
+.at-risk {
+    background-color: #ef4444;
+}
+
+.pending {
+    background-color: #facc15;
+    color: #374151;
+}
+
+.in-progress {
+    background-color: #6366f1;
+}

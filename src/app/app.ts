@@ -8,6 +8,7 @@ import { CommonModule } from '@angular/common';
 import { AuthService } from './auth';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { JwtInterceptor } from './auth/jwt-interceptor';
+import { Sidebar } from './sidebar/sidebar';
 
 @Component({
   selector: 'app-root',
@@ -25,11 +26,5 @@ import { JwtInterceptor } from './auth/jwt-interceptor';
 })
 export class App
 {
-  constructor(private auth: AuthService, private router: Router) {}
-
-  logout()
-  {
-    this.auth.logout();
-    this.router.navigate([ '/login' ]);
-  }
+  
 }
