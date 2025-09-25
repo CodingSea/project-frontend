@@ -5,6 +5,7 @@ import { User } from '@app/user';
 import { Observable } from 'rxjs';
 import { AuthService } from "../auth"
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
+import { environment } from '@environments/environment';
 
 @Component({
   selector: 'user-component',
@@ -68,7 +69,7 @@ export class UserComponent
 
   addUser(newUser: User): Observable<User>
   {
-    return this.http.post<User>("http://localhost:3000/user", newUser);
+    return this.http.post<User>(`${environment.apiUrl}/user`, newUser);
   }
 
   login()

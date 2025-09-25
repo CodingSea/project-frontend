@@ -12,7 +12,7 @@ import { Sidebar } from './sidebar/sidebar';
 
 @Component({
   selector: 'app-root',
-  imports: [ CommonModule, RouterOutlet, RouterLink, RouterLinkActive],
+  imports: [ CommonModule, RouterOutlet],
   templateUrl: './app.html',
   styleUrl: './app.css',
   providers: [
