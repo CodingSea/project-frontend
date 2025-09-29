@@ -1,31 +1,51 @@
 @if (createMode)
 {
-    <form [formGroup]="signupForm" (ngSubmit)="signup()">
+<div class="container">
+    <div class="form-container">
+        <h1>DevHub</h1>
+        <p>Developer Management Platform</p>
+        <h2>Sign up to DevHub</h2>
 
-        <label for="first_name">First Name: </label>
-        <input type="text" formControlName="first_name" id="first_name">
+        <form [formGroup]="signupForm" (ngSubmit)="signup()">
 
-        <label for="last_name">Last name: </label>
-        <input type="text" formControlName="last_name" id="last_name">
+            <label for="first_name">First Name: </label>
+            <input type="text" formControlName="first_name" id="first_name" placeholder="Enter your first name">
 
-        <label for="email">Email: </label>
-        <input type="text" formControlName="email" id="email">
+            <label for="last_name">Last name: </label>
+            <input type="text" formControlName="last_name" id="last_name" placeholder="Enter your last name">
 
-        <label for="password">Password: </label>
-        <input type="password" formControlName="password" id="password">
+            <label for="email">Email: </label>
+            <input type="text" formControlName="email" id="email" placeholder="Enter your email">
 
-        <button type="submit">Signup</button>
-    </form>
+            <label for="password">Password: </label>
+            <input type="password" formControlName="password" id="password" placeholder="Enter your password">
+
+            <button type="submit" class="signin-button">Signup</button>
+
+            <p class="signup">Have an account? <a routerLink="/auth/login">Login page</a></p>
+        </form>
+    </div>
+</div>
 }
-@else 
+@else
 {
-    <form [formGroup]="loginForm" (ngSubmit)="login()">
-        <label for="email">Email: </label>
-        <input type="text" formControlName="email" id="email">
+<div class="container">
+    <div class="form-container">
+        <h1>DevHub</h1>
+        <p>Developer Management Platform</p>
+        <h2>Login to DevHub</h2>
 
-        <label for="password">Password: </label>
-        <input type="password" formControlName="password" id="password">
+        <form [formGroup]="loginForm" (ngSubmit)="login()">
+            <label for="email">Email: </label>
+            <input type="email" formControlName="email" id="email" placeholder="Enter your email" required>
 
-        <button type="submit">Login</button>
-    </form>
+            <label for="password">Password: </label>
+            <input type="password" formControlName="password" id="password" placeholder="Enter your password" required>
+
+            <button type="submit" class="signin-button">Login</button>
+
+            <p class="signup">Don't have an account? <a routerLink="/auth/signup">Sign up for free</a></p>
+        </form>
+    </div>
+</div>
 }

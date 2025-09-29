@@ -4,12 +4,12 @@ import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { User } from '@app/user';
 import { Observable } from 'rxjs';
 import { AuthService } from "../auth"
-import { ActivatedRoute, ParamMap, Router } from '@angular/router';
+import { ActivatedRoute, ParamMap, Router, RouterLink } from '@angular/router';
 import { environment } from '@environments/environment';
 
 @Component({
   selector: 'user-component',
-  imports: [ ReactiveFormsModule ],
+  imports: [ ReactiveFormsModule, RouterLink ],
   templateUrl: './user.component.html',
   styleUrl: './user.component.css'
 })
