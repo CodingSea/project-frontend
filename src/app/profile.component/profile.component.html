@@ -1,0 +1,41 @@
+<div class="container">
+
+    <app-sidebar />
+
+    <div class="profile-container">
+        <div class="profile-header">
+            <img src="images/user.png" width="150px" alt="Profile Image" class="profile-image">
+            <div class="profile-info">
+                <h1>{{currentUserInfo.username}}</h1>
+                <p class="email">{{ currentUserInfo.email }}</p>
+                <span class="role">{{currentUserInfo.role}}</span>
+            </div>
+        </div>
+
+        <br>
+        <button class="edit-button">Edit Profile</button>
+
+        <h2>Skill Tags</h2>
+        <div class="certificates">
+
+            @for (skill of currentUserInfo.skills; track $index) 
+            {
+                <span class="certificate">{{ skill }}</span>
+            }
+        </div>
+
+        <h2>Certificates</h2>
+        <div class="certificates">
+            <span class="certificate">JavaScript Expert</span>
+            <span class="certificate">AWS Solutions Architect</span>
+        </div>
+
+        <h2>Services</h2>
+        <div class="services">
+            <div class="service">Full-Stack Development</div>
+            <div class="service">Cloud Architecture</div>
+            <div class="service">Mobile Development</div>
+            <div class="service">DevOps & Security</div>
+        </div>
+    </div>
+</div>

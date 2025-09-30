@@ -1,30 +1,34 @@
-<aside class="sidebar">
-    <div class="logo">ProjectHub</div>
-    <nav>
-        <a routerLink="/dashboard">
+<div class="sidebar-placement">
+    <aside class="sidebar">
+        <div class="logo">ProjectHub</div>
+        <nav>
+            <a [class.active]="activeLink === 'dashboard'" (click)="setActiveLink('dashboard')" routerLink="/dashboard">
+                <svg viewBox="0 0 24 24">
+                    <path
+                        d="M3 9.5L12 3l9 6.5v11a2 2 0 01-2 2h-4a2 2 0 01-2-2v-5H9v5a2 2 0 01-2 2H3a2 2 0 01-2-2v-11z" />
+                </svg>
+                Dashboard
+            </a>
+            <a [class.active]="activeLink === 'projectManagement'" (click)="setActiveLink('projectManagement')"
+                routerLink="/auth/login">
+                <svg viewBox="0 0 24 24">
+                    <path d="M4 5h16v2H4zm0 6h10v2H4zm0 6h6v2H4z" />
+                </svg>
+                Project Management
+            </a>
+            <a [class.active]="activeLink === 'profile'" (click)="setActiveLink('profile')" routerLink="/profile">
+                <svg viewBox="0 0 24 24">
+                    <circle cx="12" cy="8" r="4" />
+                    <path d="M4 20v-1a6 6 0 0112 0v1z" />
+                </svg>
+                Profile
+            </a>
+        </nav>
+        <div class="logout" (click)="logout()">
             <svg viewBox="0 0 24 24">
-                <path d="M3 9.5L12 3l9 6.5v11a2 2 0 01-2 2h-4a2 2 0 01-2-2v-5H9v5a2 2 0 01-2 2H3a2 2 0 01-2-2v-11z" />
+                <path d="M16 17l5-5-5-5M20 12H8" />
             </svg>
-            Dashboard
-        </a>
-        <a routerLink="/auth/login">
-            <svg viewBox="0 0 24 24">
-                <path d="M4 5h16v2H4zm0 6h10v2H4zm0 6h6v2H4z" />
-            </svg>
-            Project Management
-        </a>
-        <a routerLink="/auth/login">
-            <svg viewBox="0 0 24 24">
-                <circle cx="12" cy="8" r="4" />
-                <path d="M4 20v-1a6 6 0 0112 0v1z" />
-            </svg>
-            Profile
-        </a>
-    </nav>
-    <div class="logout" (click)="logout()">
-        <svg viewBox="0 0 24 24">
-            <path d="M16 17l5-5-5-5M20 12H8" />
-        </svg>
-        Logout
-    </div>
-</aside>
+            Logout
+        </div>
+    </aside>
+</div>
