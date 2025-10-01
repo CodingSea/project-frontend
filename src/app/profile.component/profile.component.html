@@ -13,7 +13,7 @@
         </div>
 
         <br>
-        <button class="edit-button">Edit Profile</button>
+        <button class="edit-button" routerLink="/profile/edit">Edit Profile</button>
 
         <h2>Skill Tags</h2>
         <div class="certificates">
@@ -26,8 +26,12 @@
 
         <h2>Certificates</h2>
         <div class="certificates">
-            <span class="certificate">JavaScript Expert</span>
-            <span class="certificate">AWS Solutions Architect</span>
+            <button class="edit-button" routerLink="/certificate/new">+</button>
+
+            @for (c of certificates; track $index) 
+            {
+                <span class="certificate">{{c.name}}</span>
+            }
         </div>
 
         <h2>Services</h2>

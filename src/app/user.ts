@@ -1,3 +1,5 @@
+import { Certificate } from "./certificate";
+
 export interface User 
 {
     id: number,
@@ -5,8 +7,9 @@ export interface User
     last_name: string,
     email: string,
     password: string,
-    role: string
-    profileImage: string
-    profileImageID: string
-    skills: string[]
+    role: string,
+    profileImage: string,
+    profileImageID: string,
+    skills: string[],
+    certificates: Certificate[]
 }

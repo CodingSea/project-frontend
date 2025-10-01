@@ -1,0 +1,113 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f7f9fc;
+    margin: 0;
+    padding: 20px;
+}
+
+.container {
+    max-width: 600px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+}
+
+.header {
+    text-align: center;
+}
+
+.user-details {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.avatar {
+    border-radius: 50%;
+    margin-right: 15px;
+}
+
+.user-name {
+    text-align: left;
+}
+
+.role {
+    display: inline-block;
+    background-color: #dddddd;
+    color: #C21A25;
+    border: 1px solid #ec8585;
+    padding: 5px 10px;
+    border-radius: 5px;
+    margin-top: 5px;
+}
+
+.edit-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+label {
+    font-weight: bold;
+}
+
+input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+}
+
+.skills {
+    margin-top: 20px;
+}
+
+.skills-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.skill-item {
+    display: flex;
+    align-items: center;
+}
+
+.skill-item input {
+    flex: 1;
+    margin-right: 10px;
+}
+
+.remove-skill {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: red;
+}
+
+.add-skill {
+    background-color: #c21a25;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.save-button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.save-button:hover {
+    background-color: #45a049;
+}
