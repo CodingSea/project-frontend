@@ -6,6 +6,7 @@ import { environment } from '@environments/environment';
 import { jwtDecode } from 'jwt-decode';
 import { Observable } from 'rxjs';
 import { RouterLink } from '@angular/router';
+import { Certificate } from '@app/certificate';
 
 @Component({
   selector: 'app-profile.component',
@@ -26,6 +27,7 @@ export class ProfileComponent
     }
 
   currentUser: User | null = null;
+  certificates: Certificate[] | null = null;
 
   ngOnInit()
   {
@@ -50,6 +52,18 @@ export class ProfileComponent
           this.currentUserInfo.username = this.currentUser.first_name + " " + this.currentUser.last_name;
           this.currentUserInfo.email = this.currentUser.email;
           this.currentUserInfo.skills = this.currentUser.skills;
+        },
+        (error) =>
+        {
+          console.log(error);
+        }
+      )
+
+      this.http.get<Certificate[]>(`${environment.apiUrl}/certificate/${decodedToken.sub}`).subscribe(
+        (response) =>
+        {
+          console.log(response);
+          this.certificates = response;
         },
         (error) =>
         {

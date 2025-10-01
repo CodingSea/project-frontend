@@ -1,3 +1,5 @@
+import { Certificate } from "./certificate";
+
 export interface User 
 {
     id: number,
@@ -9,5 +11,5 @@ export interface User
     profileImage: string,
     profileImageID: string,
     skills: string[],
-    
+    certificates: Certificate[]
 }

@@ -1,7 +1,7 @@
 export interface Certificate
 {
-    certificateName: string;
-    certificateType: string;
+    name: string;
+    type: string;
     issuingOrganization: string;
     issueDate: string;
     expiryDate?: string;
