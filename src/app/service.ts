@@ -1,11 +1,15 @@
+import { User } from "./user";
+import { Project } from "./project";
+
 export interface Service 
 {
-    id: number,
-    projectId: number,
-    deadline: Date,
-    status: string,
-    chiefId: number,
-    projectManagerId: number,
-    assignedResources: number[],
-    backup: number[]
+    serviceID: number;
+    name: string;
+    project: Project;
+    deadline: Date;
+    status: 'pending' | 'in-progress' | 'completed';
+    chief: User;
+    projectManager?: User;
+    assignedResources?: User[];
+    backup?: User[];
 }

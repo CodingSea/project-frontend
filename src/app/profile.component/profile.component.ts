@@ -7,6 +7,7 @@ import { jwtDecode } from 'jwt-decode';
 import { Observable } from 'rxjs';
 import { RouterLink } from '@angular/router';
 import { Certificate } from '@app/certificate';
+import { Service } from '@app/service';
 
 @Component({
   selector: 'app-profile.component',
@@ -28,6 +29,7 @@ export class ProfileComponent
 
   currentUser: User | null = null;
   certificates: Certificate[] | null = null;
+  services: Service[] | null = null;
 
   ngOnInit()
   {
@@ -62,8 +64,19 @@ export class ProfileComponent
       this.http.get<Certificate[]>(`${environment.apiUrl}/certificate/${decodedToken.sub}`).subscribe(
         (response) =>
         {
-          console.log(response);
           this.certificates = response;
+        },
+        (error) =>
+        {
+          console.log(error);
+        }
+      )
+
+      this.http.get<Service[]>(`${environment.apiUrl}/service/user/${decodedToken.sub}`).subscribe(
+        (response) =>
+        {
+          this.services = response;
+          console.log(response)
         },
         (error) =>
         {

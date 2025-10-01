@@ -36,10 +36,16 @@
 
         <h2>Services</h2>
         <div class="services">
-            <div class="service">Full-Stack Development</div>
+
+            @for (service of services; track $index) 
+            {
+                <div class="service">{{ service.name }}</div>
+            }
+
+            <!-- <div class="service">Full-Stack Development</div>
             <div class="service">Cloud Architecture</div>
             <div class="service">Mobile Development</div>
-            <div class="service">DevOps & Security</div>
+            <div class="service">DevOps & Security</div> -->
         </div>
     </div>
 </div>
