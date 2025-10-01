@@ -28,7 +28,7 @@ a {
 .main {
     flex: 1;
     padding: 2rem 3rem;
-    overflow-y: auto;
+
 }
 
 /* Header */

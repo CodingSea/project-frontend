@@ -5,10 +5,11 @@ import { User } from '@app/user';
 import { environment } from '@environments/environment';
 import { jwtDecode } from 'jwt-decode';
 import { Observable } from 'rxjs';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-profile.component',
-  imports: [ Sidebar ],
+  imports: [ Sidebar, RouterLink ],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.css'
 })
@@ -32,9 +33,6 @@ export class ProfileComponent
     if (token !== null) 
     {
       const decodedToken: any = jwtDecode(token)
-      this.currentUserInfo.username = decodedToken.first_name + " " + decodedToken.last_name;
-      this.currentUserInfo.email = decodedToken.email;
-
       if (decodedToken.role === "admin")
       {
         this.currentUserInfo.role = "Admin";
@@ -44,14 +42,14 @@ export class ProfileComponent
         this.currentUserInfo.role = "Developer";
       }
 
-      console.log(decodedToken)
-
       this.http.get<User>(`${environment.apiUrl}/user/${decodedToken.sub}`).subscribe(
         (response) =>
         {
           this.currentUser = response;
+
+          this.currentUserInfo.username = this.currentUser.first_name + " " + this.currentUser.last_name;
+          this.currentUserInfo.email = this.currentUser.email;
           this.currentUserInfo.skills = this.currentUser.skills;
-          console.log(this.currentUserInfo.skills)
         },
         (error) =>
         {

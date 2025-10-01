@@ -5,8 +5,8 @@ export interface User
     last_name: string,
     email: string,
     password: string,
-    role: string
-    profileImage: string
-    profileImageID: string
+    role: string,
+    profileImage: string,
+    profileImageID: string,
     skills: string[]
 }
