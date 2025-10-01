@@ -6,6 +6,7 @@ import { Dashboard } from './dashboard/dashboard';
 import { AuthGuard } from './auth/auth-guard';
 import { ProfileComponent } from './profile.component/profile.component';
 import { ProfileEditComponent } from './profile.edit.component/profile.edit.component';
+import { CertificateCreateComponent } from './certificate.create.component/certificate.create.component';
 
 export const routes: Routes = [
     { path: "", redirectTo: 'auth/signup', pathMatch: "full" },
@@ -13,6 +14,7 @@ export const routes: Routes = [
     { path: 'dashboard', component: Dashboard, canActivate: [AuthGuard] },
     { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard] },
     { path: 'profile/edit', component: ProfileEditComponent, canActivate: [AuthGuard] },
+    { path: 'certificate/new', component: CertificateCreateComponent, canActivate: [AuthGuard] },
     { path: '**', component: UserComponent }
 ];
 

@@ -72,7 +72,7 @@ export class ProfileEditComponent
   {
     while (this.skills.length !== 0)
     {
-      this.skills.removeAt(0); // Clear all skills
+      this.skills.removeAt(0);
     }
   }
 

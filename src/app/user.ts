@@ -8,5 +8,6 @@ export interface User
     role: string,
     profileImage: string,
     profileImageID: string,
-    skills: string[]
+    skills: string[],
+    
 }
