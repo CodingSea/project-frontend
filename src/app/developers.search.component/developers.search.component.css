@@ -43,6 +43,15 @@ body {
     gap: 10px;
 }
 
+.filter-section input
+{
+    width: 80%;
+    height: 3em;
+    margin: 0 auto;
+    border-radius: 5px;
+    border: 1px solid #D1D5DB;
+}
+
 .filter-section select,
 .clear-button {
     padding: 10px;
@@ -154,4 +163,9 @@ button:hover
     padding: 10px;
     cursor: pointer;
     border-radius: 5px;
+}
+
+.status-div
+{
+    height: 2em;
 }
