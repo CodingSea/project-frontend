@@ -3,7 +3,7 @@
 <div class="container">
     <header class="header">
         <h1>DevHub</h1>
-        <button class="add-button-main">+ Add Developer</button>
+        <!-- <button class="add-button-main">+ Add Developer</button> -->
     </header>
 
     <div class="filter-section">
@@ -31,12 +31,18 @@
             <div class="card">
                 <img src="images/user.png" alt="profile image">
                 <h3>{{developer.first_name}} {{developer.last_name}}</h3>
-                <!-- <p>Senior Full-Stack Developer</p> -->
 
                 <div class="skill-list">
                     @for (skill of developer.skills; track $index)
                     {
-                        <p class="skill">{{skill}}</p>
+                        @if($index < 3)
+                        {
+                            <p class="skill">{{skill}}</p>
+                        }
+                        @else 
+                        {
+                            <p class="skill">etc...</p>
+                        }
                     }
                 </div>
 
