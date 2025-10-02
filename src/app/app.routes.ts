@@ -13,6 +13,7 @@ export const routes: Routes = [
     { path: "auth/:mode", component: UserComponent },
     { path: 'dashboard', component: Dashboard, canActivate: [AuthGuard] },
     { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard] },
+    { path: 'profile/user/:userId', component: ProfileComponent, canActivate: [AuthGuard] },
     { path: 'profile/edit', component: ProfileEditComponent, canActivate: [AuthGuard] },
     { path: 'certificate/new', component: CertificateCreateComponent, canActivate: [AuthGuard] },
     { path: '**', component: UserComponent }
