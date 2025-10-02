@@ -1,0 +1,58 @@
+<app-sidebar />
+
+<div class="container">
+    <header class="header">
+        <h1>DevHub</h1>
+        <button class="add-button-main">+ Add Developer</button>
+    </header>
+
+    <div class="filter-section">
+        <select>
+            <option>All Skills</option>
+            <option>JavaScript</option>
+            <option>Python</option>
+            <option>Java</option>
+        </select>
+        <select>
+            <option>All Status</option>
+            <option>Available</option>
+            <option>Busy</option>
+            <option>Offline</option>
+        </select>
+        <button class="clear-button">Clear all</button>
+    </div>
+
+    <div class="developer-count">{{developers?.length}} Developers Found</div>
+
+    <div class="developer-cards">
+
+        @for (developer of developers; track $index)
+        {
+            <div class="card">
+                <img src="images/user.png" alt="profile image">
+                <h3>{{developer.first_name}} {{developer.last_name}}</h3>
+                <!-- <p>Senior Full-Stack Developer</p> -->
+
+                <div class="skill-list">
+                    @for (skill of developer.skills; track $index)
+                    {
+                        <p class="skill">{{skill}}</p>
+                    }
+                </div>
+
+                <p>Status: <span class="status busy">Busy</span></p>
+                <div class="card-btns">
+                    <button class="profile-button" (click)="viewProfile(developer.id)">View Profile</button>
+                    <button class="add-button">+</button>
+                </div>
+            </div>
+        }
+
+        
+    </div>
+
+    <div class="pagination">
+        <button class="page-button">1</button>
+        <button class="page-button">2</button>
+    </div>
+</div>

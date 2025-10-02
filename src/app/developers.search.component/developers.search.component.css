@@ -1,0 +1,156 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #f9f9f9;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.add-button {
+    background-color: #C21A25;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.add-button-main {
+    background-color: #C21A25;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.filter-section {
+    margin: 20px 0;
+    display: flex;
+    gap: 10px;
+}
+
+.filter-section select,
+.clear-button {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.developer-count {
+    margin: 20px 0;
+    font-weight: bold;
+}
+
+.developer-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.card {
+    background-color: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    
+}
+
+.skill-list
+{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3em;
+}
+
+.skill
+{
+    border: 1px solid black;
+    padding: 0.3em;
+    border-radius: 5px;
+}
+
+.card-btns
+{
+    text-align: center;
+}
+
+button:hover
+{
+    filter: brightness(0.7);
+}
+
+.card img
+{
+    width: 50px;
+    text-align: start;
+}
+
+.card h3 {
+    margin: 10px 0;
+}
+
+.status {
+    font-weight: bold;
+}
+
+.status.busy {
+    color: red;
+}
+
+.status.available {
+    color: green;
+}
+
+.status.offline {
+    color: gray;
+}
+
+.profile-button {
+    background-color: #C21A25;
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 5px;
+    margin: auto 5px;
+    aspect-ratio: 2 / 1;
+}
+
+.add-button
+{
+    aspect-ratio: 1 / 1;
+    background-color: #ffffff;
+    color: black;
+    border: solid 1px #D1D5DB;
+}
+
+.pagination {
+    margin: 20px 0;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.page-button {
+    border: 1px solid #C21A25;
+    background-color: white;
+    color: #C21A25;
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 5px;
+}

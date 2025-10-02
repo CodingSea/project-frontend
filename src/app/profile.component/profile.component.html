@@ -29,7 +29,10 @@
 
         <h2>Certificates</h2>
         <div class="certificates">
-            <button class="edit-button" routerLink="/certificate/new">+</button>
+            @if(isCurrentUser == true)
+            {
+                <button class="edit-button" routerLink="/certificate/new">+</button>
+            }
 
             @for (c of certificates; track $index) 
             {
