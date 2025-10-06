@@ -8,6 +8,7 @@ import { ProfileComponent } from './profile.component/profile.component';
 import { ProfileEditComponent } from './profile.edit.component/profile.edit.component';
 import { CertificateCreateComponent } from './certificate.create.component/certificate.create.component';
 import { DevelopersSearchComponent } from './developers.search.component/developers.search.component';
+import { ServiceTasksComponent } from './service.tasks.component/service.tasks.component';
 
 export const routes: Routes = [
     { path: "", redirectTo: 'auth/signup', pathMatch: "full" },
@@ -18,6 +19,7 @@ export const routes: Routes = [
     { path: 'profile/edit', component: ProfileEditComponent, canActivate: [ AuthGuard ] },
     { path: 'certificate/new', component: CertificateCreateComponent, canActivate: [ AuthGuard ] },
     { path: 'developers', component: DevelopersSearchComponent, canActivate: [ AuthGuard ], data: { onlyAdmin: true } },
+    { path: 'kanban', component: ServiceTasksComponent, canActivate: [ AuthGuard ] },
     { path: '**', component: UserComponent }
 ];
 
