@@ -12,12 +12,12 @@ import { DevelopersSearchComponent } from './developers.search.component/develop
 export const routes: Routes = [
     { path: "", redirectTo: 'auth/signup', pathMatch: "full" },
     { path: "auth/:mode", component: UserComponent },
-    { path: 'dashboard', component: Dashboard, canActivate: [AuthGuard] },
-    { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard] },
-    { path: 'profile/user/:userId', component: ProfileComponent, canActivate: [AuthGuard] },
-    { path: 'profile/edit', component: ProfileEditComponent, canActivate: [AuthGuard] },
-    { path: 'certificate/new', component: CertificateCreateComponent, canActivate: [AuthGuard] },
-    { path: 'developers', component: DevelopersSearchComponent, canActivate: [AuthGuard] },
+    { path: 'dashboard', component: Dashboard, canActivate: [ AuthGuard ], data: { onlyAdmin: true } },
+    { path: 'profile', component: ProfileComponent, canActivate: [ AuthGuard ] },
+    { path: 'profile/user/:userId', component: ProfileComponent, canActivate: [ AuthGuard ] },
+    { path: 'profile/edit', component: ProfileEditComponent, canActivate: [ AuthGuard ] },
+    { path: 'certificate/new', component: CertificateCreateComponent, canActivate: [ AuthGuard ] },
+    { path: 'developers', component: DevelopersSearchComponent, canActivate: [ AuthGuard ], data: { onlyAdmin: true } },
     { path: '**', component: UserComponent }
 ];
 
