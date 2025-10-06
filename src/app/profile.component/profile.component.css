@@ -64,7 +64,7 @@ body {
 }
 
 .edit-button:hover {
-    background-color: #890009;
+    /* background-color: #890009; */
 }
 
 .certificates, .services {
