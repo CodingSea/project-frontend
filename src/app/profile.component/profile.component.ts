@@ -32,7 +32,7 @@ export class ProfileComponent
   ngOnInit()
   {
     const token: string | null = localStorage.getItem("token");
-    if (token !== null) 
+    if (token !== null)
     {
       const decodedToken: any = jwtDecode(token)
       if (decodedToken.role === "admin")

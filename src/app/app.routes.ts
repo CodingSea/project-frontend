@@ -7,9 +7,15 @@ import { AuthGuard } from './auth/auth-guard';
 import { ProfileComponent } from './profile.component/profile.component';
 import { ProfileEditComponent } from './profile.edit.component/profile.edit.component';
 import { CertificateCreateComponent } from './certificate.create.component/certificate.create.component';
+import { HomePage } from './home-page/home-page';
+import { ProjectManagement } from './project-management/project-management';
+import { ServiceFormComponent } from './service-form/service-form.component';
 
 export const routes: Routes = [
-    { path: "", redirectTo: 'auth/signup', pathMatch: "full" },
+  { path: 'home', component: HomePage, title: 'Home' ,canActivate: [AuthGuard]},
+  { path: 'project-management', component: ProjectManagement, canActivate: [AuthGuard] },
+  { path: 'services', component: ServiceFormComponent, canActivate: [AuthGuard] },
+  { path: "", redirectTo: 'auth/signup', pathMatch: "full" },
     { path: "auth/:mode", component: UserComponent },
     { path: 'dashboard', component: Dashboard, canActivate: [AuthGuard] },
     { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard] },

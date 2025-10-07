@@ -9,10 +9,11 @@ import { AuthService } from './auth';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { JwtInterceptor } from './auth/jwt-interceptor';
 import { Sidebar } from './sidebar/sidebar';
+import { HeaderComponent } from './header/header';
 
 @Component({
   selector: 'app-root',
-  imports: [ CommonModule, RouterOutlet],
+  imports: [ CommonModule, RouterOutlet,Sidebar,HeaderComponent],
   templateUrl: './app.html',
   styleUrl: './app.css',
   providers: [
@@ -26,5 +27,5 @@ import { Sidebar } from './sidebar/sidebar';
 })
 export class App
 {
-  
+
 }
