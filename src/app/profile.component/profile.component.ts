@@ -87,7 +87,14 @@ export class ProfileComponent
         this.http.get<Service[]>(`${environment.apiUrl}/service/user/${userId}`).subscribe(
           (response) =>
           {
-            this.services = response;
+            if(response.length === 0)
+            {
+              console.log("no services found")
+            }
+            else
+            {
+              this.services = response;
+            }
           },
           (error) =>
           {
