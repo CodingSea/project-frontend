@@ -1,72 +1,116 @@
 .main-content {
-    flex: 1;
+  flex: 1;
 }
 
-.sidebar-placement
-{
-    width: 220px;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    padding: 1.5rem 1rem;
-    float: left;
+/* sidebar.css */
+.sidebar-placement{
+  width: var(--sidebar-w);
+  height: calc(100vh - var(--header-offset));
+  display: flex;
+  flex-direction: column;
 }
 
-.sidebar {
-    width: 220px;
-    background-color: white;
-    border-right: 1px solid #e5e7eb;
-    display: flex;
-    flex-direction: column;
-    position: fixed;
+.sidebar{
+  position: fixed;
+  left: var(--page-gutter);
+  top: var(--header-offset);                  /* starts RIGHT under header */
+  height: calc(100vh - var(--header-offset));
+  width: var(--sidebar-w);
+  background: #fff;
+  z-index: 900;
+  border: 1px solid #f3f4f6;
+  box-shadow: 0 1px 0 rgba(0,0,0,.02), 0 6px 16px rgba(0,0,0,.04);
+
 }
 
+
+/* Logo */
 .sidebar .logo {
-    font-weight: 700;
-    font-size: 1.25rem;
-    margin-bottom: 2rem;
-    color: #C21A25;
-    display: flex;
-    align-items: center;
+  font-weight: 700;
+  font-size: 1.25rem;
+  margin-bottom: 2rem;
+  color: #111827; /* dark text */
+  display: none;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Add red square like image */
+.sidebar .logo::before {
+  content: "";
+  display: inline-block;
+  width: 32px;
+  height: 32px;
+  background: #b91c1c;
+  border-radius: 8px;
+}
+
+/* Navigation */
+.sidebar nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
 }
 
 .sidebar nav a {
-    display: flex;
-    align-items: center;
-    padding: 0.7rem 1rem;
-    margin-bottom: 0.5rem;
-    border-radius: 0.375rem;
-    font-weight: 600;
-    color: #374151;
-    transition: background-color 0.3s;
-}
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  font-size: 0.95rem;
+  color: #4b5563; /* gray */
+  transition: 0.3s;
+  text-decoration: none;  /* remove underline */
 
-.sidebar nav a.active,
-.sidebar nav a:hover {
-    background-color: #C21A25;
-    color: white;
 }
 
 .sidebar nav a svg {
-    margin-right: 0.75rem;
-    fill: currentColor;
-    width: 18px;
-    height: 18px;
+  margin-right: 0.75rem;
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
 }
 
-.sidebar .logout {
-    margin-top: auto;
-    padding: 1rem;
-    font-weight: 600;
-    color: #6b7280;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
+/* Active + hover */
+.sidebar nav a.active {
+  background-color: #b91c1c; /* red background */
+  color: #ffffff;
+  font-weight: 600;
 }
+
+.sidebar nav a.active svg {
+  fill: #ffffff;
+}
+
+.sidebar nav a:hover {
+  background: #f3f4f6; /* light gray on hover */
+  color: #111827;
+}
+
+/* Logout */
+.sidebar .logout {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 12px;              /* distance from bottom edge */
+  padding: 1rem 16px;
+  border-top: 1px solid #f3f4f6;
+  display: flex;
+  align-items: center;
+}
+
 
 .sidebar .logout svg {
-    margin-right: 0.5rem;
-    width: 18px;
-    height: 18px;
-    fill: #6b7280;
+  margin-right: 0.5rem;
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
 }
+
+.sidebar .logout:hover {
+  background: #f3f4f6;
+  border-radius: 0.5rem;
+  color: #111827;
+}
+

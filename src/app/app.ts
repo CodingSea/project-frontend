@@ -11,10 +11,11 @@ import { JwtInterceptor } from './auth/jwt-interceptor';
 import { Sidebar } from './sidebar/sidebar';
 import { jqxKanbanModule } from 'jqwidgets-ng/jqxkanban';
 import { ServiceTasksComponent } from './service.tasks.component/service.tasks.component';
+import { HeaderComponent } from './header/header';
 
 @Component({
   selector: 'app-root',
-  imports: [ CommonModule, RouterOutlet, jqxKanbanModule],
+  imports: [ CommonModule, RouterOutlet, jqxKanbanModule, Sidebar, HeaderComponent ],
   templateUrl: './app.html',
   styleUrl: './app.css',
   providers: [
@@ -28,5 +29,5 @@ import { ServiceTasksComponent } from './service.tasks.component/service.tasks.c
 })
 export class App
 {
-  
+
 }
