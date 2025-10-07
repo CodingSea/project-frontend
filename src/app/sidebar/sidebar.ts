@@ -1,10 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '@app/auth';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-sidebar',
-  imports: [ RouterLink ],
+  standalone: true,
+  imports: [ RouterLink ,RouterModule],
   templateUrl: './sidebar.html',
   styleUrl: './sidebar.css'
 })
@@ -32,15 +34,15 @@ export class Sidebar implements OnInit
     if (url.includes('/dashboard'))
     {
       this.activeLink = 'dashboard';
-    } 
+    }
     else if (url.includes('/auth/login'))
     {
       this.activeLink = 'projectManagement';
-    } 
+    }
     else if (url.includes('/profile'))
     {
       this.activeLink = 'profile';
-    } 
+    }
     else
     {
       this.activeLink = '';

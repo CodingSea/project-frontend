@@ -35,6 +35,8 @@ export class ProfileComponent
 
   ngOnInit()
   {
+    const token: string | null = localStorage.getItem("token");
+    if (token !== null)
     this.activatedRoute.queryParamMap.subscribe((params: ParamMap) =>
     {
       if (this.activatedRoute.snapshot.paramMap.has("userId"))

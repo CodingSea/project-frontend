@@ -2,3 +2,26 @@
     display: flex;
     height: 100vh;
 }
+/* app.css or your layout css */
+/* FULLY ANCHORED CONTENT PANE */
+/* content area: directly under header, immediately right of sidebar */
+/* content area: directly under header, immediately right of sidebar */
+.content{
+  position: fixed;
+  top: var(--header-offset);                          /* sits right under header */
+  left: calc(var(--page-gutter) + var(--sidebar-w));  /* immediately right of sidebar */
+  right: var(--page-gutter);                          /* same right gutter as header */
+  bottom: 0;                                          /* fill to bottom */
+  overflow: auto;                                     /* scroll page content */
+  padding: 0 0 24px 0;                                /* no top padding */
+}
+
+/* optional: avoid extra jump on first heading */
+.content > *:first-child{ margin-top: 0 !important; }
+
+
+
+
+.content h1{ margin-top: 0; }
+
+
