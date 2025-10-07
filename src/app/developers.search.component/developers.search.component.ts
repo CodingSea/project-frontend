@@ -30,7 +30,6 @@ export class DevelopersSearchComponent implements OnInit
       switchMap(searchTerm => this.getDevelopers(searchTerm)) // Call the service
     ).subscribe(
       (response) => {
-        console.log(response);
         this.filteredDevelopers = response;
       },
       (error) => {
