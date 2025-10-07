@@ -2,12 +2,14 @@ import { CommonModule } from '@angular/common';
 import { AfterViewInit, ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { jqxKanbanComponent, jqxKanbanModule } from "jqwidgets-ng/jqxkanban";
 import { jqxSplitterModule } from 'jqwidgets-ng/jqxsplitter';
+import { AddTaskPopup } from '@app/add-task-popup/add-task-popup';
+import { TaskPopup } from '@app/task-popup/task-popup';
 
 @Component({
   selector: 'app-service-tasks',
   templateUrl: './service.tasks.component.html',
   styleUrls: [ './service.tasks.component.css' ],
-  imports: [ jqxKanbanModule, jqxSplitterModule, CommonModule ]
+  imports: [ jqxKanbanModule, jqxSplitterModule, CommonModule, AddTaskPopup, TaskPopup ]
 })
 export class ServiceTasksComponent implements OnInit, AfterViewInit 
 {
@@ -15,8 +17,13 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
 
   showKanban = true;
 
-  data: any[] = []; // Local data array for tasks
-  dataAdapter: any; // Data adapter for Kanban
+  data: any[] = [];
+  dataAdapter: any;
+  showPopup: boolean = false;
+  showTaskDetailPopup = false;
+  selectedTask: any;
+  dragInProgress = false;
+  dragCooldown = false;
 
   columns: any[] = [
     { text: 'Backlog', dataField: 'new', minWidth: 150 },
@@ -28,21 +35,79 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
 
   ngOnInit()
   {
-    // Initialize the data array with some default tasks
     this.data = [
       { id: '1', status: 'new', text: 'Task 1', tags: 'tag1' },
       { id: '2', status: 'work', text: 'Task 2', tags: 'tag2' },
-      { id: '3', status: 'done', text: 'Task 3', tags: 'tag1,tag2' }
+      { id: '3', status: 'done', text: 'Task 3', tags: 'tag1,tag2' },
+      { id: '3', status: 'done', text: 'Task 4', tags: 'css,html' }
     ];
 
-    // Initialize the dataAdapter
     this.initializeKanbanDataSource();
   }
 
   ngAfterViewInit()
   {
-    // Set the initial source for the Kanban
     this.initializeKanbanDataSource();
+  }
+
+  openTaskDetailPopup(item: any)
+  {
+    if (this.dragInProgress || this.dragCooldown)
+    {
+      return;
+    }
+
+    this.selectedTask = item;
+    this.showTaskDetailPopup = true;
+  }
+
+  onItemMoved(event: any): void
+  {
+    this.dragInProgress = true;
+    this.dragCooldown = true;
+
+    setTimeout(() =>
+    {
+      this.dragInProgress = false;
+    }, 0);
+
+    setTimeout(() =>
+    {
+      this.dragCooldown = false;
+    }, 300);
+  }
+
+  closeTaskDetailPopup()
+  {
+    this.showTaskDetailPopup = false;
+    this.selectedTask = null;
+  }
+
+  openPopup()
+  {
+    this.showPopup = true;
+  }
+
+  closePopup()
+  {
+    this.showPopup = false;
+  }
+
+  onTaskAdded(task: { text: string; tags: string })
+  {
+    const newTask = {
+      id: (this.data.length + 1).toString(),
+      status: 'new',
+      text: task.text,
+      tags: task.tags
+    };
+
+    this.data.push(newTask);
+    this.dataAdapter.localdata = this.data;
+    this.rebuildKanban();
+    this.kanban.source = this.dataAdapter;
+    this.closePopup();
+    this.cdr.detectChanges();
   }
 
   initializeKanbanDataSource(): void
@@ -53,38 +118,41 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
       dataFields: [
         { name: 'id', type: 'string' },
         { name: 'status', type: 'string' },
-        { name: 'text', type: 'string' }
+        { name: 'text', type: 'string' },
+        { name: 'tags', type: 'string' }
       ]
     });
   }
 
-  addTask(column: string, taskText: string)
+  addTask(column: string, taskText: string, tagsText: string)
   {
     const newTask = {
-      id: (this.data.length + 1).toString(), // Generate a new ID
-      status: column, // Set the state to the column
-      text: taskText
+      id: (this.data.length + 1).toString(),
+      status: column,
+      text: taskText,
+      tags: tagsText
     };
 
-    // Update the local data array
     this.data.push(newTask);
-    console.log('Current Data after adding task:', this.data); // Log updated data
+    console.log('Current Data after adding task:', this.data);
 
-    // Update the dataAdapter's localData to reflect the new data
-    this.dataAdapter.localdata = this.data; // Update the local data of the dataAdapter
+    this.dataAdapter.localdata = this.data;
     this.rebuildKanban();
+
+    this.closePopup();
   }
 
-  rebuildKanban() {
-    if (this.kanban) {
-      this.kanban.destroy(); // fully destroy the instance
+  rebuildKanban()
+  {
+    if (this.kanban)
+    {
+      this.kanban.destroy();
     }
 
-    // Hide and show the Kanban again after a tick to reinsert it into DOM
     this.showKanban = false;
 
-    // Allow Angular to process *ngIf change
-    setTimeout(() => {
+    setTimeout(() =>
+    {
       this.dataAdapter = new jqx.dataAdapter(this.dataAdapter);
       this.showKanban = true;
     }, 0);
