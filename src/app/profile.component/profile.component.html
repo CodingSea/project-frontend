@@ -13,7 +13,10 @@
         </div>
 
         <br>
-        <button class="edit-button" routerLink="/profile/edit">Edit Profile</button>
+        @if(isCurrentUser == true)
+        {
+            <button class="edit-button" routerLink="/profile/edit">Edit Profile</button>
+        }
 
         <h2>Skill Tags</h2>
         <div class="certificates">
@@ -26,7 +29,10 @@
 
         <h2>Certificates</h2>
         <div class="certificates">
-            <button class="edit-button" routerLink="/certificate/new">+</button>
+            @if(isCurrentUser == true)
+            {
+                <button class="edit-button" routerLink="/certificate/new">+</button>
+            }
 
             @for (c of certificates; track $index) 
             {
@@ -36,10 +42,10 @@
 
         <h2>Services</h2>
         <div class="services">
-            <div class="service">Full-Stack Development</div>
-            <div class="service">Cloud Architecture</div>
-            <div class="service">Mobile Development</div>
-            <div class="service">DevOps & Security</div>
+            @for (service of services; track $index) 
+            {
+                <div class="service">{{ service.name }}</div>
+            }
         </div>
     </div>
 </div>

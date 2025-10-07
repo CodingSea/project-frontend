@@ -78,7 +78,7 @@ export class UserComponent
     const password = this.loginForm.value.password ?? '';
 
     this.authService.login(email, password).subscribe({
-      next: () => this.router.navigate([ '/dashboard' ]),
+      next: () => this.router.navigate([ '/profile' ]),
       error: (err) =>
       {
         console.error(err);
