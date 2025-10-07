@@ -15,23 +15,23 @@ import { ServiceTasksComponent } from './service.tasks.component/service.tasks.c
 
 
 export const routes: Routes = [
-  { path: 'home', component: HomePage, title: 'Home' ,canActivate: [AuthGuard]},
-  { path: 'project-management', component: ProjectManagement, canActivate: [AuthGuard] },
-  { path: 'services', component: ServiceFormComponent, canActivate: [AuthGuard] },
   { path: "", redirectTo: 'auth/signup', pathMatch: "full" },
-    { path: "auth/:mode", component: UserComponent },
-    { path: 'dashboard', component: Dashboard, canActivate: [ AuthGuard ], data: { onlyAdmin: true } },
-    { path: 'profile', component: ProfileComponent, canActivate: [ AuthGuard ] },
-    { path: 'profile/user/:userId', component: ProfileComponent, canActivate: [ AuthGuard ] },
-    { path: 'profile/edit', component: ProfileEditComponent, canActivate: [ AuthGuard ] },
-    { path: 'certificate/new', component: CertificateCreateComponent, canActivate: [ AuthGuard ] },
-    { path: 'developers', component: DevelopersSearchComponent, canActivate: [ AuthGuard ], data: { onlyAdmin: true } },
-    { path: 'kanban', component: ServiceTasksComponent, canActivate: [ AuthGuard ] },
-    { path: '**', component: UserComponent }
+  { path: 'home', component: HomePage, title: 'Home', canActivate: [ AuthGuard ] },
+  { path: 'project-management', component: ProjectManagement, canActivate: [ AuthGuard ] },
+  { path: 'services', component: ServiceFormComponent, canActivate: [ AuthGuard ] },
+  { path: "auth/:mode", component: UserComponent },
+  { path: 'dashboard', component: Dashboard, canActivate: [ AuthGuard ], data: { onlyAdmin: true } },
+  { path: 'profile', component: ProfileComponent, canActivate: [ AuthGuard ] },
+  { path: 'profile/user/:userId', component: ProfileComponent, canActivate: [ AuthGuard ] },
+  { path: 'profile/edit', component: ProfileEditComponent, canActivate: [ AuthGuard ] },
+  { path: 'certificate/new', component: CertificateCreateComponent, canActivate: [ AuthGuard ] },
+  { path: 'developers', component: DevelopersSearchComponent, canActivate: [ AuthGuard ], data: { onlyAdmin: true } },
+  { path: 'kanban', component: ServiceTasksComponent, canActivate: [ AuthGuard ] },
+  { path: '**', component: UserComponent }
 ];
 
 @NgModule({
-    imports: [ BrowserModule, RouterModule.forRoot(routes) ],
-    exports: [ RouterModule ],
+  imports: [ BrowserModule, RouterModule.forRoot(routes) ],
+  exports: [ RouterModule ],
 })
 export class RoutingModule { }

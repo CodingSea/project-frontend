@@ -10,42 +10,4 @@ button:hover
 {
     filter: brightness(0.7);
 }
-/* RESET */
-html, body { height: 100%; margin: 0; padding: 0; }
-* { box-sizing: border-box; font-family: Arial, sans-serif; }
-
-/* LAYOUT VARS */
-:root{
-  --sidebar-w: 220px;
-  --page-gutter: 16px;
-
-  /* header sizing */
-  --header-card-h: 72px;   /* adjust 68/70/74 if needed */
-  --header-pt: 12px;       /* top padding around the header card */
-  --header-pb: 0px;        /* bottom padding (0 = no gap) */
-
-  /* computed header offset used by sidebar/content */
-  --header-offset: calc(var(--header-card-h) + var(--header-pt) + var(--header-pb));
-}
-
-/* ROUTED PAGE: remove any top spacing + left container padding/margins */
-/* Host element of whatever is rendered after <router-outlet> */
-/* The host element of the routed component */
-main.content > router-outlet + * {
-  display: block;
-  margin-top: 0 !important;
-  padding-top: 0 !important;
-}
-
-/* Whatever the first child is inside that routed component (h1, div, section...) */
-main.content > router-outlet + * > :first-child {
-  margin-top: 0 !important;
-  padding-top: 0 !important;
-}
-
-/* Safety: if the first child contains a heading, make sure it's flush too */
-main.content > router-outlet + * :is(h1,h2,h3,h4,p):first-child {
-  margin-top: 0 !important;
-}
-
 
