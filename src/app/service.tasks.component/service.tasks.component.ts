@@ -8,12 +8,13 @@ import { HttpClient } from '@angular/common/http';
 import { TaskCard } from '@app/task-card';
 import { environment } from '@environments/environment';
 import { TaskBoard } from '@app/task-board';
+import { Sidebar } from "@app/sidebar/sidebar";
 
 @Component({
   selector: 'app-service-tasks',
   templateUrl: './service.tasks.component.html',
   styleUrls: [ './service.tasks.component.css' ],
-  imports: [ jqxKanbanModule, jqxSplitterModule, CommonModule, AddTaskPopup, TaskPopup ]
+  imports: [jqxKanbanModule, jqxSplitterModule, CommonModule, AddTaskPopup, TaskPopup, Sidebar]
 })
 
 export class ServiceTasksComponent implements OnInit, AfterViewInit 

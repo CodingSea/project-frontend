@@ -1,3 +1,9 @@
+.container
+{
+  display: flex;
+  width: 100%;
+}
+
 .div_33-96 {
   position: relative;
   box-sizing: border-box;
@@ -9,8 +15,6 @@
   height: 878px;
 }
 .div_33-97 {
-  top: 32px;
-  left: 32px;
   position: absolute;
   display: flex;
   box-sizing: border-box;
@@ -22,8 +26,6 @@
   height: 106px;
 }
 .div_33-98 {
-  top: 0px;
-  left: 0px;
   position: absolute;
   display: flex;
   box-sizing: border-box;
@@ -50,8 +52,6 @@
   height: 56px;
 }
 .div_33-100 {
-  top: 0px;
-  left: 0px;
   position: absolute;
   display: flex;
   box-sizing: border-box;
@@ -551,7 +551,6 @@
 
 .div_33-138 {
   top: 170px;
-  left: 32px;
   position: absolute;
   display: flex;
   box-sizing: border-box;
@@ -2133,9 +2132,7 @@
 /* Center the page content within the .content area */
 .pm-container{
   width: 100%;
-  max-width: 1200px;        /* pick 1100–1280 as you like */
-  margin: 0 auto;           /* <-- centers horizontally */
-  padding: 8px 16px 24px;   /* tiny gap under header + side padding for small screens */
+  max-width: 1200px;        /* pick 1100–1280 as you like */         /* <-- centers horizontally */
 }
 .select_33-142,
 .button_33-146 {
