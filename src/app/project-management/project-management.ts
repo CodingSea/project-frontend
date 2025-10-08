@@ -1,12 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ProjectService, Project } from '@app/services/project.service'; // ✅ use one Project type
+import { ProjectService, Project } from '@app/services/project.service';
+import { Sidebar } from "@app/sidebar/sidebar"; // ✅ use one Project type
 
 @Component({
   selector: 'app-project-management',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, Sidebar],
   templateUrl: './project-management.html',
   styleUrls: ['./project-management.scss'] // ✅ plural
 })
