@@ -99,11 +99,6 @@ body {
     text-align: center;
 }
 
-button:hover
-{
-    filter: brightness(0.7);
-}
-
 .card img
 {
     width: 50px;

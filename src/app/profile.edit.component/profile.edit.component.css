@@ -107,7 +107,3 @@ input[type="text"] {
     border-radius: 4px;
     cursor: pointer;
 }
-
-.save-button:hover {
-    background-color: #45a049;
-}

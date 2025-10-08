@@ -1,0 +1,43 @@
+<div class="kanban-container">
+  <header class="kanban-header">
+    <h1>Government Portal Redesign</h1>
+    <div class="header-info">
+      <p>Led by: Sara Al-Mahmood</p>
+      <p>Started: Jan 15, 2025</p>
+      <p>Project Progress: <strong>78%</strong></p>
+    </div>
+    <div class="header-actions">
+      <button class="add-task" (click)="openPopup()">Add Task</button>
+      <button class="filter">Filter</button>
+    </div>
+  </header>
+
+  <!-- <div>
+    <h3>Add Task</h3>
+    <input type="text" placeholder="Task Text" #taskInput />
+    <input type="text" placeholder="Tags (comma-separated)" #tagsInput />
+    <button (click)="addTask('new', taskInput.value, tagsInput.value)">Add to Backlog</button>
+    <button (click)="addTask('work', taskInput.value, tagsInput.value)">Add to In Progress</button>
+    <button (click)="addTask('done', taskInput.value, tagsInput.value)">Add to Done</button>
+  </div> -->
+
+  <div *ngIf="showKanban">
+    <jqxKanban #kanbanReference 
+    [width]="'100%'" 
+    [height]="'500px'" 
+    [columns]="columns" 
+    [source]="dataAdapter" 
+    (onItemAttrClicked)="openTaskDetailPopup($event.args.item)"
+    (onItemMoved)="onItemMoved($event)"
+    >
+    </jqxKanban>
+  </div>
+
+  <add-task-popup *ngIf="showPopup" (taskAdded)="onTaskAdded($event)" (close)="closePopup()"></add-task-popup>
+
+  <task-popup *ngIf="showTaskDetailPopup" 
+                     [task]="selectedTask" 
+                     (close)="closeTaskDetailPopup()">
+  </task-popup>
+
+</div>

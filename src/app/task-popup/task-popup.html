@@ -1,0 +1,14 @@
+<div class="popup">
+    <h2>{{ task?.text }}</h2>
+    <p><strong>Description:</strong> {{ task?.description }}</p>
+
+    <h3>Comments</h3>
+    <textarea rows="4" placeholder="Add a comment..."></textarea>
+
+    <h3>Tags</h3>
+    <p>{{ task?.tags }}</p>
+
+    <div class="popup-actions">
+        <button (click)="closePopup()">Close</button>
+    </div>
+</div>

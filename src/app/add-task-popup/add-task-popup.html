@@ -1,0 +1,9 @@
+<div class="popup-overlay">
+    <div class="popup">
+        <h3>Add Task</h3>
+        <input type="text" placeholder="Task Text" [(ngModel)]="taskText" />
+        <input type="text" placeholder="Tags (comma-separated)" [(ngModel)]="tagsText" />
+        <button (click)="addTask()">Add Task</button>
+        <button (click)="closePopup()">Cancel</button>
+    </div>
+</div>

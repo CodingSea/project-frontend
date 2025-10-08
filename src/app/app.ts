@@ -9,11 +9,12 @@ import { AuthService } from './auth';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { JwtInterceptor } from './auth/jwt-interceptor';
 import { Sidebar } from './sidebar/sidebar';
-import { HeaderComponent } from './header/header';
+import { jqxKanbanModule } from 'jqwidgets-ng/jqxkanban';
+import { ServiceTasksComponent } from './service.tasks.component/service.tasks.component';
 
 @Component({
   selector: 'app-root',
-  imports: [ CommonModule, RouterOutlet,Sidebar,HeaderComponent],
+  imports: [ CommonModule, RouterOutlet, jqxKanbanModule],
   templateUrl: './app.html',
   styleUrl: './app.css',
   providers: [
@@ -27,5 +28,5 @@ import { HeaderComponent } from './header/header';
 })
 export class App
 {
-
+  
 }
