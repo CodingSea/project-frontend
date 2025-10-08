@@ -266,3 +266,19 @@
 }
 
 .btn-right { display: flex; justify-content: flex-end; }
+.error small {
+  display: block;
+  color: #dc2626; /* red */
+  font-size: 13px;
+  margin-top: 4px;
+}
+select.ng-invalid.ng-touched {
+  border-color: #dc2626; /* red border */
+}
+
+.error small {
+  color: #dc2626;
+  font-size: 13px;
+  display: block;
+  margin-top: 4px;
+}

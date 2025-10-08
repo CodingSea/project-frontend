@@ -154,17 +154,46 @@
                   </header>
 
                   <form #projectForm="ngForm" (ngSubmit)="saveNewProject(projectForm)">
-                    <label class="pm-label">Project name<span class="req">*</span></label>
-                    <input class="pm-input" type="text" name="name" required [(ngModel)]="newProject.name" placeholder="e.g., Website Revamp">
+                    <!-- ✅ Project Name with Regex -->
+<label class="pm-label">Project name<span class="req">*</span></label>
+<input
+  class="pm-input"
+  type="text"
+  name="name"
+  required
+  pattern="^[A-Za-z0-9 ]{3,50}$"
+  #nameField="ngModel"
+  [(ngModel)]="newProject.name"
+  placeholder="e.g., Website Revamp">
 
-                    <label class="pm-label">Description</label>
-                    <textarea class="pm-textarea" name="description" rows="3" [(ngModel)]="newProject.description" placeholder="(optional) brief summary"></textarea>
+<!-- Error message -->
+<div *ngIf="nameField.invalid && (nameField.dirty || nameField.touched)" class="pm-error">
+  <small *ngIf="nameField.errors?.['required']">Project name is required.</small>
+  <small *ngIf="nameField.errors?.['pattern']">Only letters, numbers, and spaces (3–50 chars).</small>
+</div>
+
+<!-- ✅ Description (optional but regex validated) -->
+<label class="pm-label">Description</label>
+<textarea
+  class="pm-textarea"
+  name="description"
+  rows="3"
+  [(ngModel)]="newProject.description"
+  pattern="^$|^[A-Za-z0-9.,!?()\\s-]{1,200}$"
+  #descField="ngModel"
+  placeholder="(optional) brief summary"></textarea>
+
+<!-- Error message -->
+<div *ngIf="descField.invalid && (descField.dirty || descField.touched)" class="pm-error">
+  <small *ngIf="descField.errors?.['pattern']">
+    Only letters, numbers, spaces, and punctuation allowed (max 200 chars).
+  </small>
+</div>
+
+
 
                     <div class="pm-row-2">
-                      <div>
-                        <label class="pm-label">Due date</label>
-                        <input class="pm-input" type="date" name="dueDate" [(ngModel)]="newProject.dueDate">
-                      </div>
+
                       <div>
                         <label class="pm-label">Status</label>
                         <select class="pm-input" name="status" [(ngModel)]="newProject.status">

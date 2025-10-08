@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '@environments/environment';
 
 // ✅ Define TypeScript interface (matches backend DTO)
 export interface CreateServiceDto {
@@ -18,7 +19,7 @@ export interface CreateServiceDto {
   providedIn: 'root',
 })
 export class ServiceService {
-  private apiUrl = 'http://localhost:3000/services'; // ✅ backend base URL
+  private apiUrl = `${environment.apiUrl}/services`;
 
   constructor(private http: HttpClient) {}
 

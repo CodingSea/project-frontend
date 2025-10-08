@@ -49,16 +49,25 @@ export class ProjectManagement implements OnInit {
     const d = new Date();
     d.setDate(d.getDate() + 14);
     const yyyyMmDd = d.toISOString().slice(0, 10);
-    return { name: '', description: '', dueDate: yyyyMmDd, status: 'Active', progress: 0 };
+    return { name: '', description: '', status: 'Active', progress: 0 };
   }
 
   saveNewProject(form: any) {
     if (form.invalid) return;
+
+    // Automatically set due date (e.g., 14 days from now)
+    if (!this.newProject.dueDate) {
+      const d = new Date();
+      d.setDate(d.getDate() + 1);
+      this.newProject.dueDate = d.toISOString().slice(0, 10);
+    }
+
     this.projectService.createProject(this.newProject).subscribe(created => {
       this.projects = [created, ...this.projects];
       this.closeNewProject();
     });
   }
+
 
   // Filter panel
   openFilter() { this.showFilter = true; }
