@@ -4,6 +4,7 @@ export interface TaskCard
     column: string;
     title: string;
     description: string;
-    taskBoardId: number;
+    taskBoardId?: number;
     comments?: Comment[];
+    tags?: string[];
 }

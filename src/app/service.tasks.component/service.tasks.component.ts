@@ -9,15 +9,16 @@ import { TaskCard } from '@app/task-card';
 import { environment } from '@environments/environment';
 import { TaskBoard } from '@app/task-board';
 import { Sidebar } from "@app/sidebar/sidebar";
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-service-tasks',
   templateUrl: './service.tasks.component.html',
   styleUrls: [ './service.tasks.component.css' ],
-  imports: [jqxKanbanModule, jqxSplitterModule, CommonModule, AddTaskPopup, TaskPopup, Sidebar]
+  imports: [ jqxKanbanModule, jqxSplitterModule, CommonModule, AddTaskPopup, TaskPopup, Sidebar ]
 })
 
-export class ServiceTasksComponent implements OnInit, AfterViewInit 
+export class ServiceTasksComponent implements AfterViewInit 
 {
   @ViewChild('kanbanReference') kanban!: jqxKanbanComponent;
 
@@ -39,27 +40,29 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
 
   constructor(private cdr: ChangeDetectorRef, private http: HttpClient) { }
 
-  ngOnInit()
+  async getBoardCards(): Promise<void>
   {
-    this.data = [
-      { id: '1', status: 'new', text: 'Task 1', tags: 'tag1' },
-      { id: '2', status: 'work', text: 'Task 2', tags: 'tag2' },
-      { id: '3', status: 'done', text: 'Task 3', tags: 'tag1,tag2' },
-      { id: '3', status: 'done', text: 'Task 4', tags: 'css,html' }
-    ];
+    try
+    {
+      const response = await this.http.get<TaskCard[]>(`${environment.apiUrl}/service/${2}/tasks`).toPromise();
 
-    this.http.get<TaskBoard>(`${environment.apiUrl}/service/${1}/tasks`).subscribe(
-      (response) =>
+      if (response == null) return;
+
+      this.data = []; // Reset data
+
+      for (let i = 0; i < response.length; i++)
       {
-        console.log(response);
-      },
-      (error) =>
-      {
-        console.log(error);
+        this.data.push({
+          id: response[ i ].id, // Ensure this is set correctly
+          status: response[ i ].column,
+          text: response[ i ].title,
+          tags: response[ i ].tags
+        });
       }
-    )
-
-    this.initializeKanbanDataSource();
+    } catch (error)
+    {
+      console.log('Error fetching board cards:', error);
+    }
   }
 
   ngAfterViewInit()
@@ -78,11 +81,40 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
     this.showTaskDetailPopup = true;
   }
 
-  onItemMoved(event: any): void
+  async onItemMoved(event: any): Promise<void>
   {
+    console.log('Event:', event); // Log the entire event object
     this.dragInProgress = true;
     this.dragCooldown = true;
 
+    // Access the moved task from event.args.itemData
+    const movedTask = event.args.itemData;
+    console.log('Moved Task:', movedTask); // Log the moved task
+
+    if (!movedTask)
+    {
+      console.error('Moved task is undefined');
+      this.dragInProgress = false;
+      this.dragCooldown = false;
+      return;
+    }
+
+    const newStatus = event.args.newColumn.dataField; // Get the new status (column)
+
+    // Update the task in the local data array
+    const taskToUpdate = this.data.find(task => task.id === movedTask.id);
+    if (taskToUpdate)
+    {
+      taskToUpdate.status = newStatus; // Update the status
+
+      // Save or update the task in the backend
+      await this.updateTask(taskToUpdate); // Call updateTask
+    } else
+    {
+      console.error('Task to update not found:', movedTask);
+    }
+
+    // Reset drag states
     setTimeout(() =>
     {
       this.dragInProgress = false;
@@ -92,6 +124,20 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
     {
       this.dragCooldown = false;
     }, 300);
+  }
+
+  private async saveOrUpdateTask(task: any): Promise<void>
+  {
+    try
+    {
+      const url = `${environment.apiUrl}/service/${2}/tasks/${task.id}`;
+      // Assuming you have a PUT or POST endpoint based on whether the task exists
+      const response = await this.http.put(url, task).toPromise(); // Use PUT for updates
+      console.log('Task saved/updated successfully:', response);
+    } catch (error)
+    {
+      console.error('Error saving/updating task:', error);
+    }
   }
 
   closeTaskDetailPopup()
@@ -110,25 +156,34 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
     this.showPopup = false;
   }
 
-  onTaskAdded(task: { text: string; tags: string })
+  textToArray(text: string): string[]
   {
-    const newTask = {
-      id: (this.data.length + 1).toString(),
-      status: 'new',
-      text: task.text,
-      tags: task.tags
-    };
-
-    this.data.push(newTask);
-    this.dataAdapter.localdata = this.data;
-    this.rebuildKanban();
-    this.kanban.source = this.dataAdapter;
-    this.closePopup();
-    this.cdr.detectChanges();
+    return text.split(',').map(tag => tag.trim());
   }
 
-  initializeKanbanDataSource(): void
+  onTaskAdded(task: { text: string; tags: string })
   {
+    // const newTask = {
+    //   id: this.data.length + 1,
+    //   status: "new",
+    //   text: task.text,
+    //   tags: this.textToArray(task.tags)
+    // };
+
+    // this.data.push(newTask);
+    // this.dataAdapter.localdata = this.data;
+    // this.rebuildKanban();
+    // this.kanban.source = this.dataAdapter;
+    // this.closePopup();
+    // this.cdr.detectChanges();
+
+    this.createTask(task.text, "new", task.tags);
+  }
+
+  async initializeKanbanDataSource(): Promise<void>
+  {
+    await this.getBoardCards();
+
     this.dataAdapter = new jqx.dataAdapter({
       localData: this.data,
       dataType: 'array',
@@ -139,6 +194,9 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
         { name: 'tags', type: 'string' }
       ]
     });
+
+    this.dataAdapter.localdata = this.data;
+    this.rebuildKanban();
   }
 
   addTask(column: string, taskText: string, tagsText: string)
@@ -151,7 +209,6 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
     };
 
     this.data.push(newTask);
-    console.log('Current Data after adding task:', this.data);
 
     this.dataAdapter.localdata = this.data;
     this.rebuildKanban();
@@ -174,4 +231,50 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
       this.showKanban = true;
     }, 0);
   }
+
+
+  async createTask(taskText: string, column: string, tagsText: string): Promise<void>
+  {
+    const newTask = {
+      title: taskText,
+      column: column,
+      description: '', // Add any description if needed
+      tags: this.textToArray(tagsText)
+    };
+
+    try
+    {
+      const response = await this.http.post<TaskCard>(`${environment.apiUrl}/service/${2}/tasks`, newTask).toPromise();
+      this.data.push(response); // Add the created task to the local data
+      this.dataAdapter.localdata = this.data;
+      this.rebuildKanban();
+      this.closePopup();
+    } catch (error)
+    {
+      console.error('Error creating task:', error);
+    }
+  }
+
+  async updateTask(task: any): Promise<void>
+  {
+    if (!task || !task.id)
+    {
+      console.error('Invalid task object:', task);
+      return;
+    }
+
+    try
+    {
+      const response = await this.http.patch(`${environment.apiUrl}/service/${2}/tasks/${task.id}`, {
+        column: task.status,
+        title: task.text,
+        tags: task.tags,
+      }).toPromise();
+      console.log('Task updated successfully:', response);
+    } catch (error)
+    {
+      console.error('Error updating task:', error);
+    }
+  }
+
 }
