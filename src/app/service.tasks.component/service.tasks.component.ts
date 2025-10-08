@@ -4,6 +4,10 @@ import { jqxKanbanComponent, jqxKanbanModule } from "jqwidgets-ng/jqxkanban";
 import { jqxSplitterModule } from 'jqwidgets-ng/jqxsplitter';
 import { AddTaskPopup } from '@app/add-task-popup/add-task-popup';
 import { TaskPopup } from '@app/task-popup/task-popup';
+import { HttpClient } from '@angular/common/http';
+import { TaskCard } from '@app/task-card';
+import { environment } from '@environments/environment';
+import { TaskBoard } from '@app/task-board';
 
 @Component({
   selector: 'app-service-tasks',
@@ -11,6 +15,7 @@ import { TaskPopup } from '@app/task-popup/task-popup';
   styleUrls: [ './service.tasks.component.css' ],
   imports: [ jqxKanbanModule, jqxSplitterModule, CommonModule, AddTaskPopup, TaskPopup ]
 })
+
 export class ServiceTasksComponent implements OnInit, AfterViewInit 
 {
   @ViewChild('kanbanReference') kanban!: jqxKanbanComponent;
@@ -31,7 +36,7 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
     { text: 'Done', dataField: 'done', minWidth: 150 }
   ];
 
-  constructor(private cdr: ChangeDetectorRef) { }
+  constructor(private cdr: ChangeDetectorRef, private http: HttpClient) { }
 
   ngOnInit()
   {
@@ -41,6 +46,17 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
       { id: '3', status: 'done', text: 'Task 3', tags: 'tag1,tag2' },
       { id: '3', status: 'done', text: 'Task 4', tags: 'css,html' }
     ];
+
+    this.http.get<TaskBoard>(`${environment.apiUrl}/service/${1}/tasks`).subscribe(
+      (response) =>
+      {
+        console.log(response);
+      },
+      (error) =>
+      {
+        console.log(error);
+      }
+    )
 
     this.initializeKanbanDataSource();
   }
