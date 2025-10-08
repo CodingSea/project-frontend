@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { Sidebar } from '@app/sidebar/sidebar';
+import { Sidebar } from "@app/sidebar/sidebar";
 import { HeaderComponent } from '@app/header/header';
 
 @Component({

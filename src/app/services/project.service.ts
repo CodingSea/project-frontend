@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '@environments/environment';
 
 export interface Project {
   projectID: number;
@@ -21,7 +22,7 @@ export interface Project {
 
 @Injectable({ providedIn: 'root' })
 export class ProjectService {
-  private apiUrl = 'http://localhost:3000/projects'; // ✅ plural
+  private apiUrl = `${environment.apiUrl}/project`;
 
   constructor(private http: HttpClient) {}
 

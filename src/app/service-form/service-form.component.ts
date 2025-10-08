@@ -39,15 +39,34 @@ export class ServiceFormComponent implements OnInit {
     private serviceService: ServiceService,
     private userService: UserService
   ) {
-    // ✅ Initialize form
     this.form = this.fb.group({
-      name: ['', Validators.required],
+      // ✅ Service name: letters, numbers, spaces only (3–50 chars)
+      name: [
+        '',
+        [
+          Validators.required,
+          Validators.pattern(/^[A-Za-z0-9 ]{3,50}$/),
+        ],
+      ],
+
+      // ✅ Deadline (required)
       deadline: ['', Validators.required],
-      description: ['', [Validators.required, Validators.minLength(10)]],
+
+      // ✅ Description (optional): allows letters, numbers, punctuation, spaces
+      description: [
+        '',
+        [
+          Validators.pattern(/^$|^[A-Za-z0-9.,!?()\s-]{1,300}$/),
+          Validators.maxLength(300),
+        ],
+      ],
+
+      // ✅ Dropdowns
       chiefId: [null, Validators.required],
       managerId: [null, Validators.required],
       resources: this.fb.array<number>([] as number[]),
     });
+
   }
 
   ngOnInit() {
