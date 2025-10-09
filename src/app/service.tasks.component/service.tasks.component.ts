@@ -314,7 +314,7 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
   {
     try
     {
-      const url = `${environment.apiUrl}/service/${this.serviceId}/tasks/${taskId}`;
+      const url = `${environment.apiUrl}/service/${this.taskBoardId}/tasks/${taskId}`;
       await this.http.delete(url).toPromise(); // Call the delete API
       this.data = this.data.filter(task => task.id !== taskId); // Remove from local data
       this.dataAdapter.localdata = this.data;
