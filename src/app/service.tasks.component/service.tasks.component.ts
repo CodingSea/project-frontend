@@ -241,23 +241,42 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
 
   async createTask(taskText: string, column: string, tagsText: string): Promise<void>
   {
+    const formattedTags = this.textToArray(tagsText); // Convert to an array
+
     const newTask = {
       title: taskText,
       column: column,
-      description: '', // Add any description if needed
-      tags: this.textToArray(tagsText)
+      description: '', // Optional
+      tags: formattedTags // Ensure this is an array
     };
+
+    const newTask02 = {
+      status: column,
+      text: taskText,
+      tags: formattedTags
+    };
+
+    console.log('Creating task with payload:', newTask); // Log the task being added
 
     try
     {
-      const response = await this.http.post<TaskCard>(`${environment.apiUrl}/service/${this.taskBoardId}/cards`, newTask).toPromise();
-      this.data.push(response);
+      const response = await this.http.post<TaskCard>(
+        `${environment.apiUrl}/service/${this.taskBoardId}/cards`,
+        newTask,
+        { headers: { 'Content-Type': 'application/json' } }
+      ).toPromise();
+
+      this.data.push(newTask02);
       this.dataAdapter.localdata = this.data;
       this.rebuildKanban();
       this.closePopup();
     } catch (error)
     {
       console.error('Error creating task:', error);
+      if (error)
+      {
+        console.error('Error response body:', error); // Log detailed error message
+      }
     }
   }
 
