@@ -7,7 +7,6 @@ export interface Project {
   projectID: number;
   name: string;
   description?: string;
-  dueDate?: string;
   status?: string;
   progress?: number;
 

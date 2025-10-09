@@ -29,8 +29,7 @@ export class ProjectManagement implements OnInit {
     this.projectService.getProjects().subscribe((data) => {
       // ensure dueDate is a yyyy-mm-dd string for the date pipe
       this.projects = (data ?? []).map(p => ({
-        ...p,
-        dueDate: p.dueDate ? String(p.dueDate) : undefined
+        ...p
       }));
     });
   }
@@ -55,13 +54,6 @@ export class ProjectManagement implements OnInit {
 
   saveNewProject(form: any) {
     if (form.invalid) return;
-
-    // Automatically set due date (e.g., 14 days from now)
-    if (!this.newProject.dueDate) {
-      const d = new Date();
-      d.setDate(d.getDate() + 1);
-      this.newProject.dueDate = d.toISOString().slice(0, 10);
-    }
 
     this.projectService.createProject(this.newProject).subscribe(created => {
       this.projects = [created, ...this.projects];
