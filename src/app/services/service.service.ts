@@ -23,10 +23,24 @@ export class ServiceService {
 
   constructor(private http: HttpClient) {}
 
-  // ✅ POST: create new service
-  createService(data: CreateServiceDto): Observable<any> {
-    return this.http.post(this.apiUrl, data);
+  createService(data: CreateServiceDto, files: File[]): Observable<any> {
+    const formData = new FormData();
+
+    // Append normal fields
+    Object.entries(data).forEach(([key, value]) => {
+      if (Array.isArray(value)) {
+        value.forEach(v => formData.append(key, v.toString()));
+      } else if (value !== null && value !== undefined) {
+        formData.append(key, value.toString());
+      }
+    });
+
+    // Append files
+    files.forEach(file => formData.append('files', file));
+
+    return this.http.post(this.apiUrl, formData);
   }
+
 
   // ✅ GET: all services (optional for listing later)
   getAllServices(): Observable<any[]> {
