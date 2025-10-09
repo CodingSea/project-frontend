@@ -23,7 +23,7 @@
 
     <add-task-popup *ngIf="showPopup" (taskAdded)="onTaskAdded($event)" (close)="closePopup()"></add-task-popup>
 
-    <task-popup *ngIf="showTaskDetailPopup" [task]="selectedTask" (close)="closeTaskDetailPopup()">
+    <task-popup *ngIf="showTaskDetailPopup" [task]="selectedTask" (close)="closeTaskDetailPopup()" (delete)="deleteTask($event)">
     </task-popup>
 
   </div>

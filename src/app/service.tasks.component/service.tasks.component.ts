@@ -310,5 +310,20 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
     }
   }
 
+  async deleteTask(taskId: number): Promise<void>
+  {
+    try
+    {
+      const url = `${environment.apiUrl}/service/${this.serviceId}/tasks/${taskId}`;
+      await this.http.delete(url).toPromise(); // Call the delete API
+      this.data = this.data.filter(task => task.id !== taskId); // Remove from local data
+      this.dataAdapter.localdata = this.data;
+      this.rebuildKanban();
+      this.closeTaskDetailPopup();
+    } catch (error)
+    {
+      console.error('Error deleting task:', error);
+    }
+  }
 
 }
