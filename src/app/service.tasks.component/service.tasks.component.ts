@@ -9,6 +9,7 @@ import { TaskCard } from '@app/task-card';
 import { environment } from '@environments/environment';
 import { TaskBoard } from '@app/task-board';
 import { Sidebar } from "@app/sidebar/sidebar";
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-service-tasks',
@@ -17,7 +18,7 @@ import { Sidebar } from "@app/sidebar/sidebar";
   imports: [jqxKanbanModule, jqxSplitterModule, CommonModule, AddTaskPopup, TaskPopup, Sidebar]
 })
 
-export class ServiceTasksComponent implements OnInit, AfterViewInit 
+export class ServiceTasksComponent implements OnInit, AfterViewInit
 {
   @ViewChild('kanbanReference') kanban!: jqxKanbanComponent;
 
@@ -37,30 +38,32 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
     { text: 'Done', dataField: 'done', minWidth: 150 }
   ];
 
-  constructor(private cdr: ChangeDetectorRef, private http: HttpClient) { }
+  constructor(private cdr: ChangeDetectorRef, private http: HttpClient, private route: ActivatedRoute) { }
 
-  ngOnInit()
-  {
+  ngOnInit() {
+    const projectId = Number(this.route.snapshot.paramMap.get('id'));
+    console.log('Opened Kanban for project ID:', projectId);
+
+
+    this.http.get<TaskBoard>(`${environment.apiUrl}/service/${projectId}/tasks`).subscribe(
+      (response) => {
+        console.log('Tasks for project', projectId, response);
+
+      },
+      (error) => {
+        console.log('Error fetching tasks:', error);
+      }
+    );
+
     this.data = [
       { id: '1', status: 'new', text: 'Task 1', tags: 'tag1' },
       { id: '2', status: 'work', text: 'Task 2', tags: 'tag2' },
       { id: '3', status: 'done', text: 'Task 3', tags: 'tag1,tag2' },
-      { id: '3', status: 'done', text: 'Task 4', tags: 'css,html' }
     ];
-
-    this.http.get<TaskBoard>(`${environment.apiUrl}/service/${1}/tasks`).subscribe(
-      (response) =>
-      {
-        console.log(response);
-      },
-      (error) =>
-      {
-        console.log(error);
-      }
-    )
 
     this.initializeKanbanDataSource();
   }
+
 
   ngAfterViewInit()
   {
