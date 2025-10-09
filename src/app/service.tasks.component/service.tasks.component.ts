@@ -10,6 +10,7 @@ import { environment } from '@environments/environment';
 import { TaskBoard } from '@app/task-board';
 import { Sidebar } from "@app/sidebar/sidebar";
 import { firstValueFrom } from 'rxjs';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-service-tasks',
@@ -18,7 +19,7 @@ import { firstValueFrom } from 'rxjs';
   imports: [ jqxKanbanModule, jqxSplitterModule, CommonModule, AddTaskPopup, TaskPopup, Sidebar ]
 })
 
-export class ServiceTasksComponent implements AfterViewInit 
+export class ServiceTasksComponent implements OnInit, AfterViewInit 
 {
   @ViewChild('kanbanReference') kanban!: jqxKanbanComponent;
 
@@ -32,31 +33,45 @@ export class ServiceTasksComponent implements AfterViewInit
   dragInProgress = false;
   dragCooldown = false;
 
+  serviceId!: number;
+  taskBoardId!: number;
+
   columns: any[] = [
     { text: 'Backlog', dataField: 'new', minWidth: 150 },
     { text: 'In Progress', dataField: 'work', minWidth: 150 },
     { text: 'Done', dataField: 'done', minWidth: 150 }
   ];
 
-  constructor(private cdr: ChangeDetectorRef, private http: HttpClient) { }
+  constructor(private cdr: ChangeDetectorRef, private http: HttpClient, private route: ActivatedRoute) { }
+
+  ngOnInit(): void
+  {
+    this.route.params.subscribe(params =>
+    {
+      this.serviceId = +params[ 'serviceId' ];
+      this.taskBoardId = +params[ 'taskBoardId' ];
+    })
+
+
+  }
 
   async getBoardCards(): Promise<void>
   {
     try
     {
-      const response = await this.http.get<TaskCard[]>(`${environment.apiUrl}/service/${2}/tasks`).toPromise();
+      const response = await this.http.get<TaskCard[]>(`${environment.apiUrl}/service/${this.serviceId}/tasks`).toPromise();
 
       if (response == null) return;
 
-      this.data = []; // Reset data
+      this.data = [];
 
       for (let i = 0; i < response.length; i++)
       {
         this.data.push({
-          id: response[ i ].id, // Ensure this is set correctly
+          id: response[ i ].id,
           status: response[ i ].column,
           text: response[ i ].title,
-          tags: response[ i ].tags
+          tags: this.arrayToString(response[ i ].tags as string[])
         });
       }
     } catch (error)
@@ -83,13 +98,11 @@ export class ServiceTasksComponent implements AfterViewInit
 
   async onItemMoved(event: any): Promise<void>
   {
-    console.log('Event:', event); // Log the entire event object
     this.dragInProgress = true;
     this.dragCooldown = true;
 
     // Access the moved task from event.args.itemData
     const movedTask = event.args.itemData;
-    console.log('Moved Task:', movedTask); // Log the moved task
 
     if (!movedTask)
     {
@@ -130,7 +143,7 @@ export class ServiceTasksComponent implements AfterViewInit
   {
     try
     {
-      const url = `${environment.apiUrl}/service/${2}/tasks/${task.id}`;
+      const url = `${environment.apiUrl}/service/${this.serviceId}/tasks/${task.id}`;
       // Assuming you have a PUT or POST endpoint based on whether the task exists
       const response = await this.http.put(url, task).toPromise(); // Use PUT for updates
       console.log('Task saved/updated successfully:', response);
@@ -160,6 +173,12 @@ export class ServiceTasksComponent implements AfterViewInit
   {
     if (!text) return [];
     return text.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0);
+  }
+
+  private arrayToString(array: string[]): string
+  {
+    if (!array || array.length === 0) return '';
+    return array.join(', ');
   }
 
   onTaskAdded(task: { text: string; tags: string }): void
@@ -231,7 +250,7 @@ export class ServiceTasksComponent implements AfterViewInit
 
     try
     {
-      const response = await this.http.post<TaskCard>(`${environment.apiUrl}/service/${1}/cards`, newTask).toPromise();
+      const response = await this.http.post<TaskCard>(`${environment.apiUrl}/service/${this.taskBoardId}/cards`, newTask).toPromise();
       this.data.push(response);
       this.dataAdapter.localdata = this.data;
       this.rebuildKanban();
@@ -250,18 +269,27 @@ export class ServiceTasksComponent implements AfterViewInit
       return;
     }
 
+    const payload = {
+      column: task.status,
+      title: task.text,
+      description: '', // optional
+      tags: this.textToArray(task.tags) // ensure it's an array
+    };
+
     try
     {
-      const response = await this.http.patch(`${environment.apiUrl}/service/${2}/tasks/${task.id}`, {
-        column: task.status,
-        title: task.text,
-        tags: task.tags,
-      }).toPromise();
-      console.log('Task updated successfully:', response);
+      const response = await this.http
+        .patch(
+          `${environment.apiUrl}/service/${this.taskBoardId}/tasks/${task.id}`,
+          payload,
+          { headers: { 'Content-Type': 'application/json' } }
+        )
+        .toPromise();
     } catch (error)
     {
       console.error('Error updating task:', error);
     }
   }
+
 
 }

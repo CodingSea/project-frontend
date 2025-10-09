@@ -26,7 +26,7 @@ export const routes: Routes = [
   { path: 'profile/edit', component: ProfileEditComponent, canActivate: [ AuthGuard ] },
   { path: 'certificate/new', component: CertificateCreateComponent, canActivate: [ AuthGuard ] },
   { path: 'developers', component: DevelopersSearchComponent, canActivate: [ AuthGuard ], data: { onlyAdmin: true } },
-  { path: 'kanban', component: ServiceTasksComponent, canActivate: [ AuthGuard ] },
+  { path: 'services/:serviceId/taskboard/:taskBoardId', component: ServiceTasksComponent, canActivate: [ AuthGuard ] },
   { path: '**', component: UserComponent }
 ];
 
