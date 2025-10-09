@@ -156,28 +156,15 @@ export class ServiceTasksComponent implements AfterViewInit
     this.showPopup = false;
   }
 
-  textToArray(text: string): string[]
+  private textToArray(text: string): string[]
   {
-    return text.split(',').map(tag => tag.trim());
+    if (!text) return [];
+    return text.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0);
   }
 
-  onTaskAdded(task: { text: string; tags: string })
+  onTaskAdded(task: { text: string; tags: string }): void
   {
-    // const newTask = {
-    //   id: this.data.length + 1,
-    //   status: "new",
-    //   text: task.text,
-    //   tags: this.textToArray(task.tags)
-    // };
-
-    // this.data.push(newTask);
-    // this.dataAdapter.localdata = this.data;
-    // this.rebuildKanban();
-    // this.kanban.source = this.dataAdapter;
-    // this.closePopup();
-    // this.cdr.detectChanges();
-
-    this.createTask(task.text, "new", task.tags);
+    this.createTask(task.text, 'new', task.tags); // Include empty description
   }
 
   async initializeKanbanDataSource(): Promise<void>
@@ -205,7 +192,7 @@ export class ServiceTasksComponent implements AfterViewInit
       id: (this.data.length + 1).toString(),
       status: column,
       text: taskText,
-      tags: tagsText
+      tags: this.textToArray(tagsText)
     };
 
     this.data.push(newTask);
@@ -244,8 +231,8 @@ export class ServiceTasksComponent implements AfterViewInit
 
     try
     {
-      const response = await this.http.post<TaskCard>(`${environment.apiUrl}/service/${2}/tasks`, newTask).toPromise();
-      this.data.push(response); // Add the created task to the local data
+      const response = await this.http.post<TaskCard>(`${environment.apiUrl}/service/${1}/cards`, newTask).toPromise();
+      this.data.push(response);
       this.dataAdapter.localdata = this.data;
       this.rebuildKanban();
       this.closePopup();
