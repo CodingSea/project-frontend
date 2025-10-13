@@ -39,7 +39,7 @@ export class ProjectManagement implements OnInit {
     if (!p.projectID) return;
 
     console.log('Navigating to project', p.projectID);
-    this.router.navigate(['/kanban', p.projectID]);
+    this.router.navigate([`/projects/${p.projectID}/services`]);
   }
 
 

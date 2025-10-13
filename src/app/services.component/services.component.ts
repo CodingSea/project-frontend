@@ -1,9 +1,13 @@
 import { CommonModule } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
+import { Project } from '@app/project';
 import { Service } from '@app/service';
 import { ServiceService } from '@app/services/service.service';
 import { Sidebar } from '@app/sidebar/sidebar';
+import { environment } from '@environments/environment';
 
 @Component({
   selector: 'app-services.component',
@@ -13,29 +17,35 @@ import { Sidebar } from '@app/sidebar/sidebar';
 })
 export class ServicesComponent
 {
-  services: Service[] = []; // Updated variable name
+  services: Service[] = [];
 
-  // New Service Modal
-  showNewService = false; // Updated variable name
-  newService: Partial<Service> = this.blankNewService(); // Updated variable type
+  showNewService = false;
+  newService: Partial<Service> = this.blankNewService();
+
+  projectId: string | null = null;
 
   // Filters
   showFilter = false;
   selectedFilter: 'all' | 'active' | 'in-review' | 'urgent' = 'all';
   filterState = { active: true, inReview: true, urgent: true };
 
-  constructor(private serviceService: ServiceService) { } // Updated service
+  constructor(private http: HttpClient, private route: ActivatedRoute) { }
 
   ngOnInit()
   {
-    this.serviceService.getAllServices().subscribe((data: any) => // Updated method
-    {
-      // ensure dueDate is a yyyy-mm-dd string for the date pipe
-      this.services = (data ?? []).map((s: any) => ({ // Updated variable name
-        ...s,
-        dueDate: s.dueDate ? String(s.dueDate) : undefined
-      }));
-    });
+    this.projectId = this.route.snapshot.paramMap.get('projectId');
+
+    this.http.get<Project>(`${environment.apiUrl}/project/${this.projectId}`).subscribe(
+      (res) =>
+      {
+        this.services = res.services; // Assuming res has a 'services' property
+        console.log(res.services)
+      },
+      (error) =>
+      {
+        console.log(error);
+      }
+    );
   }
 
   // card click from template

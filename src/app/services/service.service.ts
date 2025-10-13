@@ -19,7 +19,7 @@ export interface CreateServiceDto {
   providedIn: 'root',
 })
 export class ServiceService {
-  private apiUrl = `${environment.apiUrl}/services`;
+  private apiUrl = `${environment.apiUrl}/service`;
 
   constructor(private http: HttpClient) {}
 
