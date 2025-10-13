@@ -48,11 +48,9 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
   {
     this.route.params.subscribe(params =>
     {
-      this.serviceId = +params[ 'serviceId' ];
-      this.taskBoardId = +params[ 'taskBoardId' ];
+      this.serviceId = params[ 'serviceId' ];
+      this.taskBoardId = params[ 'taskBoardId' ];
     })
-
-
   }
 
   async getBoardCards(): Promise<void>
@@ -60,23 +58,23 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
     try
     {
       const response = await this.http.get<TaskCard[]>(`${environment.apiUrl}/service/${this.serviceId}/tasks`).toPromise();
+      console.log('API Response:', response); // Log the response
 
-      if (response == null) return;
-
-      this.data = [];
-
-      for (let i = 0; i < response.length; i++)
+      if (!response || response.length === 0)
       {
-        this.data.push({
-          id: response[ i ].id,
-          status: response[ i ].column,
-          text: response[ i ].title,
-          tags: this.arrayToString(response[ i ].tags as string[])
-        });
+        console.log('No tasks found for the service.'); // Log if no tasks found
+        return;
       }
+
+      this.data = response.map(task => ({
+        id: task.id,
+        status: task.column,
+        text: task.title,
+        tags: this.arrayToString(task.tags as string[])
+      }));
     } catch (error)
     {
-      console.log('Error fetching board cards:', error);
+      console.error('Error fetching board cards:', error);
     }
   }
 
@@ -189,6 +187,11 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
   async initializeKanbanDataSource(): Promise<void>
   {
     await this.getBoardCards();
+
+    if(this.data.length == 0)
+    {
+      this.data = [{ id: '1', status: 'eee', text: 'eee', tags: 'ss' }]
+    }
 
     this.dataAdapter = new jqx.dataAdapter({
       localData: this.data,
