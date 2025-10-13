@@ -8,97 +8,73 @@
                 <div class="div_33-4">
                     <div class="main_33-71">
                         <div class="div_33-96">
-                            <div class="div_33-97">
-                                <div class="div_33-98">
-                                    <div class="div_33-99">
-                                        <div class="div_33-100">
-                                            <span class="text-total-projects_33-101">Total Projects</span>
-                                            <span class="text-24_33-102">24</span>
-                                        </div>
-                                        <div class="div_33-103">
-                                            <!-- keep your SVG -->
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="div_33-108">
-                                    <div class="div_33-109">
-                                        <div class="div_33-110">
-                                            <span class="text-active-tasks_33-111">Active Tasks</span>
-                                            <span class="text-156_33-112">156</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="div_33-118">
-                                    <div class="div_33-119">
-                                        <div class="div_33-120">
-                                            <span class="text-team-members_33-121">Team Members</span>
-                                            <span class="text-32_33-122">32</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="div_33-128">
-                                    <div class="div_33-129">
-                                        <div class="div_33-130">
-                                            <span class="text-completion-rate_33-131">Completion Rate</span>
-                                            <span class="text-87-_33-132">87%</span>
-                                        </div>
-                                    </div>
-                                </div>
+                            <div class="main-div">
+                                <ul class="stats-list">
+                                    <li class="stat-item">
+                                        <span class="text-total-projects">Total Services</span>
+                                        <span class="text-24">24</span>
+                                    </li>
+                                    <li class="stat-item">
+                                        <span class="text-active-tasks">Active Tasks</span>
+                                        <span class="text-156">156</span>
+                                    </li>
+                                    <li class="stat-item">
+                                        <span class="text-team-members">Team Members</span>
+                                        <span class="text-32">32</span>
+                                    </li>
+                                    <li class="stat-item">
+                                        <span class="text-completion-rate">Completion Rate</span>
+                                        <span class="text-87">87%</span>
+                                    </li>
+                                </ul>
                             </div>
 
-                            <!-- Recent Projects Section -->
+                            <!-- Recent services Section -->
                             <div class="div_33-138">
-                                <div class="div_33-139">
-                                    <span class="text-recent-projects_33-140">Recent Projects</span>
-                                    <div class="div_33-141">
-
+                                <div class="recent-services">
+                                    <span class="text-recent-projects">Recent Services:</span>
+                                    <div class="filter-container">
                                         <!-- Dropdown Filter -->
-                                        <select class="select_33-142" [(ngModel)]="selectedFilter"
-                                            (change)="applyFilters()">
-                                            <option value="all">All Projects</option>
+                                        <select class="select" [(ngModel)]="selectedFilter" (change)="applyFilters()">
+                                            <option value="all">All Services</option>
                                             <option value="active">Active</option>
                                             <option value="in-review">In Review</option>
                                             <option value="urgent">Urgent</option>
                                         </select>
-
+                                
                                         <!-- Button for filter panel -->
-                                        <button class="button_33-146" type="button" aria-label="Open filters"
-                                            (click)="openFilter()">
+                                        <button class="button" type="button" aria-label="Open filters" (click)="openFilter()">
                                             <!-- keep your filter SVG here -->
                                         </button>
                                     </div>
-
+                                
                                     <!-- Side Filter Panel -->
                                     <div *ngIf="showFilter">
                                         <div class="pm-filter-backdrop" (click)="closeFilter()"></div>
                                         <aside class="pm-filter-panel" role="dialog" aria-label="Filters">
                                             <div class="pm-filter-header">
                                                 <strong>Filters</strong>
-                                                <button class="pm-close" type="button"
-                                                    (click)="closeFilter()">×</button>
+                                                <button class="pm-close" type="button" (click)="closeFilter()">×</button>
                                             </div>
                                             <div class="pm-filter-body">
                                                 <div class="pm-row">
-                                                    <label><input type="checkbox" [(ngModel)]="filterState.active">
-                                                        Active</label>
+                                                    <label><input type="checkbox" [(ngModel)]="filterState.active"> Active</label>
                                                 </div>
                                                 <div class="pm-row">
-                                                    <label><input type="checkbox" [(ngModel)]="filterState.inReview"> In
-                                                        Review</label>
+                                                    <label><input type="checkbox" [(ngModel)]="filterState.inReview"> In Review</label>
                                                 </div>
                                                 <div class="pm-row">
-                                                    <label><input type="checkbox" [(ngModel)]="filterState.urgent">
-                                                        Urgent</label>
+                                                    <label><input type="checkbox" [(ngModel)]="filterState.urgent"> Urgent</label>
                                                 </div>
                                             </div>
                                         </aside>
                                     </div>
                                 </div>
 
-                                <!-- ✅ Project Cards (Add New + Dynamic Projects) -->
+                                <!-- ✅ service Cards (Add New + Dynamic Services) -->
                                 <div class="pm-cards">
 
-                                    <!-- Add New Project Card -->
+                                    <!-- Add New service Card -->
                                     <article class="pm-card add-new" (click)="openNewService()">
                                         <div class="pm-plus-circle">
                                             <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
@@ -107,12 +83,11 @@
                                             </svg>
                                         </div>
                                         <h3>Add New Service</h3>
-                                        <p>Start a new project and invite your team members</p>
+                                        <p>Start a new service and invite your team members</p>
                                     </article>
 
-                                    <!-- Dynamic Project Cards -->
-                                    <article class="pm-card" *ngFor="let p of services"
-                                        [hidden]="!matchesStatus(p.status)" (click)="onCardClick(p)">
+                                    <!-- Dynamic service Cards -->
+                                    <article class="pm-card" *ngFor="let p of services" (click)="onCardClick(p)">
 
                                         <!-- Header -->
                                         <header class="pm-card-header">
@@ -121,7 +96,7 @@
                                         </header>
 
                                         <!-- Description -->
-                                        <p class="pm-desc">{{ p.name }}</p>
+                                        <p class="pm-desc">{{ p.description }}</p>
 
                                         <!-- Members -->
                                         <!-- <div class="pm-members">
@@ -145,23 +120,23 @@
                                     </article>
 
                                 </div>
-                                <!-- ✅ End Project Cards -->
+                                <!-- ✅ End service Cards -->
 
-                                <!-- New Project Modal -->
+                                <!-- New service Modal -->
                                 <ng-container *ngIf="showNewService">
                                     <div class="pm-modal-backdrop" (click)="closeNewService()"></div>
 
-                                    <div class="pm-modal" role="dialog" aria-modal="true" aria-label="Create Project"
+                                    <div class="pm-modal" role="dialog" aria-modal="true" aria-label="Create service"
                                         (click)="$event.stopPropagation()">
                                         <header class="pm-modal-header">
-                                            <strong>Create Project</strong>
+                                            <strong>Create service</strong>
                                             <button class="pm-close" type="button" (click)="closeNewService()"
                                                 aria-label="Close">×</button>
                                         </header>
 
                                         <form #projectForm="ngForm" (ngSubmit)="saveNewService(projectForm)">
-                                            <!-- ✅ Project Name with Regex -->
-                                            <label class="pm-label">Project name<span class="req">*</span></label>
+                                            <!-- ✅ service Name with Regex -->
+                                            <label class="pm-label">service name<span class="req">*</span></label>
                                             <input class="pm-input" type="text" name="name" required
                                                 pattern="^[A-Za-z0-9 ]{3,50}$" #nameField="ngModel"
                                                 [(ngModel)]="newService.name" placeholder="e.g., Website Revamp">
@@ -169,7 +144,7 @@
                                             <!-- Error message -->
                                             <div *ngIf="nameField.invalid && (nameField.dirty || nameField.touched)"
                                                 class="pm-error">
-                                                <small *ngIf="nameField.errors?.['required']">Project name is
+                                                <small *ngIf="nameField.errors?.['required']">service name is
                                                     required.</small>
                                                 <small *ngIf="nameField.errors?.['pattern']">Only letters, numbers, and
                                                     spaces (3–50

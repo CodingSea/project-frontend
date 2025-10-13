@@ -5,6 +5,7 @@ export interface Service
 {
     serviceID: number;
     name: string;
+    description: string;
     project: Project;
     deadline: Date;
     status: 'pending' | 'in-progress' | 'completed';
