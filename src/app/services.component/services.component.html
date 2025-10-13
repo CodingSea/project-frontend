@@ -134,13 +134,12 @@
                                                 aria-label="Close">×</button>
                                         </header>
 
-                                        <form #projectForm="ngForm" (ngSubmit)="saveNewService(projectForm)">
+                                        <form #serviceForm="ngForm" (ngSubmit)="saveNewService(serviceForm)">
                                             <!-- ✅ service Name with Regex -->
                                             <label class="pm-label">service name<span class="req">*</span></label>
                                             <input class="pm-input" type="text" name="name" required
-                                                pattern="^[A-Za-z0-9 ]{3,50}$" #nameField="ngModel"
-                                                [(ngModel)]="newService.name" placeholder="e.g., Website Revamp">
-
+                                            pattern="^[A-Za-z0-9 ]{3,50}$" #nameField="ngModel"
+                                            [(ngModel)]="newService.name" placeholder="e.g., Website Revamp">
                                             <!-- Error message -->
                                             <div *ngIf="nameField.invalid && (nameField.dirty || nameField.touched)"
                                                 class="pm-error">
@@ -169,24 +168,16 @@
 
 
 
-                                            <!-- <div class="pm-row-2">
-
-                                                <div>
-                                                    <label class="pm-label">Status</label>
-                                                    <select class="pm-input" name="status"
-                                                        [(ngModel)]="newService.status">
-                                                        <option value="Active">Active</option>
-                                                        <option value="In Review">In Review</option>
-                                                        <option value="Urgent">Urgent</option>
-                                                    </select>
-                                                </div> 
-                                            </div>-->
+                                            <div class="pm-row-2">
+                                                <label class="pm-label">Deadline date</label>
+                                                <input class="pm-input" type="date" name="deadline" [(ngModel)]="newService.deadline">
+                                              </div>
 
                                             <div class="pm-actions">
                                                 <button type="button" class="pm-btn"
                                                     >Cancel</button>
                                                 <button type="submit" class="pm-btn pm-btn-primary"
-                                                    [disabled]="projectForm.invalid">Create</button>
+                                                    [disabled]="serviceForm.invalid">Create</button>
                                             </div>
                                         </form>
                                     </div>

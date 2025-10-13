@@ -2,10 +2,10 @@ import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Project } from '@app/project';
 import { Service } from '@app/service';
-import { ServiceService } from '@app/services/service.service';
+import { CreateServiceDto, ServiceService } from '@app/services/service.service';
 import { Sidebar } from '@app/sidebar/sidebar';
 import { environment } from '@environments/environment';
 
@@ -29,7 +29,7 @@ export class ServicesComponent
   selectedFilter: 'all' | 'active' | 'in-review' | 'urgent' = 'all';
   filterState = { active: true, inReview: true, urgent: true };
 
-  constructor(private http: HttpClient, private route: ActivatedRoute) { }
+  constructor(private http: HttpClient, private route: ActivatedRoute, private serviceService: ServiceService, private router : Router) { }
 
   ngOnInit()
   {
@@ -57,7 +57,7 @@ export class ServicesComponent
   }
 
   // New service modal handlers
-  openNewService() { this.showNewService = true; this.newService = this.blankNewService(); } // Updated method
+  openNewService() { this.router.navigate([`${this.router.url}/new`]); } // Updated method
   closeNewService() { this.showNewService = false; } // Updated method
 
   private blankNewService(): Partial<Service> // Updated method
@@ -72,19 +72,12 @@ export class ServicesComponent
   {
     if (form.invalid) return;
 
-    // Automatically set due date (e.g., 14 days from now)
-    // if (!this.newService.dueDate)
-    // {
-    //   const d = new Date();
-    //   d.setDate(d.getDate() + 1);
-    //   this.newService.dueDate = d.toISOString().slice(0, 10);
-    // }
-
-    // this.serviceService.createService(this.newService).subscribe((created: any) => // Updated method
-    // {
-    //   this.services = [ created, ...this.services ]; // Updated variable name
-    //   this.closeNewService(); // Updated method
-    // });
+    if (!this.newService.deadline)
+    {
+      const d = new Date();
+      d.setDate(d.getDate() + 1);
+      this.newService.deadline = d;
+    }
   }
 
   // Filter panel
