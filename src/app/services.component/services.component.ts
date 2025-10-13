@@ -81,7 +81,7 @@ export class ServicesComponent
               {
                 serviceBackloggedTasksCount++;
                 this.servicesInfo.backloggedTasks++;
-              } else if (task.column === 'in-progress')
+              } else if (task.column === 'work')
               {
                 serviceActiveTasksCount++;
                 this.servicesInfo.activeTasks++;
