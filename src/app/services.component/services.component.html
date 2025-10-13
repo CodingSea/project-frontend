@@ -1,0 +1,228 @@
+<div class="container">
+    <app-sidebar />
+
+    <div class="pm-container">
+
+        <div class="service-dashbaord_33-2">
+            <div class="body_33-3">
+                <div class="div_33-4">
+                    <div class="main_33-71">
+                        <div class="div_33-96">
+                            <div class="div_33-97">
+                                <div class="div_33-98">
+                                    <div class="div_33-99">
+                                        <div class="div_33-100">
+                                            <span class="text-total-projects_33-101">Total Projects</span>
+                                            <span class="text-24_33-102">24</span>
+                                        </div>
+                                        <div class="div_33-103">
+                                            <!-- keep your SVG -->
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="div_33-108">
+                                    <div class="div_33-109">
+                                        <div class="div_33-110">
+                                            <span class="text-active-tasks_33-111">Active Tasks</span>
+                                            <span class="text-156_33-112">156</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="div_33-118">
+                                    <div class="div_33-119">
+                                        <div class="div_33-120">
+                                            <span class="text-team-members_33-121">Team Members</span>
+                                            <span class="text-32_33-122">32</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="div_33-128">
+                                    <div class="div_33-129">
+                                        <div class="div_33-130">
+                                            <span class="text-completion-rate_33-131">Completion Rate</span>
+                                            <span class="text-87-_33-132">87%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Recent Projects Section -->
+                            <div class="div_33-138">
+                                <div class="div_33-139">
+                                    <span class="text-recent-projects_33-140">Recent Projects</span>
+                                    <div class="div_33-141">
+
+                                        <!-- Dropdown Filter -->
+                                        <select class="select_33-142" [(ngModel)]="selectedFilter"
+                                            (change)="applyFilters()">
+                                            <option value="all">All Projects</option>
+                                            <option value="active">Active</option>
+                                            <option value="in-review">In Review</option>
+                                            <option value="urgent">Urgent</option>
+                                        </select>
+
+                                        <!-- Button for filter panel -->
+                                        <button class="button_33-146" type="button" aria-label="Open filters"
+                                            (click)="openFilter()">
+                                            <!-- keep your filter SVG here -->
+                                        </button>
+                                    </div>
+
+                                    <!-- Side Filter Panel -->
+                                    <div *ngIf="showFilter">
+                                        <div class="pm-filter-backdrop" (click)="closeFilter()"></div>
+                                        <aside class="pm-filter-panel" role="dialog" aria-label="Filters">
+                                            <div class="pm-filter-header">
+                                                <strong>Filters</strong>
+                                                <button class="pm-close" type="button"
+                                                    (click)="closeFilter()">×</button>
+                                            </div>
+                                            <div class="pm-filter-body">
+                                                <div class="pm-row">
+                                                    <label><input type="checkbox" [(ngModel)]="filterState.active">
+                                                        Active</label>
+                                                </div>
+                                                <div class="pm-row">
+                                                    <label><input type="checkbox" [(ngModel)]="filterState.inReview"> In
+                                                        Review</label>
+                                                </div>
+                                                <div class="pm-row">
+                                                    <label><input type="checkbox" [(ngModel)]="filterState.urgent">
+                                                        Urgent</label>
+                                                </div>
+                                            </div>
+                                        </aside>
+                                    </div>
+                                </div>
+
+                                <!-- ✅ Project Cards (Add New + Dynamic Projects) -->
+                                <div class="pm-cards">
+
+                                    <!-- Add New Project Card -->
+                                    <article class="pm-card add-new" (click)="openNewService()">
+                                        <div class="pm-plus-circle">
+                                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+                                                <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2"
+                                                    stroke-linecap="round" />
+                                            </svg>
+                                        </div>
+                                        <h3>Add New Service</h3>
+                                        <p>Start a new project and invite your team members</p>
+                                    </article>
+
+                                    <!-- Dynamic Project Cards -->
+                                    <article class="pm-card" *ngFor="let p of services"
+                                        [hidden]="!matchesStatus(p.status)" (click)="onCardClick(p)">
+
+                                        <!-- Header -->
+                                        <header class="pm-card-header">
+                                            <h3>{{ p.name }}</h3> <!-- ✅ changed -->
+                                            <span class="pm-pill" [attr.data-status]="p.status">{{ p.status }}</span>
+                                        </header>
+
+                                        <!-- Description -->
+                                        <p class="pm-desc">{{ p.name }}</p>
+
+                                        <!-- Members -->
+                                        <!-- <div class="pm-members">
+                                            <ng-container *ngFor="let m of p.members ?? []; let i = index">
+                                                <img *ngIf="i < 3" [src]="m.avatar || ''" [alt]="m.name || ''"
+                                                    class="pm-avatar">
+                                            </ng-container>
+                                            <span *ngIf="(p.members?.length || 0) > 3" class="pm-more">
+                                                +{{ (p.members?.length || 0) - 3 }}
+                                            </span>
+                                        </div> -->
+
+                                        <!-- Footer -->
+                                        <footer class="pm-card-footer">
+                                            <span class="pm-due">Due: {{ p.deadline | date:'MMM d' }}</span>
+                                            <div class="pm-progress">
+                                                <div class="pm-progress-fill" [style.width.%]="p.deadline"></div>
+                                            </div>
+                                            <span class="pm-progress-label">{{ p.deadline }}%</span>
+                                        </footer>
+                                    </article>
+
+                                </div>
+                                <!-- ✅ End Project Cards -->
+
+                                <!-- New Project Modal -->
+                                <ng-container *ngIf="showNewService">
+                                    <div class="pm-modal-backdrop" (click)="closeNewService()"></div>
+
+                                    <div class="pm-modal" role="dialog" aria-modal="true" aria-label="Create Project"
+                                        (click)="$event.stopPropagation()">
+                                        <header class="pm-modal-header">
+                                            <strong>Create Project</strong>
+                                            <button class="pm-close" type="button" (click)="closeNewService()"
+                                                aria-label="Close">×</button>
+                                        </header>
+
+                                        <form #projectForm="ngForm" (ngSubmit)="saveNewService(projectForm)">
+                                            <!-- ✅ Project Name with Regex -->
+                                            <label class="pm-label">Project name<span class="req">*</span></label>
+                                            <input class="pm-input" type="text" name="name" required
+                                                pattern="^[A-Za-z0-9 ]{3,50}$" #nameField="ngModel"
+                                                [(ngModel)]="newService.name" placeholder="e.g., Website Revamp">
+
+                                            <!-- Error message -->
+                                            <div *ngIf="nameField.invalid && (nameField.dirty || nameField.touched)"
+                                                class="pm-error">
+                                                <small *ngIf="nameField.errors?.['required']">Project name is
+                                                    required.</small>
+                                                <small *ngIf="nameField.errors?.['pattern']">Only letters, numbers, and
+                                                    spaces (3–50
+                                                    chars).</small>
+                                            </div>
+
+                                            <!-- ✅ Description (optional but regex validated) -->
+                                            <label class="pm-label">Description</label>
+                                            <textarea class="pm-textarea" name="description" rows="3"
+                                                [(ngModel)]="newService.name"
+                                                pattern="^$|^[A-Za-z0-9.,!?()\\s-]{1,200}$" #descField="ngModel"
+                                                placeholder="(optional) brief summary"></textarea>
+
+                                            <!-- Error message -->
+                                            <div *ngIf="descField.invalid && (descField.dirty || descField.touched)"
+                                                class="pm-error">
+                                                <small *ngIf="descField.errors?.['pattern']">
+                                                    Only letters, numbers, spaces, and punctuation allowed (max 200
+                                                    chars).
+                                                </small>
+                                            </div>
+
+
+
+                                            <div class="pm-row-2">
+
+                                                <!-- <div>
+                                                    <label class="pm-label">Status</label>
+                                                    <select class="pm-input" name="status"
+                                                        [(ngModel)]="newService.status">
+                                                        <option value="Active">Active</option>
+                                                        <option value="In Review">In Review</option>
+                                                        <option value="Urgent">Urgent</option>
+                                                    </select>
+                                                </div> -->
+                                            </div>
+
+                                            <div class="pm-actions">
+                                                <button type="button" class="pm-btn"
+                                                    >Cancel</button>
+                                                <button type="submit" class="pm-btn pm-btn-primary"
+                                                    [disabled]="projectForm.invalid">Create</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </ng-container>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>

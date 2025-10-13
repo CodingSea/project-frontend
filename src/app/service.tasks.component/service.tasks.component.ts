@@ -19,7 +19,7 @@ import { ActivatedRoute } from '@angular/router';
   imports: [ jqxKanbanModule, jqxSplitterModule, CommonModule, AddTaskPopup, TaskPopup, Sidebar ]
 })
 
-export class ServiceTasksComponent implements OnInit, AfterViewInit 
+export class ServiceTasksComponent implements OnInit, AfterViewInit
 {
   @ViewChild('kanbanReference') kanban!: jqxKanbanComponent;
 
@@ -79,6 +79,7 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
       console.log('Error fetching board cards:', error);
     }
   }
+
 
   ngAfterViewInit()
   {

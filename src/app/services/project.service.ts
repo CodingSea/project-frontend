@@ -7,7 +7,6 @@ export interface Project {
   projectID: number;
   name: string;
   description?: string;
-  dueDate?: string;
   status?: string;
   progress?: number;
 
@@ -22,7 +21,7 @@ export interface Project {
 
 @Injectable({ providedIn: 'root' })
 export class ProjectService {
-  private apiUrl = `${environment.apiUrl}/project`;
+  private apiUrl = `${environment.apiUrl}/projects`;
 
   constructor(private http: HttpClient) {}
 

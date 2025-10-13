@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ProjectService, Project } from '@app/services/project.service';
 import { Sidebar } from "@app/sidebar/sidebar"; // ✅ use one Project type
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-project-management',
@@ -23,24 +24,24 @@ export class ProjectManagement implements OnInit {
   selectedFilter: 'all' | 'active' | 'in-review' | 'urgent' = 'all';
   filterState = { active: true, inReview: true, urgent: true };
 
-  constructor(private projectService: ProjectService) {}
+  constructor(private projectService: ProjectService, private router: Router ) {}
 
   ngOnInit() {
     this.projectService.getProjects().subscribe((data) => {
       // ensure dueDate is a yyyy-mm-dd string for the date pipe
       this.projects = (data ?? []).map(p => ({
-        ...p,
-        dueDate: p.dueDate ? String(p.dueDate) : undefined
+        ...p
       }));
     });
   }
 
-  // card click from template
   onCardClick(p: Project) {
-    // Do whatever you want here (navigate, open details, etc.)
-    // For now just avoid the TS error:
-    console.log('Open project', p.projectID);
+    if (!p.projectID) return;
+
+    console.log('Navigating to project', p.projectID);
+    this.router.navigate(['/kanban', p.projectID]);
   }
+
 
   // New project modal handlers
   openNewProject() { this.showNewProject = true; this.newProject = this.blankNewProject(); }
@@ -55,13 +56,6 @@ export class ProjectManagement implements OnInit {
 
   saveNewProject(form: any) {
     if (form.invalid) return;
-
-    // Automatically set due date (e.g., 14 days from now)
-    if (!this.newProject.dueDate) {
-      const d = new Date();
-      d.setDate(d.getDate() + 1);
-      this.newProject.dueDate = d.toISOString().slice(0, 10);
-    }
 
     this.projectService.createProject(this.newProject).subscribe(created => {
       this.projects = [created, ...this.projects];
