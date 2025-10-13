@@ -188,7 +188,7 @@ export class ServiceFormComponent implements OnInit {
     this.isSubmitting = true;
     console.log('🚀 Sending payload:', payload);
 
-    this.serviceService.createService(payload).subscribe({
+    this.serviceService.createService(payload, this.files).subscribe({
       next: (res) => {
         console.log('✅ Service created successfully:', res);
         alert('Service created successfully!');
