@@ -75,7 +75,7 @@ export class ProfileComponent {
           );
 
           // ✅ Fetch services (PLURAL FIX)
-          this.http.get<Service[]>(`${environment.apiUrl}/services/user/${userId}`).subscribe(
+          this.http.get<Service[]>(`${environment.apiUrl}/service/user/${userId}`).subscribe(
             (response) => {
               if (response.length === 0) {
                 console.log("no services found");
@@ -126,7 +126,7 @@ export class ProfileComponent {
             );
 
             // ✅ Fetch services (PLURAL FIX)
-            this.http.get<Service[]>(`${environment.apiUrl}/services/user/${decodedToken.sub}`).subscribe(
+            this.http.get<Service[]>(`${environment.apiUrl}/service/user/${decodedToken.sub}`).subscribe(
               (response) => {
                 if (response.length === 0) {
                   console.log("no services found");
