@@ -31,11 +31,11 @@ export class Sidebar implements OnInit
 
   setActiveLink(url: string)
   {
-    if (url.includes('/dashboard'))
+    if (url.includes('/home'))
     {
       this.activeLink = 'dashboard';
     }
-    else if (url.includes('/auth/login'))
+    else if (url.includes('/projects'))
     {
       this.activeLink = 'projectManagement';
     }

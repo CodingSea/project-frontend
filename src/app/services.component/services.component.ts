@@ -2,10 +2,10 @@ import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Project } from '@app/project';
 import { Service } from '@app/service';
-import { ServiceService } from '@app/services/service.service';
+import { CreateServiceDto, ServiceService } from '@app/services/service.service';
 import { Sidebar } from '@app/sidebar/sidebar';
 import { environment } from '@environments/environment';
 
@@ -24,12 +24,21 @@ export class ServicesComponent
 
   projectId: string | null = null;
 
+  servicesInfo =
+    {
+      totalServices: 0,
+      backloggedTasks: 0,
+      activeTasks: 0,
+      totalMembers: 0,
+      completionRate: 0.0,
+    }
+
   // Filters
   showFilter = false;
   selectedFilter: 'all' | 'active' | 'in-review' | 'urgent' = 'all';
   filterState = { active: true, inReview: true, urgent: true };
 
-  constructor(private http: HttpClient, private route: ActivatedRoute) { }
+  constructor(private http: HttpClient, private route: ActivatedRoute, private serviceService: ServiceService, private router: Router) { }
 
   ngOnInit()
   {
@@ -39,7 +48,63 @@ export class ServicesComponent
       (res) =>
       {
         this.services = res.services; // Assuming res has a 'services' property
-        console.log(res.services)
+        this.servicesInfo.totalServices = this.services.length;
+
+        let totalTasksCount = 0;
+        let completedTasksCount = 0;
+
+        this.servicesInfo.totalMembers = this.services.reduce((total, service) =>
+        {
+          // Count members from all fields
+          const chiefCount = service.chief ? 1 : 0;
+          const projectManagerCount = service.projectManager ? 1 : 0;
+          const backupCount = service.backup ? 1 : 0;
+          const assignedResourcesCount = service.assignedResources ? service.assignedResources.length : 0;
+
+          service.memberCount = chiefCount + projectManagerCount + backupCount + assignedResourcesCount;
+          service.completionRate = 0;
+
+          let serviceBackloggedTasksCount = 0;
+          let serviceActiveTasksCount = 0;
+          let serviceCompletedTasksCount = 0;
+          let serviceTotalTasksCount = 0;
+
+          // Count tasks based on their status
+          if (service.taskBoard && service.taskBoard.cards)
+          {
+            service.taskBoard.cards.forEach(task =>
+            {
+              totalTasksCount++;
+              serviceTotalTasksCount++; // Count every task
+
+              if (task.column === 'new')
+              {
+                serviceBackloggedTasksCount++;
+                this.servicesInfo.backloggedTasks++;
+              } else if (task.column === 'in-progress')
+              {
+                serviceActiveTasksCount++;
+                this.servicesInfo.activeTasks++;
+              } else if (task.column === 'done')
+              {
+                serviceCompletedTasksCount++;
+                completedTasksCount++;
+              }
+            });
+            service.completionRate = serviceTotalTasksCount > 0
+              ? (serviceCompletedTasksCount / serviceTotalTasksCount) * 100
+              : 0;
+          }
+
+          return (total + chiefCount + projectManagerCount + backupCount + assignedResourcesCount);
+        }, 0);
+
+        this.servicesInfo.completionRate = totalTasksCount > 0
+          ? (completedTasksCount / totalTasksCount) * 100
+          : 0;
+
+        console.log('Services:', res.services);
+        console.log('Total Members:', this.servicesInfo.totalMembers);
       },
       (error) =>
       {
@@ -54,10 +119,12 @@ export class ServicesComponent
     // Do whatever you want here (navigate, open details, etc.)
     // For now just avoid the TS error:
     console.log('Open service', s.serviceID); // Updated log
+
+    this.router.navigate([ `services/${s.serviceID}/taskboard/${s.taskBoard?.id}` ])
   }
 
   // New service modal handlers
-  openNewService() { this.showNewService = true; this.newService = this.blankNewService(); } // Updated method
+  openNewService() { this.router.navigate([ `${this.router.url}/new` ]); } // Updated method
   closeNewService() { this.showNewService = false; } // Updated method
 
   private blankNewService(): Partial<Service> // Updated method
@@ -72,19 +139,12 @@ export class ServicesComponent
   {
     if (form.invalid) return;
 
-    // Automatically set due date (e.g., 14 days from now)
-    // if (!this.newService.dueDate)
-    // {
-    //   const d = new Date();
-    //   d.setDate(d.getDate() + 1);
-    //   this.newService.dueDate = d.toISOString().slice(0, 10);
-    // }
-
-    // this.serviceService.createService(this.newService).subscribe((created: any) => // Updated method
-    // {
-    //   this.services = [ created, ...this.services ]; // Updated variable name
-    //   this.closeNewService(); // Updated method
-    // });
+    if (!this.newService.deadline)
+    {
+      const d = new Date();
+      d.setDate(d.getDate() + 1);
+      this.newService.deadline = d;
+    }
   }
 
   // Filter panel
