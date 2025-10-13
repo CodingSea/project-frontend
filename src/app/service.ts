@@ -15,4 +15,5 @@ export interface Service
     assignedResources?: User[];
     backup?: User[];
     taskBoard?: TaskBoard;
+    memberCount?: number;
 }

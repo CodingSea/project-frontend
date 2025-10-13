@@ -24,12 +24,21 @@ export class ServicesComponent
 
   projectId: string | null = null;
 
+  servicesInfo =
+    {
+      totalServices: 0,
+      backloggedTasks: 0,
+      activeTasks: 0,
+      totalMembers: 0,
+      completionRate: 0.0,
+    }
+
   // Filters
   showFilter = false;
   selectedFilter: 'all' | 'active' | 'in-review' | 'urgent' = 'all';
   filterState = { active: true, inReview: true, urgent: true };
 
-  constructor(private http: HttpClient, private route: ActivatedRoute, private serviceService: ServiceService, private router : Router) { }
+  constructor(private http: HttpClient, private route: ActivatedRoute, private serviceService: ServiceService, private router: Router) { }
 
   ngOnInit()
   {
@@ -39,7 +48,23 @@ export class ServicesComponent
       (res) =>
       {
         this.services = res.services; // Assuming res has a 'services' property
-        console.log(res.services)
+        this.servicesInfo.totalServices = this.services.length;
+
+        this.servicesInfo.totalMembers = this.services.reduce((total, service) =>
+        {
+          // Count members from all fields
+          const chiefCount = service.chief ? 1 : 0;
+          const projectManagerCount = service.projectManager ? 1 : 0;
+          const backupCount = service.backup ? 1 : 0;
+          const assignedResourcesCount = service.assignedResources ? service.assignedResources.length : 0;
+
+          service.memberCount = chiefCount + projectManagerCount + backupCount + assignedResourcesCount;
+
+          return total + chiefCount + projectManagerCount + backupCount + assignedResourcesCount;
+        }, 0);
+
+        console.log('Services:', res.services);
+        console.log('Total Members:', this.servicesInfo.totalMembers);
       },
       (error) =>
       {
@@ -55,11 +80,11 @@ export class ServicesComponent
     // For now just avoid the TS error:
     console.log('Open service', s.serviceID); // Updated log
 
-    this.router.navigate([`services/${s.serviceID}/taskboard/${s.taskBoard?.id}`])
+    this.router.navigate([ `services/${s.serviceID}/taskboard/${s.taskBoard?.id}` ])
   }
 
   // New service modal handlers
-  openNewService() { this.router.navigate([`${this.router.url}/new`]); } // Updated method
+  openNewService() { this.router.navigate([ `${this.router.url}/new` ]); } // Updated method
   closeNewService() { this.showNewService = false; } // Updated method
 
   private blankNewService(): Partial<Service> // Updated method

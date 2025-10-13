@@ -12,19 +12,23 @@
                                 <ul class="stats-list">
                                     <li class="stat-item">
                                         <span class="text-total-projects">Total Services</span>
-                                        <span class="text-24">24</span>
+                                        <span class="text-24">{{ servicesInfo.totalServices }}</span>
+                                    </li>
+                                    <li class="stat-item">
+                                        <span class="text-active-tasks">Backlogged Tasks</span>
+                                        <span class="text-156">{{ servicesInfo.backloggedTasks }}</span>
                                     </li>
                                     <li class="stat-item">
                                         <span class="text-active-tasks">Active Tasks</span>
-                                        <span class="text-156">156</span>
+                                        <span class="text-156">{{ servicesInfo.activeTasks }}</span>
                                     </li>
                                     <li class="stat-item">
                                         <span class="text-team-members">Team Members</span>
-                                        <span class="text-32">32</span>
+                                        <span class="text-32">{{ servicesInfo.totalMembers }}</span>
                                     </li>
                                     <li class="stat-item">
                                         <span class="text-completion-rate">Completion Rate</span>
-                                        <span class="text-87">87%</span>
+                                        <span class="text-87">{{ servicesInfo.completionRate }}%</span>
                                     </li>
                                 </ul>
                             </div>
@@ -41,30 +45,35 @@
                                             <option value="in-review">In Review</option>
                                             <option value="urgent">Urgent</option>
                                         </select>
-                                
+
                                         <!-- Button for filter panel -->
-                                        <button class="button" type="button" aria-label="Open filters" (click)="openFilter()">
+                                        <button class="button" type="button" aria-label="Open filters"
+                                            (click)="openFilter()">
                                             <!-- keep your filter SVG here -->
                                         </button>
                                     </div>
-                                
+
                                     <!-- Side Filter Panel -->
                                     <div *ngIf="showFilter">
                                         <div class="pm-filter-backdrop" (click)="closeFilter()"></div>
                                         <aside class="pm-filter-panel" role="dialog" aria-label="Filters">
                                             <div class="pm-filter-header">
                                                 <strong>Filters</strong>
-                                                <button class="pm-close" type="button" (click)="closeFilter()">×</button>
+                                                <button class="pm-close" type="button"
+                                                    (click)="closeFilter()">×</button>
                                             </div>
                                             <div class="pm-filter-body">
                                                 <div class="pm-row">
-                                                    <label><input type="checkbox" [(ngModel)]="filterState.active"> Active</label>
+                                                    <label><input type="checkbox" [(ngModel)]="filterState.active">
+                                                        Active</label>
                                                 </div>
                                                 <div class="pm-row">
-                                                    <label><input type="checkbox" [(ngModel)]="filterState.inReview"> In Review</label>
+                                                    <label><input type="checkbox" [(ngModel)]="filterState.inReview"> In
+                                                        Review</label>
                                                 </div>
                                                 <div class="pm-row">
-                                                    <label><input type="checkbox" [(ngModel)]="filterState.urgent"> Urgent</label>
+                                                    <label><input type="checkbox" [(ngModel)]="filterState.urgent">
+                                                        Urgent</label>
                                                 </div>
                                             </div>
                                         </aside>
@@ -97,6 +106,9 @@
 
                                         <!-- Description -->
                                         <p class="pm-desc">{{ p.description }}</p>
+
+
+                                        <p class="pm-members">Members: {{ p.memberCount }}</p>
 
                                         <!-- Members -->
                                         <!-- <div class="pm-members">
@@ -138,8 +150,8 @@
                                             <!-- ✅ service Name with Regex -->
                                             <label class="pm-label">service name<span class="req">*</span></label>
                                             <input class="pm-input" type="text" name="name" required
-                                            pattern="^[A-Za-z0-9 ]{3,50}$" #nameField="ngModel"
-                                            [(ngModel)]="newService.name" placeholder="e.g., Website Revamp">
+                                                pattern="^[A-Za-z0-9 ]{3,50}$" #nameField="ngModel"
+                                                [(ngModel)]="newService.name" placeholder="e.g., Website Revamp">
                                             <!-- Error message -->
                                             <div *ngIf="nameField.invalid && (nameField.dirty || nameField.touched)"
                                                 class="pm-error">
@@ -170,12 +182,12 @@
 
                                             <div class="pm-row-2">
                                                 <label class="pm-label">Deadline date</label>
-                                                <input class="pm-input" type="date" name="deadline" [(ngModel)]="newService.deadline">
-                                              </div>
+                                                <input class="pm-input" type="date" name="deadline"
+                                                    [(ngModel)]="newService.deadline">
+                                            </div>
 
                                             <div class="pm-actions">
-                                                <button type="button" class="pm-btn"
-                                                    >Cancel</button>
+                                                <button type="button" class="pm-btn">Cancel</button>
                                                 <button type="submit" class="pm-btn pm-btn-primary"
                                                     [disabled]="serviceForm.invalid">Create</button>
                                             </div>
