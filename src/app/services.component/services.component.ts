@@ -50,6 +50,9 @@ export class ServicesComponent
         this.services = res.services; // Assuming res has a 'services' property
         this.servicesInfo.totalServices = this.services.length;
 
+        let totalTasksCount = 0;
+        let completedTasksCount = 0;
+
         this.servicesInfo.totalMembers = this.services.reduce((total, service) =>
         {
           // Count members from all fields
@@ -60,8 +63,32 @@ export class ServicesComponent
 
           service.memberCount = chiefCount + projectManagerCount + backupCount + assignedResourcesCount;
 
+          // Count tasks based on their status
+          if (service.taskBoard && service.taskBoard.cards)
+          {
+            service.taskBoard.cards.forEach(task =>
+            {
+              totalTasksCount++;
+              if (task.column === 'new')
+              {
+                this.servicesInfo.backloggedTasks++;
+              } else if (task.column === 'work')
+              {
+                this.servicesInfo.activeTasks++;
+              }
+              else if (task.column === 'done')
+              {
+                completedTasksCount++;
+              }
+            });
+          }
+
           return total + chiefCount + projectManagerCount + backupCount + assignedResourcesCount;
         }, 0);
+
+        this.servicesInfo.completionRate = totalTasksCount > 0
+          ? (completedTasksCount / totalTasksCount) * 100
+          : 0;
 
         console.log('Services:', res.services);
         console.log('Total Members:', this.servicesInfo.totalMembers);
