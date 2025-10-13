@@ -128,7 +128,7 @@
 
                     <!-- Footer -->
                     <footer class="pm-card-footer">
-                      <span class="pm-due">Due: {{ p.dueDate ?? '' | date:'MMM d' }}</span>
+                      <span class="pm-due">Due: {{ p.description | date:'MMM d' }}</span>
                       <div class="pm-progress">
                         <div class="pm-progress-fill" [style.width.%]="p.progress"></div>
                       </div>

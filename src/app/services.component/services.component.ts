@@ -1,8 +1,13 @@
 import { CommonModule } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
+import { Project } from '@app/project';
 import { Service } from '@app/service';
+import { ServiceService } from '@app/services/service.service';
 import { Sidebar } from '@app/sidebar/sidebar';
+import { environment } from '@environments/environment';
 
 @Component({
   selector: 'app-services.component',
@@ -12,29 +17,35 @@ import { Sidebar } from '@app/sidebar/sidebar';
 })
 export class ServicesComponent
 {
-  services: Service[] = []; // Updated variable name
+  services: Service[] = [];
 
-  // New Service Modal
-  showNewService = false; // Updated variable name
-  newService: Partial<Service> = this.blankNewService(); // Updated variable type
+  showNewService = false;
+  newService: Partial<Service> = this.blankNewService();
+
+  projectId: string | null = null;
 
   // Filters
   showFilter = false;
   selectedFilter: 'all' | 'active' | 'in-review' | 'urgent' = 'all';
   filterState = { active: true, inReview: true, urgent: true };
 
-  constructor(private serviceService: ServiceService) { } // Updated service
+  constructor(private http: HttpClient, private route: ActivatedRoute) { }
 
   ngOnInit()
   {
-    this.serviceService.getServices().subscribe((data: any) => // Updated method
-    {
-      // ensure dueDate is a yyyy-mm-dd string for the date pipe
-      this.services = (data ?? []).map(s => ({ // Updated variable name
-        ...s,
-        dueDate: s.dueDate ? String(s.dueDate) : undefined
-      }));
-    });
+    this.projectId = this.route.snapshot.paramMap.get('projectId');
+
+    this.http.get<Project>(`${environment.apiUrl}/project/${this.projectId}`).subscribe(
+      (res) =>
+      {
+        this.services = res.services; // Assuming res has a 'services' property
+        console.log(res.services)
+      },
+      (error) =>
+      {
+        console.log(error);
+      }
+    );
   }
 
   // card click from template
@@ -54,7 +65,7 @@ export class ServicesComponent
     const d = new Date();
     d.setDate(d.getDate() + 14);
     const yyyyMmDd = d.toISOString().slice(0, 10);
-    return { name: '', description: '', status: 'Active', progress: 0 }; // Adjust fields as necessary
+    return { name: '' }; // Adjust fields as necessary
   }
 
   saveNewService(form: any) // Updated method
@@ -62,18 +73,18 @@ export class ServicesComponent
     if (form.invalid) return;
 
     // Automatically set due date (e.g., 14 days from now)
-    if (!this.newService.dueDate)
-    {
-      const d = new Date();
-      d.setDate(d.getDate() + 1);
-      this.newService.dueDate = d.toISOString().slice(0, 10);
-    }
+    // if (!this.newService.dueDate)
+    // {
+    //   const d = new Date();
+    //   d.setDate(d.getDate() + 1);
+    //   this.newService.dueDate = d.toISOString().slice(0, 10);
+    // }
 
-    this.serviceService.createService(this.newService).subscribe((created: any) => // Updated method
-    {
-      this.services = [ created, ...this.services ]; // Updated variable name
-      this.closeNewService(); // Updated method
-    });
+    // this.serviceService.createService(this.newService).subscribe((created: any) => // Updated method
+    // {
+    //   this.services = [ created, ...this.services ]; // Updated variable name
+    //   this.closeNewService(); // Updated method
+    // });
   }
 
   // Filter panel

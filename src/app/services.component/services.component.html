@@ -99,7 +99,7 @@
                                 <div class="pm-cards">
 
                                     <!-- Add New Project Card -->
-                                    <article class="pm-card add-new" (click)="openNewProject()">
+                                    <article class="pm-card add-new" (click)="openNewService()">
                                         <div class="pm-plus-circle">
                                             <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
                                                 <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2"
@@ -111,7 +111,7 @@
                                     </article>
 
                                     <!-- Dynamic Project Cards -->
-                                    <article class="pm-card" *ngFor="let p of projects"
+                                    <article class="pm-card" *ngFor="let p of services"
                                         [hidden]="!matchesStatus(p.status)" (click)="onCardClick(p)">
 
                                         <!-- Header -->
@@ -121,10 +121,10 @@
                                         </header>
 
                                         <!-- Description -->
-                                        <p class="pm-desc">{{ p.description }}</p>
+                                        <p class="pm-desc">{{ p.name }}</p>
 
                                         <!-- Members -->
-                                        <div class="pm-members">
+                                        <!-- <div class="pm-members">
                                             <ng-container *ngFor="let m of p.members ?? []; let i = index">
                                                 <img *ngIf="i < 3" [src]="m.avatar || ''" [alt]="m.name || ''"
                                                     class="pm-avatar">
@@ -132,15 +132,15 @@
                                             <span *ngIf="(p.members?.length || 0) > 3" class="pm-more">
                                                 +{{ (p.members?.length || 0) - 3 }}
                                             </span>
-                                        </div>
+                                        </div> -->
 
                                         <!-- Footer -->
                                         <footer class="pm-card-footer">
-                                            <span class="pm-due">Due: {{ p.dueDate ?? '' | date:'MMM d' }}</span>
+                                            <span class="pm-due">Due: {{ p.deadline | date:'MMM d' }}</span>
                                             <div class="pm-progress">
-                                                <div class="pm-progress-fill" [style.width.%]="p.progress"></div>
+                                                <div class="pm-progress-fill" [style.width.%]="p.deadline"></div>
                                             </div>
-                                            <span class="pm-progress-label">{{ p.progress }}%</span>
+                                            <span class="pm-progress-label">{{ p.deadline }}%</span>
                                         </footer>
                                     </article>
 
@@ -148,23 +148,23 @@
                                 <!-- ✅ End Project Cards -->
 
                                 <!-- New Project Modal -->
-                                <ng-container *ngIf="showNewProject">
-                                    <div class="pm-modal-backdrop" (click)="closeNewProject()"></div>
+                                <ng-container *ngIf="showNewService">
+                                    <div class="pm-modal-backdrop" (click)="closeNewService()"></div>
 
                                     <div class="pm-modal" role="dialog" aria-modal="true" aria-label="Create Project"
                                         (click)="$event.stopPropagation()">
                                         <header class="pm-modal-header">
                                             <strong>Create Project</strong>
-                                            <button class="pm-close" type="button" (click)="closeNewProject()"
+                                            <button class="pm-close" type="button" (click)="closeNewService()"
                                                 aria-label="Close">×</button>
                                         </header>
 
-                                        <form #projectForm="ngForm" (ngSubmit)="saveNewProject(projectForm)">
+                                        <form #projectForm="ngForm" (ngSubmit)="saveNewService(projectForm)">
                                             <!-- ✅ Project Name with Regex -->
                                             <label class="pm-label">Project name<span class="req">*</span></label>
                                             <input class="pm-input" type="text" name="name" required
                                                 pattern="^[A-Za-z0-9 ]{3,50}$" #nameField="ngModel"
-                                                [(ngModel)]="newProject.name" placeholder="e.g., Website Revamp">
+                                                [(ngModel)]="newService.name" placeholder="e.g., Website Revamp">
 
                                             <!-- Error message -->
                                             <div *ngIf="nameField.invalid && (nameField.dirty || nameField.touched)"
@@ -179,7 +179,7 @@
                                             <!-- ✅ Description (optional but regex validated) -->
                                             <label class="pm-label">Description</label>
                                             <textarea class="pm-textarea" name="description" rows="3"
-                                                [(ngModel)]="newProject.description"
+                                                [(ngModel)]="newService.name"
                                                 pattern="^$|^[A-Za-z0-9.,!?()\\s-]{1,200}$" #descField="ngModel"
                                                 placeholder="(optional) brief summary"></textarea>
 
@@ -196,20 +196,20 @@
 
                                             <div class="pm-row-2">
 
-                                                <div>
+                                                <!-- <div>
                                                     <label class="pm-label">Status</label>
                                                     <select class="pm-input" name="status"
-                                                        [(ngModel)]="newProject.status">
+                                                        [(ngModel)]="newService.status">
                                                         <option value="Active">Active</option>
                                                         <option value="In Review">In Review</option>
                                                         <option value="Urgent">Urgent</option>
                                                     </select>
-                                                </div>
+                                                </div> -->
                                             </div>
 
                                             <div class="pm-actions">
                                                 <button type="button" class="pm-btn"
-                                                    (click)="closeNewProject()">Cancel</button>
+                                                    >Cancel</button>
                                                 <button type="submit" class="pm-btn pm-btn-primary"
                                                     [disabled]="projectForm.invalid">Create</button>
                                             </div>
