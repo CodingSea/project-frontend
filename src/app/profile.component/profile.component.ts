@@ -10,14 +10,15 @@ import { Service } from '@app/service';
 
 @Component({
   selector: 'app-profile.component',
-  imports: [Sidebar, RouterLink],
+  imports: [ Sidebar, RouterLink ],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.css'
 })
-export class ProfileComponent {
+export class ProfileComponent
+{
   isCurrentUser: boolean = false;
 
-  constructor(private http: HttpClient, private activatedRoute: ActivatedRoute) {}
+  constructor(private http: HttpClient, private activatedRoute: ActivatedRoute) { }
 
   currentUserInfo = {
     username: "",
@@ -30,111 +31,137 @@ export class ProfileComponent {
   certificates: Certificate[] | null = null;
   services: Service[] | null = null;
 
-  ngOnInit() {
+  ngOnInit()
+  {
     const token: string | null = localStorage.getItem("token");
     if (token !== null)
-      this.activatedRoute.queryParamMap.subscribe((params: ParamMap) => {
-        if (this.activatedRoute.snapshot.paramMap.has("userId")) {
+      this.activatedRoute.queryParamMap.subscribe((params: ParamMap) =>
+      {
+        if (this.activatedRoute.snapshot.paramMap.has("userId"))
+        {
           this.isCurrentUser = false;
           const userId = this.activatedRoute.snapshot.paramMap.get('userId');
 
           const token: string | null = localStorage.getItem("token");
-          if (token !== null) {
+          if (token !== null)
+          {
             const decodedToken: any = jwtDecode(token);
             this.isCurrentUser = decodedToken.sub == userId;
           }
 
           // ✅ Fetch user info
           this.http.get<User>(`${environment.apiUrl}/user/${userId}`).subscribe(
-            (response) => {
+            (response) =>
+            {
               this.currentUser = response;
 
               this.currentUserInfo.username = this.currentUser.first_name + " " + this.currentUser.last_name;
               this.currentUserInfo.email = this.currentUser.email;
               this.currentUserInfo.skills = this.currentUser.skills;
 
-              if (this.currentUser.role === "admin") {
+              if (this.currentUser.role === "admin")
+              {
                 this.currentUserInfo.role = "Admin";
-              } else if (this.currentUser.role === "developer") {
+              } else if (this.currentUser.role === "developer")
+              {
                 this.currentUserInfo.role = "Developer";
               }
             },
-            (error) => {
+            (error) =>
+            {
               console.log(error);
             }
           );
 
           // ✅ Fetch certificates
           this.http.get<Certificate[]>(`${environment.apiUrl}/certificate/${userId}`).subscribe(
-            (response) => {
+            (response) =>
+            {
               this.certificates = response;
             },
-            (error) => {
+            (error) =>
+            {
               console.log(error);
             }
           );
 
           // ✅ Fetch services (PLURAL FIX)
-          this.http.get<Service[]>(`${environment.apiUrl}/services/user/${userId}`).subscribe(
-            (response) => {
-              if (response.length === 0) {
+          this.http.get<Service[]>(`${environment.apiUrl}/service/user/${userId}`).subscribe(
+            (response) =>
+            {
+              if (response.length === 0)
+              {
                 console.log("no services found");
-              } else {
+              } else
+              {
                 this.services = response;
               }
             },
-            (error) => {
+            (error) =>
+            {
               console.log(error);
             }
           );
         }
-        else {
+        else
+        {
           // ✅ Current user profile (decoded from token)
           this.isCurrentUser = true;
           const token: string | null = localStorage.getItem("token");
-          if (token !== null) {
+          if (token !== null)
+          {
             const decodedToken: any = jwtDecode(token);
 
-            if (decodedToken.role === "admin") {
+            if (decodedToken.role === "admin")
+            {
               this.currentUserInfo.role = "Admin";
-            } else if (decodedToken.role === "developer") {
+            } else if (decodedToken.role === "developer")
+            {
               this.currentUserInfo.role = "Developer";
             }
 
             // ✅ Fetch user info
             this.http.get<User>(`${environment.apiUrl}/user/${decodedToken.sub}`).subscribe(
-              (response) => {
+              (response) =>
+              {
                 this.currentUser = response;
 
                 this.currentUserInfo.username = this.currentUser.first_name + " " + this.currentUser.last_name;
                 this.currentUserInfo.email = this.currentUser.email;
                 this.currentUserInfo.skills = this.currentUser.skills;
               },
-              (error) => {
+              (error) =>
+              {
                 console.log(error);
               }
             );
 
             // ✅ Fetch certificates
             this.http.get<Certificate[]>(`${environment.apiUrl}/certificate/${decodedToken.sub}`).subscribe(
-              (response) => {
+              (response) =>
+              {
                 this.certificates = response;
               },
-              (error) => {
+              (error) =>
+              {
                 console.log(error);
               }
             );
 
             // ✅ Fetch services (PLURAL FIX)
-            this.http.get<Service[]>(`${environment.apiUrl}/services/user/${decodedToken.sub}`).subscribe(
-              (response) => {
-                if (response.length === 0) {
+            this.http.get<Service[]>(`${environment.apiUrl}/service/user/${decodedToken.sub}`).subscribe(
+              (response) =>
+              {
+                if (response.length === 0)
+                {
                   console.log("no services found");
-                } else {
+                } else
+                {
                   this.services = response;
                 }
               },
-              (error) => {
+              (error) =>
+              {
                 console.log(error);
               }
             );

@@ -1,13 +1,14 @@
 import { Component, HostListener, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {
-  FormArray,
-  FormBuilder,
-  FormControl,
-  FormGroup,
-  ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
+import
+  {
+    FormArray,
+    FormBuilder,
+    FormControl,
+    FormGroup,
+    ReactiveFormsModule,
+    Validators,
+  } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { ServiceService, CreateServiceDto } from '../services/service.service';
 import { UserService, User } from '@app/services/user.service';
@@ -15,11 +16,12 @@ import { UserService, User } from '@app/services/user.service';
 @Component({
   selector: 'app-service-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule],
+  imports: [ CommonModule, ReactiveFormsModule, RouterModule ],
   templateUrl: './service-form.component.html',
-  styleUrls: ['./service-form.component.scss'],
+  styleUrls: [ './service-form.component.scss' ],
 })
-export class ServiceFormComponent implements OnInit {
+export class ServiceFormComponent implements OnInit
+{
   form!: FormGroup;
   files: File[] = [];
   isDragging = false;
@@ -38,7 +40,8 @@ export class ServiceFormComponent implements OnInit {
     private route: ActivatedRoute,
     private serviceService: ServiceService,
     private userService: UserService
-  ) {
+  )
+  {
     this.form = this.fb.group({
       // ✅ Service name: letters, numbers, spaces only (3–50 chars)
       name: [
@@ -50,7 +53,7 @@ export class ServiceFormComponent implements OnInit {
       ],
 
       // ✅ Deadline (required)
-      deadline: ['', Validators.required],
+      deadline: [ '', Validators.required ],
 
       // ✅ Description (optional): allows letters, numbers, punctuation, spaces
       description: [
@@ -62,14 +65,15 @@ export class ServiceFormComponent implements OnInit {
       ],
 
       // ✅ Dropdowns
-      chiefId: [null, Validators.required],
-      managerId: [null, Validators.required],
+      chiefId: [ null, Validators.required ],
+      managerId: [ null, Validators.required ],
       resources: this.fb.array<number>([] as number[]),
     });
 
   }
 
-  ngOnInit() {
+  ngOnInit()
+  {
     // ✅ If projectId is passed via route (e.g. /projects/:id/create-service)
     this.projectId = Number(this.route.snapshot.paramMap.get('id')) || 1; // fallback for now
 
@@ -80,15 +84,18 @@ export class ServiceFormComponent implements OnInit {
   // ======================
   // 🔹 Load all users
   // ======================
-  loadUsers() {
+  loadUsers()
+  {
     this.userService.getAllUsers().subscribe({
-      next: (users) => {
+      next: (users) =>
+      {
         console.log('✅ Users loaded:', users);
         this.chiefs = users;
         this.managers = users;
         this.allResources = users;
       },
-      error: (err) => {
+      error: (err) =>
+      {
         console.error('❌ Error loading users:', err);
       },
     });
@@ -97,26 +104,31 @@ export class ServiceFormComponent implements OnInit {
   // ======================
   // 🔹 Helpers for resources
   // ======================
-  get resourcesFA(): FormArray<FormControl<number | null>> {
+  get resourcesFA(): FormArray<FormControl<number | null>>
+  {
     return this.form.get('resources') as FormArray<FormControl<number | null>>;
   }
 
-  getResourceName(resourceId: number | null | undefined): string {
+  getResourceName(resourceId: number | null | undefined): string
+  {
     if (!resourceId) return '';
     const found = this.allResources.find((r) => r.id === resourceId);
     return found ? `${found.first_name} ${found.last_name}` : String(resourceId);
   }
 
-  addResource(selectEl: HTMLSelectElement) {
+  addResource(selectEl: HTMLSelectElement)
+  {
     const id = Number(selectEl.value);
     if (!id) return;
-    if (!this.resourcesFA.value?.includes(id)) {
+    if (!this.resourcesFA.value?.includes(id))
+    {
       this.resourcesFA.push(new FormControl(id));
     }
     selectEl.value = '';
   }
 
-  removeResource(id: number) {
+  removeResource(id: number)
+  {
     const idx = this.resourcesFA.value.findIndex((v) => v === id);
     if (idx > -1) this.resourcesFA.removeAt(idx);
   }
@@ -124,34 +136,40 @@ export class ServiceFormComponent implements OnInit {
   // ======================
   // 🔹 File handling
   // ======================
-  onFilesSelected(e: Event) {
+  onFilesSelected(e: Event)
+  {
     const input = e.target as HTMLInputElement;
     if (!input.files) return;
     this.addFileList(input.files);
     input.value = '';
   }
 
-  addFileList(list: FileList) {
+  addFileList(list: FileList)
+  {
     Array.from(list).forEach((f) => this.files.push(f));
   }
 
-  @HostListener('dragover', ['$event'])
-  onDragOver(ev: DragEvent) {
+  @HostListener('dragover', [ '$event' ])
+  onDragOver(ev: DragEvent)
+  {
     ev.preventDefault();
     this.isDragging = true;
   }
 
-  @HostListener('dragleave', ['$event'])
-  onDragLeave(ev: DragEvent) {
+  @HostListener('dragleave', [ '$event' ])
+  onDragLeave(ev: DragEvent)
+  {
     ev.preventDefault();
     this.isDragging = false;
   }
 
-  @HostListener('drop', ['$event'])
-  onDrop(ev: DragEvent) {
+  @HostListener('drop', [ '$event' ])
+  onDrop(ev: DragEvent)
+  {
     ev.preventDefault();
     this.isDragging = false;
-    if (ev.dataTransfer?.files?.length) {
+    if (ev.dataTransfer?.files?.length)
+    {
       this.addFileList(ev.dataTransfer.files);
     }
   }
@@ -159,19 +177,23 @@ export class ServiceFormComponent implements OnInit {
   // ======================
   // 🔹 Navigation
   // ======================
-  goBack() {
+  goBack()
+  {
     this.router.navigateByUrl('/project-management');
   }
 
-  cancel() {
+  cancel()
+  {
     this.router.navigateByUrl('/project-management');
   }
 
   // ======================
   // 🔹 Submit form to backend
   // ======================
-  submit() {
-    if (this.form.invalid) {
+  submit()
+  {
+    if (this.form.invalid)
+    {
       this.form.markAllAsTouched();
       return;
     }
@@ -189,16 +211,19 @@ export class ServiceFormComponent implements OnInit {
     console.log('🚀 Sending payload:', payload);
 
     this.serviceService.createService(payload, this.files).subscribe({
-      next: (res) => {
+      next: (res) =>
+      {
         console.log('✅ Service created successfully:', res);
         alert('Service created successfully!');
         this.router.navigateByUrl('/project-management');
       },
-      error: (err) => {
+      error: (err) =>
+      {
         console.error('❌ Error creating service:', err);
         alert('Failed to create service. Check console for details.');
       },
-      complete: () => {
+      complete: () =>
+      {
         this.isSubmitting = false;
       },
     });
