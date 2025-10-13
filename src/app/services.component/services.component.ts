@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Service } from '@app/service';
+import { ServiceService } from '@app/services/service.service';
 import { Sidebar } from '@app/sidebar/sidebar';
 
 @Component({
@@ -27,10 +28,10 @@ export class ServicesComponent
 
   ngOnInit()
   {
-    this.serviceService.getServices().subscribe((data: any) => // Updated method
+    this.serviceService.getAllServices().subscribe((data: any) => // Updated method
     {
       // ensure dueDate is a yyyy-mm-dd string for the date pipe
-      this.services = (data ?? []).map(s => ({ // Updated variable name
+      this.services = (data ?? []).map((s: any) => ({ // Updated variable name
         ...s,
         dueDate: s.dueDate ? String(s.dueDate) : undefined
       }));
@@ -54,7 +55,7 @@ export class ServicesComponent
     const d = new Date();
     d.setDate(d.getDate() + 14);
     const yyyyMmDd = d.toISOString().slice(0, 10);
-    return { name: '', description: '', status: 'Active', progress: 0 }; // Adjust fields as necessary
+    return { name: '' }; // Adjust fields as necessary
   }
 
   saveNewService(form: any) // Updated method
@@ -62,18 +63,18 @@ export class ServicesComponent
     if (form.invalid) return;
 
     // Automatically set due date (e.g., 14 days from now)
-    if (!this.newService.dueDate)
-    {
-      const d = new Date();
-      d.setDate(d.getDate() + 1);
-      this.newService.dueDate = d.toISOString().slice(0, 10);
-    }
+    // if (!this.newService.dueDate)
+    // {
+    //   const d = new Date();
+    //   d.setDate(d.getDate() + 1);
+    //   this.newService.dueDate = d.toISOString().slice(0, 10);
+    // }
 
-    this.serviceService.createService(this.newService).subscribe((created: any) => // Updated method
-    {
-      this.services = [ created, ...this.services ]; // Updated variable name
-      this.closeNewService(); // Updated method
-    });
+    // this.serviceService.createService(this.newService).subscribe((created: any) => // Updated method
+    // {
+    //   this.services = [ created, ...this.services ]; // Updated variable name
+    //   this.closeNewService(); // Updated method
+    // });
   }
 
   // Filter panel
