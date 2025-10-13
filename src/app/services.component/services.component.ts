@@ -54,6 +54,8 @@ export class ServicesComponent
     // Do whatever you want here (navigate, open details, etc.)
     // For now just avoid the TS error:
     console.log('Open service', s.serviceID); // Updated log
+
+    this.router.navigate([`services/${s.serviceID}/taskboard/${s.taskBoard?.id}`])
   }
 
   // New service modal handlers

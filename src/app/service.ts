@@ -1,5 +1,6 @@
 import { User } from "./user";
 import { Project } from "./project";
+import { TaskBoard } from "./task-board";
 
 export interface Service 
 {
@@ -13,4 +14,5 @@ export interface Service
     projectManager?: User;
     assignedResources?: User[];
     backup?: User[];
+    taskBoard?: TaskBoard;
 }
