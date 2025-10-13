@@ -62,6 +62,12 @@ export class ServicesComponent
           const assignedResourcesCount = service.assignedResources ? service.assignedResources.length : 0;
 
           service.memberCount = chiefCount + projectManagerCount + backupCount + assignedResourcesCount;
+          service.completionRate = 0;
+
+          let serviceBackloggedTasksCount = 0;
+          let serviceActiveTasksCount = 0;
+          let serviceCompletedTasksCount = 0;
+          let serviceTotalTasksCount = 0;
 
           // Count tasks based on their status
           if (service.taskBoard && service.taskBoard.cards)
@@ -69,21 +75,28 @@ export class ServicesComponent
             service.taskBoard.cards.forEach(task =>
             {
               totalTasksCount++;
+              serviceTotalTasksCount++; // Count every task
+
               if (task.column === 'new')
               {
+                serviceBackloggedTasksCount++;
                 this.servicesInfo.backloggedTasks++;
-              } else if (task.column === 'work')
+              } else if (task.column === 'in-progress')
               {
+                serviceActiveTasksCount++;
                 this.servicesInfo.activeTasks++;
-              }
-              else if (task.column === 'done')
+              } else if (task.column === 'done')
               {
+                serviceCompletedTasksCount++;
                 completedTasksCount++;
               }
             });
+            service.completionRate = serviceTotalTasksCount > 0
+              ? (serviceCompletedTasksCount / serviceTotalTasksCount) * 100
+              : 0;
           }
 
-          return total + chiefCount + projectManagerCount + backupCount + assignedResourcesCount;
+          return (total + chiefCount + projectManagerCount + backupCount + assignedResourcesCount);
         }, 0);
 
         this.servicesInfo.completionRate = totalTasksCount > 0

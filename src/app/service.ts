@@ -16,4 +16,5 @@ export interface Service
     backup?: User[];
     taskBoard?: TaskBoard;
     memberCount?: number;
+    completionRate?: number;
 }
