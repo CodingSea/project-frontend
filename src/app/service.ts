@@ -13,7 +13,7 @@ export interface Service
     chief: User;
     projectManager?: User;
     assignedResources: User[];
-    backup?: User[];
+    backup: User[];
     taskBoard?: TaskBoard;
     memberCount?: number;
     completionRate?: number;

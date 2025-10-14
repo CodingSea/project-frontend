@@ -43,31 +43,59 @@ export class ProjectManagement implements OnInit
     this.projectService.getProjects().subscribe((data) =>
     {
       this.projects = data;
+      let totalCardsCount = 0; // Total cards across all services
+      let completedCardsCount = 0;
+      let closestDeadline: Date | null = null;
 
       data.map((p) =>
       {
-        p.members = 0;
+        const uniqueMembers = new Set(); // Create a Set to track unique member IDs
+        p.members = 0; // Initialize member count to 0
+
         p.services.map((s) =>
         {
-          if(s.chief)
+          if (s.chief)
           {
-            p.members++;
-            console.log(p.members)
+            uniqueMembers.add(s.chief.id);
           }
-          // if(s.projectManager)
-          // {
-          //   p.members++;
-          // }
-          // if(s.assignedResources?.length > 0)
-          // {
-          //   p.members += s.assignedResources.length;
-          // }
-          // if(s.backup)
-          // {
-          //   p.members += s.backup.length;
-          // }
-        })
-      })
+          if (s.projectManager)
+          {
+            uniqueMembers.add(s.projectManager.id);
+          }
+          if (s.assignedResources?.length > 0)
+          {
+            s.assignedResources.forEach(resource => uniqueMembers.add(resource.id));
+          }
+          if (s.backup?.length > 0)
+          {
+            s.backup.forEach(b => uniqueMembers.add(b.id));
+          }
+
+          if (s.taskBoard?.cards)
+          { // Check if cards exist
+            totalCardsCount += s.taskBoard?.cards.length; // Add total number of cards
+            completedCardsCount += s.taskBoard?.cards.filter(card => card.column === 'done').length; // Count completed cards
+          }
+
+          // Determine the closest deadline
+          if (s.deadline)
+          {
+            const serviceDeadline = new Date(s.deadline);
+            if (!closestDeadline || serviceDeadline < closestDeadline)
+            {
+              closestDeadline = serviceDeadline; // Update closest deadline
+            }
+          }
+        });
+
+        p.deadline = closestDeadline ? closestDeadline.toISOString() : '';
+
+        p.progress = totalCardsCount > 0
+          ? (completedCardsCount / totalCardsCount) * 100
+          : 0;
+
+        p.members = uniqueMembers.size;
+      });
 
       console.log(this.projects);
     });

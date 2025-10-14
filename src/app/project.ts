@@ -11,4 +11,5 @@ export interface Project
     progress: number;
 
     members: number;
+    deadline: string;
 }
