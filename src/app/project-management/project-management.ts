@@ -1,19 +1,25 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ProjectService, Project } from '@app/services/project.service';
+import { ProjectService } from '@app/services/project.service';
 import { Sidebar } from "@app/sidebar/sidebar"; // ✅ use one Project type
 import { Router } from '@angular/router';
+import { Project } from '@app/project';
+import { ServiceInfo } from '@app/service-info';
 
 @Component({
   selector: 'app-project-management',
   standalone: true,
-  imports: [CommonModule, FormsModule, Sidebar],
+  imports: [ CommonModule, FormsModule, Sidebar ],
   templateUrl: './project-management.html',
-  styleUrls: ['./project-management.scss'] // ✅ plural
+  styleUrls: [ './project-management.scss' ] // ✅ plural
 })
-export class ProjectManagement implements OnInit {
+
+export class ProjectManagement implements OnInit
+{
   projects: Project[] = [];
+
+  // servicesInfo: ServiceInfo[] = [];
 
   // New Project Modal
   showNewProject = false;
@@ -24,22 +30,82 @@ export class ProjectManagement implements OnInit {
   selectedFilter: 'all' | 'active' | 'in-review' | 'urgent' = 'all';
   filterState = { active: true, inReview: true, urgent: true };
 
-  constructor(private projectService: ProjectService, private router: Router ) {}
+  projectsInfo =
+    {
+      totalProjects: 0,
 
-  ngOnInit() {
-    this.projectService.getProjects().subscribe((data) => {
-      // ensure dueDate is a yyyy-mm-dd string for the date pipe
-      this.projects = (data ?? []).map(p => ({
-        ...p
-      }));
+    }
+
+  constructor(private projectService: ProjectService, private router: Router) { }
+
+  ngOnInit()
+  {
+    this.projectService.getProjects().subscribe((data) =>
+    {
+      this.projects = data;
+      let totalCardsCount = 0; // Total cards across all services
+      let completedCardsCount = 0;
+      let closestDeadline: Date | null = null;
+
+      data.map((p) =>
+      {
+        const uniqueMembers = new Set(); // Create a Set to track unique member IDs
+        p.members = 0; // Initialize member count to 0
+
+        p.services.map((s) =>
+        {
+          if (s.chief)
+          {
+            uniqueMembers.add(s.chief.id);
+          }
+          if (s.projectManager)
+          {
+            uniqueMembers.add(s.projectManager.id);
+          }
+          if (s.assignedResources?.length > 0)
+          {
+            s.assignedResources.forEach(resource => uniqueMembers.add(resource.id));
+          }
+          if (s.backup?.length > 0)
+          {
+            s.backup.forEach(b => uniqueMembers.add(b.id));
+          }
+
+          if (s.taskBoard?.cards)
+          { // Check if cards exist
+            totalCardsCount += s.taskBoard?.cards.length; // Add total number of cards
+            completedCardsCount += s.taskBoard?.cards.filter(card => card.column === 'done').length; // Count completed cards
+          }
+
+          // Determine the closest deadline
+          if (s.deadline)
+          {
+            const serviceDeadline = new Date(s.deadline);
+            if (!closestDeadline || serviceDeadline < closestDeadline)
+            {
+              closestDeadline = serviceDeadline; // Update closest deadline
+            }
+          }
+        });
+
+        p.deadline = closestDeadline ? closestDeadline.toISOString() : '';
+
+        p.progress = totalCardsCount > 0
+          ? (completedCardsCount / totalCardsCount) * 100
+          : 0;
+
+        p.members = uniqueMembers.size;
+      });
+
+      console.log(this.projects);
     });
   }
 
-  onCardClick(p: Project) {
+  onCardClick(p: Project)
+  {
     if (!p.projectID) return;
 
-    console.log('Navigating to project', p.projectID);
-    this.router.navigate([`/projects/${p.projectID}/services`]);
+    this.router.navigate([ `/projects/${p.projectID}/services` ]);
   }
 
 
@@ -47,18 +113,21 @@ export class ProjectManagement implements OnInit {
   openNewProject() { this.showNewProject = true; this.newProject = this.blankNewProject(); }
   closeNewProject() { this.showNewProject = false; }
 
-  private blankNewProject(): Partial<Project> {
+  private blankNewProject(): Partial<Project>
+  {
     const d = new Date();
     d.setDate(d.getDate() + 14);
     const yyyyMmDd = d.toISOString().slice(0, 10);
-    return { name: '', description: '', status: 'Active', progress: 0 };
+    return { name: '', status: 'Active', progress: 0 };
   }
 
-  saveNewProject(form: any) {
+  saveNewProject(form: any)
+  {
     if (form.invalid) return;
 
-    this.projectService.createProject(this.newProject).subscribe(created => {
-      this.projects = [created, ...this.projects];
+    this.projectService.createProject(this.newProject).subscribe(created =>
+    {
+      this.projects = [ created, ...this.projects ];
       this.closeNewProject();
     });
   }
@@ -67,18 +136,20 @@ export class ProjectManagement implements OnInit {
   // Filter panel
   openFilter() { this.showFilter = true; }
   closeFilter() { this.showFilter = false; }
-  applyFilters() {}
+  applyFilters() { }
 
-  matchesStatus(status?: string): boolean {
+  matchesStatus(status?: string): boolean
+  {
     if (!status) return false;
     const s = status.toLowerCase();
-    if (this.selectedFilter !== 'all') {
-      return (this.selectedFilter === 'active'    && s === 'active')
-          || (this.selectedFilter === 'in-review' && s === 'in review')
-          || (this.selectedFilter === 'urgent'    && s === 'urgent');
+    if (this.selectedFilter !== 'all')
+    {
+      return (this.selectedFilter === 'active' && s === 'active')
+        || (this.selectedFilter === 'in-review' && s === 'in review')
+        || (this.selectedFilter === 'urgent' && s === 'urgent');
     }
     return (s === 'active' && this.filterState.active)
-        || (s === 'in review' && this.filterState.inReview)
-        || (s === 'urgent' && this.filterState.urgent);
+      || (s === 'in review' && this.filterState.inReview)
+      || (s === 'urgent' && this.filterState.urgent);
   }
 }

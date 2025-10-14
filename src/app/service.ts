@@ -12,8 +12,8 @@ export interface Service
     status: 'pending' | 'in-progress' | 'completed';
     chief: User;
     projectManager?: User;
-    assignedResources?: User[];
-    backup?: User[];
+    assignedResources: User[];
+    backup: User[];
     taskBoard?: TaskBoard;
     memberCount?: number;
     completionRate?: number;

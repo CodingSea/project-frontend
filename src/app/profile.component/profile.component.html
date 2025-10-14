@@ -44,7 +44,7 @@
         <div class="services">
             @for (service of services; track $index) 
             {
-                <div class="service">{{ service.name }}</div>
+                <div class="service" (click)="switchPage(service.serviceID, service.taskBoard?.id)">{{ service.name }}</div>
             }
         </div>
     </div>

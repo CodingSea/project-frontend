@@ -1,5 +1,5 @@
 <div class="container">
-  <app-sidebar/>
+  <app-sidebar />
 
   <div class="pm-container">
 
@@ -13,7 +13,7 @@
                   <div class="div_33-99">
                     <div class="div_33-100">
                       <span class="text-total-projects_33-101">Total Projects</span>
-                      <span class="text-24_33-102">24</span>
+                      <span class="text-24_33-102">{{ projects.length }}</span>
                     </div>
                     <div class="div_33-103">
                       <!-- keep your SVG -->
@@ -117,23 +117,29 @@
                     <p class="pm-desc">{{ p.description }}</p>
 
                     <!-- Members -->
-                    <div class="pm-members">
+                    <!-- <div class="pm-members">
                       <ng-container *ngFor="let m of p.members ?? []; let i = index">
                         <img *ngIf="i < 3" [src]="m.avatar || ''" [alt]="m.name || ''" class="pm-avatar">
                       </ng-container>
                       <span *ngIf="(p.members?.length || 0) > 3" class="pm-more">
                         +{{ (p.members?.length || 0) - 3 }}
                       </span>
+                    </div> -->
+
+                    <div class="pm-members">
+                      <span class="pm-more">
+                        <p>Services: {{ p.services.length }}</p>
+                        <p>Members: {{ p.members }}</p>
+                      </span>
                     </div>
 
-                    <!-- Footer -->
-                    <!-- <footer class="pm-card-footer">
-                      <span class="pm-due">Due: {{ p.dueDate ?? '' | date:'MMM d' }}</span>
+                    <footer class="pm-card-footer">
+                      <span *ngIf="p.deadline" class="pm-due">Due: {{ p.deadline | date:'MMM d' }}</span>
                       <div class="pm-progress">
                         <div class="pm-progress-fill" [style.width.%]="p.progress"></div>
                       </div>
                       <span class="pm-progress-label">{{ p.progress }}%</span>
-                    </footer> -->
+                    </footer>
                   </article>
 
                 </div>

@@ -4,7 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { User } from '@app/user';
 import { environment } from '@environments/environment';
 import { jwtDecode } from 'jwt-decode';
-import { ActivatedRoute, ParamMap, RouterLink } from '@angular/router';
+import { ActivatedRoute, ParamMap, Router, RouterLink } from '@angular/router';
 import { Certificate } from '@app/certificate';
 import { Service } from '@app/service';
 
@@ -18,7 +18,7 @@ export class ProfileComponent
 {
   isCurrentUser: boolean = false;
 
-  constructor(private http: HttpClient, private activatedRoute: ActivatedRoute) { }
+  constructor(private http: HttpClient, private activatedRoute: ActivatedRoute, private router: Router) { }
 
   currentUserInfo = {
     username: "",
@@ -158,6 +158,8 @@ export class ProfileComponent
                 } else
                 {
                   this.services = response;
+                  
+                  console.log(this.services);
                 }
               },
               (error) =>
@@ -168,5 +170,11 @@ export class ProfileComponent
           }
         }
       });
+  }
+
+  switchPage(serviceId: number, taskBoardId?: number)
+  {
+    this.router.navigate([`/services/${serviceId}/taskboard/${taskBoardId}`])
+    window.scrollTo(0,0);
   }
 }
