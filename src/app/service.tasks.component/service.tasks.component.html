@@ -13,6 +13,8 @@
         <button class="add-task" (click)="openPopup()">Add Task</button>
         <button class="filter">Filter</button>
       </div>
+
+      <button (click)="goBack()">Back</button>
     </header>
 
     <div *ngIf="showKanban">

@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location  } from '@angular/common';
 import { AfterViewInit, ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { jqxKanbanComponent, jqxKanbanModule } from "jqwidgets-ng/jqxkanban";
 import { jqxSplitterModule } from 'jqwidgets-ng/jqxsplitter';
@@ -10,7 +10,7 @@ import { environment } from '@environments/environment';
 import { TaskBoard } from '@app/task-board';
 import { Sidebar } from "@app/sidebar/sidebar";
 import { firstValueFrom } from 'rxjs';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-service-tasks',
@@ -42,7 +42,10 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
     { text: 'Done', dataField: 'done', minWidth: 150 }
   ];
 
-  constructor(private cdr: ChangeDetectorRef, private http: HttpClient, private route: ActivatedRoute) { }
+  constructor(private cdr: ChangeDetectorRef, 
+    private http: HttpClient, 
+    private route: ActivatedRoute,
+    private location: Location) { }
 
   ngOnInit(): void
   {
@@ -188,9 +191,9 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
   {
     await this.getBoardCards();
 
-    if(this.data.length == 0)
+    if (this.data.length == 0)
     {
-      this.data = [{ id: '1', status: 'eee', text: 'eee', tags: 'ss' }]
+      this.data = [ { id: '1', status: 'eee', text: 'eee', tags: 'ss' } ]
     }
 
     this.dataAdapter = new jqx.dataAdapter({
@@ -327,6 +330,11 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
     {
       console.error('Error deleting task:', error);
     }
+  }
+
+  goBack()
+  {
+    this.location.back();
   }
 
 }
