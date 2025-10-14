@@ -101,3 +101,9 @@ body {
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     font-weight: bold;
 }
+
+.service:hover
+{
+    transform: translateY(-4px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
