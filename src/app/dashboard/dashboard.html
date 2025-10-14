@@ -109,25 +109,25 @@
         <table class="tasks-table">
             <tbody>
 
-                @for (project of projects; track $index) 
-                {
-                    <tr>
-                        <td>
-                            <strong>{{ project.name }}</strong><br />
-                            <!-- <small>E-commerce Platform</small> -->
-                        </td>
-                        <!-- <td class="status">
-                            <span class="status-badge completed">✓ Completed</span>
-                        </td>
-                        <td><strong>Nov 28, 2024</strong></td>
-                        <td>
-                            <div class="progress-container" style="width: 120px">
-                                <div class="progress-bar-filled" style="width: 100%; background: #22c55e"></div>
-                            </div>
-                            100%
-                        </td> -->
-                    </tr>
-                }
+                <tr *ngFor="let service of closestServices; let i = index">
+                    <td>
+                        <strong>{{ service.name }}</strong><br />
+                        <!-- You can add a subtitle or description here if needed -->
+                    </td>
+                    <td class="status">
+                        <span class="status-badge completed">✓ Completed</span> <!-- Update based on actual status -->
+                    </td>
+                    <td>
+                        <strong>{{ service.deadline | date:'MMM d' }}</strong> Format the deadline
+                    </td>
+                    <td>
+                        <div class="progress-container" style="width: 120px">
+                            <div class="progress-bar-filled" style=" background: #22c55e" 
+                            [style.width.%]="service.completionRate"></div> <!-- Adjust based on actual progress -->
+                        </div>
+                        {{ service.completionRate }}%
+                    </td>
+                </tr>
 
                 <hr>
 
