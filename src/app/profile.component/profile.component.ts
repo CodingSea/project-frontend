@@ -175,5 +175,6 @@ export class ProfileComponent
   switchPage(serviceId: number, taskBoardId?: number)
   {
     this.router.navigate([`/services/${serviceId}/taskboard/${taskBoardId}`])
+    window.scrollTo(0,0);
   }
 }

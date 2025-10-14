@@ -5,10 +5,10 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Project } from '@app/project';
 import { Service } from '@app/service';
+import { ServiceInfo } from '@app/service-info';
 import { CreateServiceDto, ServiceService } from '@app/services/service.service';
 import { Sidebar } from '@app/sidebar/sidebar';
 import { environment } from '@environments/environment';
-
 @Component({
   selector: 'app-services.component',
   imports: [ CommonModule, FormsModule, Sidebar ],
@@ -24,14 +24,14 @@ export class ServicesComponent
 
   projectId: string | null = null;
 
-  servicesInfo =
-    {
-      totalServices: 0,
-      backloggedTasks: 0,
-      activeTasks: 0,
-      totalMembers: 0,
-      completionRate: 0.0,
-    }
+  servicesInfo: ServiceInfo = {
+    totalServices: 0,
+    backloggedTasks: 0,
+    activeTasks: 0,
+    completedTasks: 0,
+    totalMembers: 0,
+    completionRate: 0.0
+  }
 
   // Filters
   showFilter = false;
@@ -51,17 +51,24 @@ export class ServicesComponent
         this.servicesInfo.totalServices = this.services.length;
 
         let totalTasksCount = 0;
-        let completedTasksCount = 0;
+        const uniqueMembers = new Set<number>(); // Create a Set to track unique member IDs
 
         this.servicesInfo.totalMembers = this.services.reduce((total, service) =>
         {
-          // Count members from all fields
-          const chiefCount = service.chief ? 1 : 0;
-          const projectManagerCount = service.projectManager ? 1 : 0;
-          const backupCount = service.backup ? 1 : 0;
-          const assignedResourcesCount = service.assignedResources ? service.assignedResources.length : 0;
+          // Add unique members to the Set
+          if (service.chief) uniqueMembers.add(service.chief.id);
+          if (service.projectManager) uniqueMembers.add(service.projectManager.id);
+          if (service.assignedResources)
+          {
+            service.assignedResources.forEach(resource => uniqueMembers.add(resource.id));
+          }
+          if (service.backup)
+          {
+            service.backup.forEach(b => uniqueMembers.add(b.id));
+          }
 
-          service.memberCount = chiefCount + projectManagerCount + backupCount + assignedResourcesCount;
+          service.memberCount = uniqueMembers.size; // Update service member count
+
           service.completionRate = 0;
 
           let serviceBackloggedTasksCount = 0;
@@ -88,7 +95,7 @@ export class ServicesComponent
               } else if (task.column === 'done')
               {
                 serviceCompletedTasksCount++;
-                completedTasksCount++;
+                this.servicesInfo.completedTasks++;
               }
             });
             service.completionRate = serviceTotalTasksCount > 0
@@ -96,11 +103,15 @@ export class ServicesComponent
               : 0;
           }
 
-          return (total + chiefCount + projectManagerCount + backupCount + assignedResourcesCount);
+          // Return the accumulated total
+          return total + service.memberCount; // This will not be used directly now
         }, 0);
 
+        // Set the totalMembers from the uniqueMembers Set
+        this.servicesInfo.totalMembers = uniqueMembers.size;
+
         this.servicesInfo.completionRate = totalTasksCount > 0
-          ? (completedTasksCount / totalTasksCount) * 100
+          ? (this.servicesInfo.completedTasks / totalTasksCount) * 100
           : 0;
 
         console.log('Services:', res.services);
