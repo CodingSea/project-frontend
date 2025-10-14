@@ -1,5 +1,5 @@
 import { Component, HostListener, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import
   {
     FormArray,
@@ -39,7 +39,8 @@ export class ServiceFormComponent implements OnInit
     private router: Router,
     private route: ActivatedRoute,
     private serviceService: ServiceService,
-    private userService: UserService
+    private userService: UserService,
+    private location: Location
   )
   {
     this.form = this.fb.group({
@@ -179,12 +180,14 @@ export class ServiceFormComponent implements OnInit
   // ======================
   goBack()
   {
-    this.router.navigateByUrl('/project-management');
+    // this.router.navigateByUrl('/project-management');
+    this.location.back();
   }
 
   cancel()
   {
-    this.router.navigateByUrl('/project-management');
+    // this.router.navigateByUrl('/project-management');
+    this.location.back();
   }
 
   // ======================

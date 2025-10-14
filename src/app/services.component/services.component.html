@@ -9,6 +9,16 @@
                     <div class="main_33-71">
                         <div class="div_33-96">
                             <div class="main-div">
+                                <button type="button" class="btn btn-red-light" (click)="goBack()">
+                                    <span class="icon-left">
+                                        <svg viewBox="0 0 24 24" width="16" height="16">
+                                            <path d="M15 18l-6-6 6-6" fill="none" stroke="currentColor" stroke-width="2"
+                                                stroke-linecap="round" stroke-linejoin="round" />
+                                        </svg>
+                                    </span>
+                                    Back
+                                </button>
+
                                 <ul class="stats-list">
                                     <li class="stat-item">
                                         <span class="text-total-projects">Total Services</span>
@@ -118,7 +128,8 @@
                                         <footer class="pm-card-footer">
                                             <span class="pm-due">Due: {{ p.deadline | date:'MMM d' }}</span>
                                             <div class="pm-progress">
-                                                <div class="pm-progress-fill" [style.width.%]="p.completionRate?.toFixed(2)"></div>
+                                                <div class="pm-progress-fill"
+                                                    [style.width.%]="p.completionRate?.toFixed(2)"></div>
                                             </div>
                                             <span class="pm-progress-label">{{ p.completionRate }}%</span>
                                         </footer>

@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -38,7 +38,11 @@ export class ServicesComponent
   selectedFilter: 'all' | 'active' | 'in-review' | 'urgent' = 'all';
   filterState = { active: true, inReview: true, urgent: true };
 
-  constructor(private http: HttpClient, private route: ActivatedRoute, private serviceService: ServiceService, private router: Router) { }
+  constructor(private http: HttpClient,
+    private route: ActivatedRoute,
+    private serviceService: ServiceService,
+    private router: Router,
+    private location: Location) { }
 
   ngOnInit()
   {
@@ -176,5 +180,10 @@ export class ServicesComponent
     return (s === 'active' && this.filterState.active)
       || (s === 'in review' && this.filterState.inReview)
       || (s === 'urgent' && this.filterState.urgent);
+  }
+
+  goBack()
+  {
+    this.location.back();
   }
 }
