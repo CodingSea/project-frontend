@@ -5,196 +5,118 @@
     <main class="main">
         <header class="header">
             <h1>Dashboard</h1>
-            <div class="icons">
-                <svg class="icon-btn" viewBox="0 0 24 24">
-                    <circle cx="12" cy="12" r="10" />
-                </svg>
-                <svg class="icon-btn" viewBox="0 0 24 24">
-                    <path d="M12 3v18M3 12h18" />
-                </svg>
-                <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="Profile" class="profile-pic" />
-            </div>
         </header>
-
-
 
         <div class="dashboard-grid">
             <section class="card progress-chart">
                 <!-- Placeholder donut chart -->
                 <svg width="150" height="150" viewBox="0 0 36 36" class="circular-chart">
                     <circle class="circle-bg" stroke="#f3f4f6" stroke-width="3" fill="none" cx="18" cy="18" r="15" />
-                    <circle class="circle" stroke="#4f46e5" stroke-width="3" stroke-dasharray="73, 100"
-                        stroke-linecap="round" fill="none" cx="18" cy="18" r="15" />
+
+                    <!-- At Risk Circle -->
+                    <circle class="circle" stroke="#ef4444" stroke-width="3"
+                        [attr.stroke-dasharray]="formatDecimal(projectStatusRate.completed + projectStatusRate.inProgress + projectStatusRate.atRisk) + ', 100'"
+                        stroke-linecap="round" fill="none" cx="18" cy="18" r="15" transform="rotate(-90,18,18)" />
+
+                    <!-- In Progress Circle (optional, if you want to visualize it separately) -->
+                    <circle class="circle" stroke="#6366f1" stroke-width="3"
+                        [attr.stroke-dasharray]="formatDecimal(projectStatusRate.completed + projectStatusRate.inProgress) + ', 100'"
+                        stroke-linecap="round" fill="none" cx="18" cy="18" r="15" transform="rotate(-90,18,18)" />
+
+                    <!-- Completed Circle -->
+                    <circle class="circle" stroke="#22c55e" stroke-width="3"
+                        [attr.stroke-dasharray]="formatDecimal(projectStatusRate.completed) + ', 100'"
+                        stroke-linecap="round" fill="none" cx="18" cy="18" r="15" transform="rotate(-90,18,18)" />
                 </svg>
                 <div class="legend">
                     <span><span class="dot completed"></span>Completed</span>
                     <span><span class="dot inprogress"></span>In Progress</span>
-                    <span><span class="dot pending"></span>Pending</span>
+                    <!-- <span><span class="dot pending"></span>Pending</span> -->
                     <span><span class="dot atrisk"></span>At Risk</span>
                 </div>
-                <div class="percent">73%</div>
+                <div class="percent">{{ formatDecimal(projectStatusRate.completed) }}%</div>
                 <div class="label">Overall Completion</div>
             </section>
 
-            <section class="card">
-                <h2>Services Progress</h2>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Project Title</th>
-                            <th>Deadline</th>
-                            <th>Progress</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>
-                                <strong>E-commerce Platform</strong><br />
-                                <span class="subtitle">Web Development</span>
-                            </td>
-                            <td>Dec 15, 2024</td>
-                            <td class="progress-bar">
-                                <div class="progress-container">
-                                    <div class="progress-bar-filled" style="width: 85%"></div>
-                                </div>
-                                85%
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <strong>Mobile App Redesign</strong><br />
-                                <span class="subtitle">UI/UX Design</span>
-                            </td>
-                            <td>Jan 20, 2025</td>
-                            <td class="progress-bar">
-                                <div class="progress-container">
-                                    <div class="progress-bar-filled" style="width: 60%"></div>
-                                </div>
-                                60%
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <strong>Data Analytics Dashboard</strong><br />
-                                <span class="subtitle">Analytics</span>
-                            </td>
-                            <td>Nov 30, 2024</td>
-                            <td class="progress-bar">
-                                <div class="progress-container">
-                                    <div class="progress-bar-filled" style="width: 92%"></div>
-                                </div>
-                                92%
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <strong>Marketing Campaign</strong><br />
-                                <span class="subtitle">Marketing</span>
-                            </td>
-                            <td>Dec 05, 2024</td>
-                            <td class="progress-bar">
-                                <div class="progress-container">
-                                    <div class="progress-bar-filled" style="width: 45%"></div>
-                                </div>
-                                45%
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </section>
+            <div class="achievements-container">
+                <h2>Recent Achievements</h2>
+                <div class="achievement">
+                    <div class="icon completed"></div>
+                    <div class="achievement-details">
+                        <h3>Database Migration Completed</h3>
+                        <p>By Ali Mohammed • 2 days ago</p>
+                    </div>
+                </div>
+                <div class="achievement">
+                    <div class="icon certification"></div>
+                    <div class="achievement-details">
+                        <h3>Security Certification Obtained</h3>
+                        <p>By Fatima Al-Zahra • 5 days ago</p>
+                    </div>
+                </div>
+                <div class="achievement">
+                    <div class="icon optimization"></div>
+                    <div class="achievement-details">
+                        <h3>Performance Optimization</h3>
+                        <p>By Khalid Al-Rashid • 1 week ago</p>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
         <h2 class="tasks-header">Projects with the most imminent deadline</h2>
 
         <table class="tasks-table">
+            <thead>
+                <tr>
+                    <th>Project Title</th>
+                    <th>Status</th>
+                    <th>Deadline</th>
+                    <th>Progress</th>
+                </tr>
+            </thead>
             <tbody>
 
-                @for (project of projects; track $index) 
-                {
-                    <tr>
-                        <td>
-                            <strong>{{ project.name }}</strong><br />
-                            <!-- <small>E-commerce Platform</small> -->
-                        </td>
-                        <!-- <td class="status">
-                            <span class="status-badge completed">✓ Completed</span>
-                        </td>
-                        <td><strong>Nov 28, 2024</strong></td>
-                        <td>
-                            <div class="progress-container" style="width: 120px">
-                                <div class="progress-bar-filled" style="width: 100%; background: #22c55e"></div>
-                            </div>
-                            100%
-                        </td> -->
-                    </tr>
-                }
+                <tr *ngFor="let service of closestServices; let i = index">
+                    <td>
+                        <strong>{{ service.name }}</strong><br />
+                        <small>{{ service.project.name }}</small>
+                        <!-- You can add a subtitle or description here if needed -->
+                    </td>
+                    <td class="status">
+                        <span class="status-badge" [ngClass]="{
+                            'completed': service.status === 'Completed',
+                            'at-risk': service.status === 'At Risk',
+                            'overdue': service.status === 'Overdue',
+                            'in-progress': service.status === 'In-Progress'
+                        }">{{ service.status }}</span>
+                    </td>
+                    <td>
+                        <strong>{{ service.deadline | date:'MMM d, y' }}</strong>
+                    </td>
+                    <td>
+                        <div class="progress-container" style="width: 120px">
+                            @if(service.status == "Completed")
+                            {
+                            <div class="progress-bar-filled" style=" background: #22c55e"
+                                [style.width.%]="service.completionRate"></div>
+                            }
+                            @else if(service.status == "At Risk")
+                            {
+                            <div class="progress-bar-filled" style=" background: #ef4444"
+                                [style.width.%]="service.completionRate"></div>
+                            }
+                            @else if(service.status == "In-Progress")
+                            {
+                            <div class="progress-bar-filled" style=" background: #6366f1"
+                                [style.width.%]="service.completionRate"></div>
+                            }
+                        </div>
+                        {{ getProgress(service) }}%
+                    </td>
+                </tr>
 
-                <hr>
-
-                <tr>
-                    <td>
-                        <strong>Payment Gateway Integration</strong><br />
-                        <small>E-commerce Platform</small>
-                    </td>
-                    <td class="status">
-                        <span class="status-badge completed">✓ Completed</span>
-                    </td>
-                    <td><strong>Nov 28, 2024</strong></td>
-                    <td>
-                        <div class="progress-container" style="width: 120px">
-                            <div class="progress-bar-filled" style="width: 100%; background: #22c55e"></div>
-                        </div>
-                        100%
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <strong>User Authentication System</strong><br />
-                        <small>E-commerce Platform</small>
-                    </td>
-                    <td class="status">
-                        <span class="status-badge at-risk">⚠ At Risk</span>
-                    </td>
-                    <td><strong>Nov 30, 2024</strong></td>
-                    <td>
-                        <div class="progress-container" style="width: 120px">
-                            <div class="progress-bar-filled" style="width: 65%; background: #ef4444"></div>
-                        </div>
-                        65%
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <strong>Database Optimization</strong><br />
-                        <small>Data Analytics Dashboard</small>
-                    </td>
-                    <td class="status">
-                        <span class="status-badge pending">⚠ Pending Approval</span>
-                    </td>
-                    <td><strong>Dec 02, 2024</strong></td>
-                    <td>
-                        <div class="progress-container" style="width: 120px">
-                            <div class="progress-bar-filled" style="width: 80%; background: #facc15"></div>
-                        </div>
-                        80%
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <strong>Social Media Integration</strong><br />
-                        <small>Marketing Campaign</small>
-                    </td>
-                    <td class="status">
-                        <span class="status-badge in-progress">▶ In Progress</span>
-                    </td>
-                    <td><strong>Dec 05, 2024</strong></td>
-                    <td>
-                        <div class="progress-container" style="width: 120px">
-                            <div class="progress-bar-filled" style="width: 40%; background: #6366f1"></div>
-                        </div>
-                        40%
-                    </td>
-                </tr>
             </tbody>
         </table>
     </main>

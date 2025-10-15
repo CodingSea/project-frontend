@@ -6,10 +6,11 @@ import { Certificate } from '@app/certificate';
 import { Sidebar } from "@app/sidebar/sidebar";
 import { environment } from '@environments/environment';
 import { jwtDecode } from 'jwt-decode';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-certificate.create.component',
-  imports: [ Sidebar, RouterLink, ReactiveFormsModule ],
+  imports: [ Sidebar, RouterLink, ReactiveFormsModule, CommonModule ],
   templateUrl: './certificate.create.component.html',
   styleUrl: './certificate.create.component.css'
 })
@@ -26,7 +27,7 @@ export class CertificateCreateComponent
         type: [ '', Validators.required ],
         issuingOrganization: [ '', Validators.required ],
         issueDate: [ '', Validators.required ],
-        expiryDate: [ '' ],
+        expiryDate: [ '', Validators.required ],
         description: [ '' ],
       }
     )
@@ -38,27 +39,36 @@ export class CertificateCreateComponent
 
     if (this.certificateForm.valid && token)
     {
-      console.log('Form Submitted', this.certificateForm.value);
+      console.log('Form Values:', this.certificateForm.value);
 
-      
-      this.decodedToken = jwtDecode(token)
+      this.decodedToken = jwtDecode(token);
 
-      const certificate: Certificate = this.certificateForm.value;
+      // Prepare the certificate object with proper date formatting
+      const certificate: Certificate = {
+        name: this.certificateForm.value.name,
+        type: this.certificateForm.value.type,
+        issuingOrganization: this.certificateForm.value.issuingOrganization,
+        issueDate: new Date(this.certificateForm.value.issueDate).toISOString(),
+        expiryDate: new Date(this.certificateForm.value.expiryDate).toISOString(),
+        description: this.certificateForm.value.description ? this.certificateForm.value.description : ""
+      };
 
-      this.http.post<Certificate>(`${environment.apiUrl}/certificate/${this.decodedToken.sub}`, certificate).subscribe(
+      console.log('Submitting Certificate:', certificate);
+
+      this.http.post(`${environment.apiUrl}/certificate/${this.decodedToken.sub}`, certificate).subscribe(
         (response) =>
         {
-          
+          console.log(response);
+          this.router.navigate([ "/profile" ]);
         },
         (error) =>
         {
-          console.log(error);
+          console.log('Submission Error:', error);
         }
-      )
-
+      );
     } else
     {
-      console.log('Form is invalid');
+      console.log('Form is invalid', this.certificateForm.errors);
     }
   }
 

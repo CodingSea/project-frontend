@@ -18,9 +18,9 @@ import { ServicesComponent } from './services.component/services.component';
 export const routes: Routes = [
   { path: "", redirectTo: 'auth/signup', pathMatch: "full" },
   { path: 'home', component: HomePage, title: 'Home', canActivate: [ AuthGuard ] },
-  { path: 'projects', component: ProjectManagement, canActivate: [ AuthGuard ] },
-  { path: 'projects/:projectId/services', component: ServicesComponent, canActivate: [ AuthGuard ] },
-  { path: 'projects/:projectId/services/new', component: ServiceFormComponent, canActivate: [ AuthGuard ] },
+  { path: 'projects', component: ProjectManagement, canActivate: [ AuthGuard ], data: { onlyAdmin: true } },
+  { path: 'projects/:projectId/services', component: ServicesComponent, canActivate: [ AuthGuard ], data: { onlyAdmin: true } },
+  { path: 'projects/:projectId/services/new', component: ServiceFormComponent, canActivate: [ AuthGuard ], data: { onlyAdmin: true } },
   { path: "auth/:mode", component: UserComponent },
   { path: 'dashboard', component: Dashboard, canActivate: [ AuthGuard ], data: { onlyAdmin: true } },
   { path: 'profile', component: ProfileComponent, canActivate: [ AuthGuard ] },

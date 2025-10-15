@@ -78,7 +78,6 @@
                   <!-- Dynamic Project Cards -->
                   <article class="pm-card" *ngFor="let p of projects" [hidden]="!matchesStatus(p.status)"
                     (click)="onCardClick(p)">
-
                     <!-- Header -->
                     <header class="pm-card-header">
                       <h3>{{ p.name }}</h3> <!-- ✅ changed -->
@@ -110,7 +109,7 @@
                       <div class="pm-progress">
                         <div class="pm-progress-fill" [style.width.%]="p.progress"></div>
                       </div>
-                      <span class="pm-progress-label">{{ p.progress }}%</span>
+                      <span class="pm-progress-label">{{ formatDecimal(p.progress) }}%</span>
                     </footer>
                   </article>
 

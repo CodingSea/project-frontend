@@ -4,9 +4,6 @@
 
 body {
     margin: 0;
-    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
-        Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue",
-        sans-serif;
     background-color: #f9fafb;
     color: #222;
 }
@@ -115,11 +112,11 @@ a {
 }
 
 .dot.completed {
-    background-color: #4f46e5;
+    background-color: #22c55e;
 }
 
 .dot.inprogress {
-    background-color: #818cf8;
+    background-color: #6366f1;
 }
 
 .dot.pending {
@@ -127,7 +124,7 @@ a {
 }
 
 .dot.atrisk {
-    background-color: #ec4899;
+    background-color: #ef4444;
 }
 
 .progress-chart .percent {
@@ -234,4 +231,66 @@ table td.progress-bar {
 
 .in-progress {
     background-color: #6366f1;
+}
+
+.achievements-container {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgb(0 0 0 / 0.1);
+    padding: 20px;
+    max-width: 600px;
+    margin: auto;
+}
+
+h2 {
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.achievement {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.achievement:last-child {
+    margin-bottom: 0;
+}
+
+.icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    margin-right: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 16px;
+    color: white;
+}
+
+.completed {
+    background-color: #4caf50; /* Green */
+}
+
+.certification {
+    background-color: #2196f3; /* Blue */
+}
+
+.optimization {
+    background-color: #ff9800; /* Orange */
+}
+
+.achievement-details h3 {
+    margin: 0;
+    font-size: 1.1em;
+    color: #333;
+}
+
+.achievement-details p {
+    margin: 5px 0 0;
+    color: #888; /* Gray for the text */
+    font-size: 0.9em;
 }

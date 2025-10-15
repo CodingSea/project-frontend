@@ -4,7 +4,7 @@ export interface Certificate
     type: string;
     issuingOrganization: string;
     issueDate: string;
-    expiryDate?: string;
+    expiryDate: string;
     description?: string;
     // certificateFile: File | null;
 }
