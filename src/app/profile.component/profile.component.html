@@ -1,6 +1,6 @@
 <div class="container">
 
-    <app-sidebar />
+<app-sidebar *ngIf="!isEmbedded" />
 
     <div class="profile-container">
         <div class="profile-header">
@@ -21,7 +21,7 @@
         <h2>Skill Tags</h2>
         <div class="certificates">
 
-            @for (skill of currentUserInfo.skills; track $index) 
+            @for (skill of currentUserInfo.skills; track $index)
             {
                 <span class="certificate">{{ skill }}</span>
             }
@@ -34,7 +34,7 @@
                 <button class="edit-button" routerLink="/certificate/new">+</button>
             }
 
-            @for (c of certificates; track $index) 
+            @for (c of certificates; track $index)
             {
                 <span class="certificate">{{c.name}}</span>
             }
@@ -42,7 +42,7 @@
 
         <h2>Services</h2>
         <div class="services">
-            @for (service of services; track $index) 
+            @for (service of services; track $index)
             {
                 <div class="service" (click)="switchPage(service.serviceID, service.taskBoard?.id)">{{ service.name }}</div>
             }

@@ -7,14 +7,15 @@ import { jwtDecode } from 'jwt-decode';
 import { ActivatedRoute, ParamMap, Router, RouterLink } from '@angular/router';
 import { Certificate } from '@app/certificate';
 import { Service } from '@app/service';
-
+import { OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
 @Component({
   selector: 'app-profile.component',
-  imports: [ Sidebar, RouterLink ],
+  imports: [ Sidebar, RouterLink,CommonModule ],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.css'
 })
-export class ProfileComponent
+export class ProfileComponent implements OnInit
 {
   isCurrentUser: boolean = false;
 
@@ -31,8 +32,10 @@ export class ProfileComponent
   certificates: Certificate[] | null = null;
   services: Service[] | null = null;
 
-  ngOnInit()
-  {
+ isEmbedded = false;
+
+ngOnInit() {
+  this.isEmbedded = window !== window.parent;
     const token: string | null = localStorage.getItem("token");
     if (token !== null)
       this.activatedRoute.queryParamMap.subscribe((params: ParamMap) =>

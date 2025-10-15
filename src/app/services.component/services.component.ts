@@ -1,6 +1,6 @@
 import { CommonModule, Location } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Component } from '@angular/core';
+import { Component, AfterViewInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Project } from '@app/project';
@@ -9,20 +9,21 @@ import { ServiceInfo } from '@app/service-info';
 import { CreateServiceDto, ServiceService } from '@app/services/service.service';
 import { Sidebar } from '@app/sidebar/sidebar';
 import { environment } from '@environments/environment';
-@Component({
-  selector: 'app-services.component',
-  imports: [ CommonModule, FormsModule, Sidebar ],
-  templateUrl: './services.component.html',
-  styleUrl: './services.component.css'
-})
-export class ServicesComponent
-{
-  services: Service[] = [];
+import { ServiceFormComponent } from '@app/service-form/service-form.component';
 
+@Component({
+  selector: 'app-services',
+  standalone: true,
+  imports: [CommonModule, FormsModule, Sidebar, ServiceFormComponent],
+  templateUrl: './services.component.html',
+  styleUrls: ['./services.component.css'],
+})
+export class ServicesComponent implements AfterViewInit {
+  services: Service[] = [];
   showNewService = false;
-  newService: Partial<Service> = this.blankNewService();
 
   projectId: string | null = null;
+  projectIdNum: number | undefined;
 
   servicesInfo: ServiceInfo = {
     totalServices: 0,
@@ -30,186 +31,170 @@ export class ServicesComponent
     activeTasks: 0,
     completedTasks: 0,
     totalMembers: 0,
-    completionRate: 0.0
-  }
+    completionRate: 0.0,
+  };
 
-  // Filters
+  openMenuId: number | null = null;
+
   showFilter = false;
   selectedFilter: 'all' | 'active' | 'in-review' | 'urgent' = 'all';
   filterState = { active: true, inReview: true, urgent: true };
 
-  constructor(private http: HttpClient,
+  constructor(
+    private http: HttpClient,
     private route: ActivatedRoute,
     private serviceService: ServiceService,
     private router: Router,
-    private location: Location) { }
+    private location: Location
+  ) {}
 
-  ngOnInit()
-  {
-    this.projectId = this.route.snapshot.paramMap.get('projectId');
+  ngOnInit() {
+    this.route.paramMap.subscribe((params) => {
+      this.projectId = params.get('projectId');
+      this.projectIdNum = this.projectId ? +this.projectId : undefined;
+      this.loadServices();
+    });
+  }
+
+  loadServices() {
+    if (!this.projectId) return;
 
     this.http.get<Project>(`${environment.apiUrl}/project/${this.projectId}`).subscribe(
-      (res) =>
-      {
-        this.services = res.services; // Assuming res has a 'services' property
+      (res) => {
+        this.services = res.services ?? [];
         this.servicesInfo.totalServices = this.services.length;
 
         let totalTasksCount = 0;
-        const uniqueMembers = new Set<number>(); // Create a Set to track unique member IDs
+        const uniqueMembers = new Set<number>();
 
-        this.servicesInfo.totalMembers = this.services.reduce((total, service) =>
-        {
-          // Add unique members to the Set
+        this.servicesInfo.completedTasks = 0;
+        this.servicesInfo.backloggedTasks = 0;
+        this.servicesInfo.activeTasks = 0;
+
+        this.servicesInfo.totalMembers = this.services.reduce((total, service) => {
           if (service.chief) uniqueMembers.add(service.chief.id);
           if (service.projectManager) uniqueMembers.add(service.projectManager.id);
-          if (service.assignedResources)
-          {
-            service.assignedResources.forEach(resource => uniqueMembers.add(resource.id));
+          if (service.assignedResources) {
+            service.assignedResources.forEach((r) => uniqueMembers.add(r.id));
           }
-          if (service.backup)
-          {
-            service.backup.forEach(b => uniqueMembers.add(b.id));
+          if (service.backup) {
+            service.backup.forEach((b) => uniqueMembers.add(b.id));
           }
 
-          service.memberCount = uniqueMembers.size; // Update service member count
-
+          service.memberCount = uniqueMembers.size;
           service.completionRate = 0;
 
-          let serviceBackloggedTasksCount = 0;
-          let serviceActiveTasksCount = 0;
           let serviceCompletedTasksCount = 0;
           let serviceTotalTasksCount = 0;
 
-          // Count tasks based on their status
-          if (service.taskBoard && service.taskBoard.cards)
-          {
-            service.taskBoard.cards.forEach(task =>
-            {
+          if (service.taskBoard?.cards) {
+            service.taskBoard.cards.forEach((task) => {
               totalTasksCount++;
-              serviceTotalTasksCount++; // Count every task
+              serviceTotalTasksCount++;
 
-              if (task.column === 'new')
-              {
-                serviceBackloggedTasksCount++;
+              if (task.column === 'new') {
                 this.servicesInfo.backloggedTasks++;
-              } else if (task.column === 'work')
-              {
-                serviceActiveTasksCount++;
+              } else if (task.column === 'work') {
                 this.servicesInfo.activeTasks++;
-              } else if (task.column === 'done')
-              {
+              } else if (task.column === 'done') {
                 serviceCompletedTasksCount++;
                 this.servicesInfo.completedTasks++;
               }
             });
-            service.completionRate = serviceTotalTasksCount > 0
-              ? (serviceCompletedTasksCount / serviceTotalTasksCount) * 100
-              : 0;
+
+            service.completionRate =
+              serviceTotalTasksCount > 0
+                ? (serviceCompletedTasksCount / serviceTotalTasksCount) * 100
+                : 0;
           }
 
-          // Return the accumulated total
-          return total + service.memberCount; // This will not be used directly now
+          return total + service.memberCount;
         }, 0);
 
-        // Set the totalMembers from the uniqueMembers Set
         this.servicesInfo.totalMembers = uniqueMembers.size;
 
-        this.servicesInfo.completionRate = totalTasksCount > 0
-          ? (this.servicesInfo.completedTasks / totalTasksCount) * 100
-          : 0;
-
-        console.log('Services:', res.services);
-        console.log('Total Members:', this.servicesInfo.totalMembers);
+        this.servicesInfo.completionRate =
+          totalTasksCount > 0
+            ? (this.servicesInfo.completedTasks / totalTasksCount) * 100
+            : 0;
       },
-      (error) =>
-      {
-        console.log(error);
-      }
+      (error) => console.error('❌ Failed to load project services:', error)
     );
   }
 
-  // card click from template
-  onCardClick(s: Service) // Updated parameter type
-  {
-    // Do whatever you want here (navigate, open details, etc.)
-    // For now just avoid the TS error:
-    console.log('Open service', s.serviceID); // Updated log
-
-    this.router.navigate([ `services/${s.serviceID}/taskboard/${s.taskBoard?.id}` ])
+  onCardClick(s: Service) {
+    this.router.navigate([`services/${s.serviceID}/taskboard/${s.taskBoard?.id}`]);
   }
 
-  // New service modal handlers
-  openNewService() { this.router.navigate([ `${this.router.url}/new` ]); } // Updated method
-  closeNewService() { this.showNewService = false; } // Updated method
-
-  private blankNewService(): Partial<Service> // Updated method
-  {
-    const d = new Date();
-    d.setDate(d.getDate() + 14);
-    const yyyyMmDd = d.toISOString().slice(0, 10);
-    return { name: '' }; // Adjust fields as necessary
+  openNewService() {
+    this.showNewService = true;
+  }
+  closeNewService() {
+    this.showNewService = false;
   }
 
-  saveNewService(form: any) // Updated method
-  {
-    if (form.invalid) return;
-
-    if (!this.newService.deadline)
-    {
-      const d = new Date();
-      d.setDate(d.getDate() + 1);
-      this.newService.deadline = d;
-    }
+  openFilter() {
+    this.showFilter = true;
+  }
+  closeFilter() {
+    this.showFilter = false;
   }
 
-  // Filter panel
-  openFilter() { this.showFilter = true; }
-  closeFilter() { this.showFilter = false; }
-  applyFilters() { }
+  applyFilters() {}
 
-  matchesStatus(status?: string): boolean
-  {
+  matchesStatus(status?: string): boolean {
     if (!status) return false;
     const s = status.toLowerCase();
-    if (this.selectedFilter !== 'all')
-    {
-      return (this.selectedFilter === 'active' && s === 'active')
-        || (this.selectedFilter === 'in-review' && s === 'in review')
-        || (this.selectedFilter === 'urgent' && s === 'urgent');
+    if (this.selectedFilter !== 'all') {
+      return (
+        (this.selectedFilter === 'active' && s === 'active') ||
+        (this.selectedFilter === 'in-review' && s === 'in review') ||
+        (this.selectedFilter === 'urgent' && s === 'urgent')
+      );
     }
-    return (s === 'active' && this.filterState.active)
-      || (s === 'in review' && this.filterState.inReview)
-      || (s === 'urgent' && this.filterState.urgent);
+    return (
+      (s === 'active' && this.filterState.active) ||
+      (s === 'in review' && this.filterState.inReview) ||
+      (s === 'urgent' && this.filterState.urgent)
+    );
   }
 
-  formatDecimal(num: number): string
-  {
-    // Round to one decimal place to handle cases like 1.123 -> 1.1 or 1.987 -> 2.0
+  formatDecimal(num: number): string {
     const roundedNum = Math.round(num * 10) / 10;
-
-    // Convert to string
     let result = String(roundedNum);
-
-    // Remove trailing .0 if present
-    if (result.endsWith(".0"))
-    {
+    if (result.endsWith('.0')) {
       result = result.substring(0, result.length - 2);
     }
-
     return result;
   }
 
-  getProgress(service: Service): string
-  {
-    let result = "";
-
-    result = this.formatDecimal(service.completionRate!);
-
-    return result;
+  getProgress(service: Service): string {
+    return this.formatDecimal(service.completionRate!);
   }
 
-  goBack()
-  {
+  toggleMenu(id: number, event: Event) {
+    event.stopPropagation();
+    this.openMenuId = this.openMenuId === id ? null : id;
+  }
+
+  goToEdit(s: Service, event: Event) {
+    event.stopPropagation();
+    const projectId = this.projectId ?? this.route.snapshot.paramMap.get('projectId');
+    this.router.navigate([`/projects/${projectId}/services/${s.serviceID}/edit`]);
+  }
+
+  ngAfterViewInit() {
+    document.addEventListener('click', () => {
+      this.openMenuId = null;
+    });
+  }
+
+  onServiceCreated() {
+    this.closeNewService();
+    this.loadServices();
+  }
+
+  goBack() {
     this.location.back();
   }
 }
