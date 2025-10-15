@@ -33,6 +33,8 @@ export class ProfileComponent
 
   ngOnInit()
   {
+    window.scrollTo(0, 0);
+
     const token: string | null = localStorage.getItem("token");
     if (token !== null)
       this.activatedRoute.queryParamMap.subscribe((params: ParamMap) =>

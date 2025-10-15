@@ -215,6 +215,8 @@ export class Dashboard
 
   ngOnInit()
   {
+    window.scrollTo(0, 0);
+
     this.listProjects();
 
     this.getProjectStatus();
