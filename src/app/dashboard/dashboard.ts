@@ -71,7 +71,7 @@ export class Dashboard
               if (card.column === 'done')
               {
                 completedServiceCards++; // Count completed cards
-              } else if (card.column === 'new' || card.column === 'work')
+              } else if (card.column === 'work' && daysUntilDeadline > 10)
               {
                 this.projectStatusRate.inProgress++; // Count in-progress cards
               }
@@ -83,7 +83,7 @@ export class Dashboard
               }
 
               // Count backlogged cards (not done and not at risk)
-              if (card.column !== 'done' && daysUntilDeadline > 10)
+              if (card.column === 'new' && daysUntilDeadline > 10)
               {
                 backloggedCards++; // Increment backlogged cards count
               }
@@ -98,7 +98,7 @@ export class Dashboard
       });
 
       // Calculate the total statuses counted
-      const totalCounted = this.projectStatusRate.completed + this.projectStatusRate.inProgress + this.projectStatusRate.backlogged;
+      const totalCounted = this.projectStatusRate.completed + this.projectStatusRate.inProgress + this.projectStatusRate.backlogged + this.projectStatusRate.atRisk;
 
       // Adjust percentages to ensure they sum to 100%
       if (totalCounted > 0)
