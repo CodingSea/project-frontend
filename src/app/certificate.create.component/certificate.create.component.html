@@ -1,52 +1,57 @@
 <app-sidebar />
 <div class="container">
-    <h2>Create New Certificate</h2>
-    <form [formGroup]="certificateForm" (ngSubmit)="onSubmit()">
-      <div class="form-group">
-        <label for="certificateName">Certificate Name</label>
-        <input type="text" id="certificateName" formControlName="name" placeholder="Enter the name of the certificate" required>
+  <h2>Create New Certificate</h2>
+  <form [formGroup]="certificateForm" (ngSubmit)="onSubmit()">
+    <div class="form-group">
+      <label for="name">Certificate Name</label>
+      <input type="text" id="name" formControlName="name" placeholder="Enter the name of the certificate" required>
+    </div>
+
+    <div class="form-group">
+      <label for="certificateType">Certificate Type</label>
+      <select id="certificateType" formControlName="type" required>
+        <option value="" disabled selected>Select certificate type</option>
+        <option value="diploma">Diploma</option>
+        <option value="degree">Degree</option>
+        <option value="certification">Certification</option>
+        <option value="award">Award</option>
+        <option value="other">Other</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="issuingOrganization">Issuing Organization</label>
+      <input type="text" id="issuingOrganization" formControlName="issuingOrganization"
+        placeholder="Enter the issuing organization" required>
+    </div>
+
+    <div class="form-group">
+      <label for="issueDate">Issue Date</label>
+      <input type="date" id="issueDate" formControlName="issueDate" required>
+    </div>
+
+    <div class="form-group">
+      <label for="expiryDate">Expiry Date</label>
+      <input type="date" id="expiryDate" formControlName="expiryDate">
+      <div *ngIf="certificateForm.get('expiryDate')?.invalid && certificateForm.get('expiryDate')?.touched" class="error">
+        Expiry date is required if provided.
       </div>
-      
-      <div class="form-group">
-        <label for="certificateType">Certificate Type</label>
-        <select id="certificateType" formControlName="type" required>
-          <option value="" disabled selected>Select certificate type</option>
-          <option value="diploma">Diploma</option>
-          <option value="degree">Degree</option>
-          <option value="certification">Certification</option>
-          <option value="award">Award</option>
-          <option value="other">Other</option>
-        </select>
-      </div>
-      
-      <div class="form-group">
-        <label for="issuingOrganization">Issuing Organization</label>
-        <input type="text" id="issuingOrganization" formControlName="issuingOrganization" placeholder="Enter the issuing organization" required>
-      </div>
-      
-      <div class="form-group">
-        <label for="issueDate">Issue Date</label>
-        <input type="date" id="issueDate" formControlName="issueDate" required>
-      </div>
-      
-      <div class="form-group">
-        <label for="expiryDate">Expiry Date</label>
-        <input type="date" id="expiryDate" formControlName="expiryDate">
-      </div>
-      
-      <div class="form-group">
-        <label for="description">Description</label>
-        <textarea id="description" formControlName="description" placeholder="Enter a brief description of the certificate"></textarea>
-      </div>
-      
-      <!-- <div class="form-group">
+    </div>
+
+    <div class="form-group">
+      <label for="description">Description</label>
+      <textarea id="description" formControlName="description"
+        placeholder="Enter a brief description of the certificate"></textarea>
+    </div>
+
+    <!-- <div class="form-group">
         <label for="certificateFile">Certificate File</label>
         <input type="file" id="certificateFile" (change)="onFileChange($event)" accept=".pdf, .jpg, .png" required>
       </div> -->
-      
-      <div class="form-buttons">
-        <button type="button" class="cancel-button" routerLink="/profile">Cancel</button>
-        <button type="submit" class="submit-button">Create Certificate</button>
-      </div>
-    </form>
-  </div>
+
+    <div class="form-buttons">
+      <button type="button" class="cancel-button" routerLink="/profile">Cancel</button>
+      <button type="submit" class="submit-button">Create Certificate</button>
+    </div>
+  </form>
+</div>
