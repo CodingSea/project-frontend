@@ -38,87 +38,86 @@ export class Dashboard
     {
       this.projects = data;
 
-      data.map((p) =>
+      // Initialize overall status rates
+      this.projectStatusRate = {
+        completed: 0,
+        inProgress: 0,
+        atRisk: 0,
+        backlogged: 0,
+      };
+
+      // Iterate through each project
+      data.forEach((project) =>
       {
-        let totalCardsCount = 0; // Reset total cards count for each project
-        let completedCardsCount = 0; // Reset completed cards count for each project
-        let inProgressCardsCount = 0; // New variable for in-progress cards count
-        let backloggedCardsCount = 0; // New variable for in-progress cards count
-        const uniqueMembers = new Set(); // Track unique member IDs
-        p.members = 0; // Initialize member count to 0
-        let closestDeadline: Date | null = null;
+        let totalServiceCards = 0; // Reset for each project
+        let completedServiceCards = 0; // Reset for each project
+        let atRiskCards = 0; // Reset for each project
+        let backloggedCards = 0; // Reset for each project
 
-        p.services.map((s) =>
+        // Iterate through project services
+        project.services.forEach((service) =>
         {
-          if (s.chief)
-          {
-            uniqueMembers.add(s.chief.id);
-          }
-          if (s.projectManager)
-          {
-            uniqueMembers.add(s.projectManager.id);
-          }
-          if (s.assignedResources?.length > 0)
-          {
-            s.assignedResources.forEach(resource => uniqueMembers.add(resource.id));
-          }
-          if (s.backup?.length > 0)
-          {
-            s.backup.forEach(b => uniqueMembers.add(b.id));
-          }
+          const deadlineDate = new Date(service.deadline);
+          const timeDiff = deadlineDate.getTime() - currentDate.getTime();
+          const daysUntilDeadline = Math.ceil(timeDiff / (1000 * 3600 * 24)); // Convert to days
 
-          if (s.taskBoard?.cards)
-          { // Check if cards exist
-            totalCardsCount += s.taskBoard.cards.length; // Add total number of cards
-            backloggedCardsCount += s.taskBoard.cards.filter(card => card.column === 'new').length; // Count new cards
-            inProgressCardsCount += s.taskBoard.cards.filter(card => card.column === 'work').length; // Count in-progress cards
-            completedCardsCount += s.taskBoard.cards.filter(card => card.column === 'done').length; // Count completed cards
-          }
-
-          // Determine the closest deadline
-          if (s.deadline)
+          if (service.taskBoard?.cards)
           {
-            const serviceDeadline = new Date(s.deadline);
-            if (!closestDeadline || serviceDeadline < closestDeadline)
+            // Iterate through each card in the service
+            service.taskBoard.cards.forEach((card) =>
             {
-              closestDeadline = serviceDeadline; // Update closest deadline
-            }
+              totalServiceCards++; // Increment total cards
+
+              if (card.column === 'done')
+              {
+                completedServiceCards++; // Count completed cards
+              } else if (card.column === 'new' || card.column === 'work')
+              {
+                this.projectStatusRate.inProgress++; // Count in-progress cards
+              }
+
+              // Check if the deadline is near and the task is not complete
+              if (daysUntilDeadline <= 10 && card.column !== 'done')
+              {
+                atRiskCards++; // Increment at-risk cards count
+              }
+
+              // Count backlogged cards (not done and not at risk)
+              if (card.column !== 'done' && daysUntilDeadline > 10)
+              {
+                backloggedCards++; // Increment backlogged cards count
+              }
+            });
           }
         });
 
-        p.deadline = closestDeadline ? closestDeadline : '';
-
-        // Calculate the progress percentage for the current project
-        p.progress = totalCardsCount > 0
-          ? (completedCardsCount / totalCardsCount) * 100
-          : 0;
-
-        // Update project status rates
-        this.projectStatusRate.completed += completedCardsCount;
-        this.projectStatusRate.inProgress += inProgressCardsCount;
-        this.projectStatusRate.backlogged += backloggedCardsCount;
-
-        p.members = uniqueMembers.size;
+        // Update overall project status rates
+        this.projectStatusRate.completed += completedServiceCards;
+        this.projectStatusRate.atRisk += atRiskCards;
+        this.projectStatusRate.backlogged += backloggedCards;
       });
 
-      // Calculate total counted for percentages
-      const totalCounted = this.projectStatusRate.completed + this.projectStatusRate.inProgress + this.projectStatusRate.atRisk + this.projectStatusRate.backlogged; // Include other statuses as needed
+      // Calculate the total statuses counted
+      const totalCounted = this.projectStatusRate.completed + this.projectStatusRate.inProgress + this.projectStatusRate.backlogged;
 
-      // Adjust percentages
+      // Adjust percentages to ensure they sum to 100%
       if (totalCounted > 0)
       {
         this.projectStatusRate.completed = (this.projectStatusRate.completed / totalCounted) * 100;
         this.projectStatusRate.inProgress = (this.projectStatusRate.inProgress / totalCounted) * 100;
-        this.projectStatusRate.backlogged = (this.projectStatusRate.backlogged / totalCounted) * 100;
-        // Add calculations for at-risk and backlogged as necessary
+        this.projectStatusRate.atRisk = (this.projectStatusRate.atRisk / totalCounted) * 100;
+        this.projectStatusRate.backlogged = (this.projectStatusRate.backlogged / totalCounted) * 100; // Calculate percentage for backlogged
       } else
       {
+        // Handle case where no projects are counted
         this.projectStatusRate.completed = 0;
         this.projectStatusRate.inProgress = 0;
-        this.projectStatusRate.backlogged = 0;
+        this.projectStatusRate.atRisk = 0;
+        this.projectStatusRate.backlogged = 0; // Set backlogged to 0
       }
 
       console.log(this.projects);
+      console.log(this.projectStatusRate);
     });
   }
 
