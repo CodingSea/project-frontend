@@ -2,7 +2,7 @@
   <div class="card-frame">
     <!-- Header -->
     <div class="topbar">
-      <h1>Create New Service</h1>
+<h1>{{ isEditMode ? 'Edit Service' : 'Create New Service' }}</h1>
 
       <button type="button" class="btn btn-red-light" (click)="goBack()">
         <span class="icon-left">
@@ -17,7 +17,7 @@
             />
           </svg>
         </span>
-        Back to Projects
+        Back to Services
       </button>
     </div>
 
@@ -82,64 +82,63 @@
         </div>
       </section>
 
-      <!-- Management Team -->
-      <section class="section">
-        <header class="section__header">
-          <span class="icon">
-            <svg viewBox="0 0 24 24" width="18" height="18">
-              <path
-                d="M12 12a5 5 0 100-10 5 5 0 000 10zm-7 9a7 7 0 0114 0v1H5v-1z"
-                fill="currentColor"
-              />
-            </svg>
+<!-- Management Team -->
+<section class="section">
+  <header class="section__header">
+    <span class="icon">
+      <svg viewBox="0 0 24 24" width="18" height="18">
+        <path
+          d="M12 12a5 5 0 100-10 5 5 0 000 10zm-7 9a7 7 0 0114 0v1H5v-1z"
+          fill="currentColor"
+        />
+      </svg>
+    </span>
+    <h2>Management Team</h2>
+  </header>
+
+  <div class="section__body">
+    <div class="grid-2">
+      <!-- 🔹 Chief -->
+      <div class="field">
+        <label>Chief<span class="req">*</span></label>
+        <button type="button" class="btn btn-red" (click)="openChiefModal($event)">
+          + Select Chief
+        </button>
+
+        <div *ngIf="selectedChief" class="chips mt-8">
+          <span class="chip">
+            {{ selectedChief.first_name }} {{ selectedChief.last_name }}
+            <button type="button" (click)="removeChief()">×</button>
           </span>
-          <h2>Management Team</h2>
-        </header>
-
-        <div class="section__body">
-          <div class="grid-2">
-            <div class="field">
-              <label>Chief<span class="req">*</span></label>
-              <div class="select-wrap">
-                <select formControlName="chiefId">
-                  <option [ngValue]="null">Select service chief</option>
-                  <option
-                    *ngFor="let c of chiefs"
-                    [value]="c.id"
-                  >
-                    {{ c.first_name }} {{ c.last_name }}
-                  </option>
-                </select>
-                <span class="chev">&#9662;</span>
-                </div>
-                <div class="error" *ngIf="form.get('chiefId')?.touched && form.get('chiefId')?.invalid">
-                  <small>Chief is required.</small>
-                </div>
-                </div>
-
-
-            <div class="field">
-              <label>Project Manager<span class="req">*</span></label>
-              <div class="select-wrap">
-                <select formControlName="managerId">
-                  <option [ngValue]="null">Select manager</option>
-                  <option
-                    *ngFor="let m of managers"
-                    [value]="m.id"
-                  >
-                    {{ m.first_name }} {{ m.last_name }}
-                  </option>
-                </select>
-                <span class="chev">&#9662;</span>
-                </div>
-                <div class="error" *ngIf="form.get('managerId')?.touched && form.get('managerId')?.invalid">
-                  <small>Project Manager is required.</small>
-                </div>
-                </div>
-
-          </div>
         </div>
-      </section>
+
+        <div class="error" *ngIf="form.get('chiefId')?.touched && form.get('chiefId')?.invalid">
+          <small>Chief is required.</small>
+        </div>
+      </div>
+
+      <!-- 🔹 Manager -->
+      <div class="field">
+        <label>Project Manager<span class="req">*</span></label>
+        <button type="button" class="btn btn-red" (click)="openManagerModal($event)">
+          + Select Manager
+        </button>
+
+        <div *ngIf="selectedManager" class="chips mt-8">
+          <span class="chip">
+            {{ selectedManager.first_name }} {{ selectedManager.last_name }}
+            <button type="button" (click)="removeManager()">×</button>
+          </span>
+        </div>
+
+        <div class="error" *ngIf="form.get('managerId')?.touched && form.get('managerId')?.invalid">
+          <small>Project Manager is required.</small>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 
       <!-- Assigned Resources -->
       <section class="section">
@@ -159,30 +158,19 @@
           <div class="grid-resource">
             <div class="field">
               <label>Assign Resources<span class="req"></span></label>
-              <div class="select-wrap">
-                <select #resourceSel>
-                  <option value="">Select resources to assign</option>
-                  <option
-                    *ngFor="let r of allResources"
-                    [value]="r.id"
-                  >
-                    {{ r.first_name }} {{ r.last_name }}
-                  </option>
-                </select>
-                <span class="chev">&#9662;</span>
-              </div>
-            </div>
+<button type="button" class="btn btn-red" (click)="openDevelopersModal($event)">
+  + Select Developers
+</button>
 
-            <div class="btn-right">
-              <button
-                type="button"
-                class="btn btn-red"
-                (click)="addResource(resourceSel)"
-              >
-                <span class="plus">+</span> Add Resource
-              </button>
             </div>
           </div>
+
+
+
+
+
+
+
 
           <div class="chips" *ngIf="resourcesFA.length">
             <span class="chip" *ngFor="let r of resourcesFA.controls">
@@ -244,10 +232,90 @@
           Cancel
         </button>
         <button type="submit" class="btn btn-red" [disabled]="isSubmitting">
-          <span class="plus">+</span>
-          {{ isSubmitting ? 'Creating...' : 'Create Service' }}
+          <span class="plus" *ngIf="!isEditMode">+</span>
+          {{ isEditMode
+              ? (isSubmitting ? 'Saving...' : 'Save Update')
+              : (isSubmitting ? 'Creating...' : 'Create Service') }}
         </button>
+
       </div>
     </form>
+    <!-- 🔹 Developer Selection Modal -->
+<div
+  class="dev-modal-backdrop"
+  *ngIf="showDevelopersModal"
+  (click)="closeDevelopersModal(); $event.stopPropagation();"
+></div>
+
+<div
+  class="dev-modal"
+  *ngIf="showDevelopersModal"
+  (click)="$event.stopPropagation()"
+  (submit)="$event.preventDefault()"
+>
+  <header class="modal-header" (click)="$event.stopPropagation()">
+    <h3>Select Developers</h3>
+    <button type="button" class="pm-close done-btn" (click)="closeDevelopersModal(); $event.stopPropagation();">Done</button>
+  </header>
+
+  <!-- Prevent clicks inside from bubbling to the form -->
+  <div (click)="$event.stopPropagation()" (submit)="$event.preventDefault()">
+    <app-developers-search
+      (developerSelected)="onDeveloperSelected($event)"
+      [selectedIds]="selectedResourceIds">
+    </app-developers-search>
   </div>
+</div>
+  </div>
+
+  <!-- 🔹 Chief Selection Modal -->
+<div
+  class="dev-modal-backdrop"
+  *ngIf="showChiefModal"
+  (click)="closeChiefModal(); $event.stopPropagation();"
+></div>
+
+<div
+  class="dev-modal"
+  *ngIf="showChiefModal"
+  (click)="$event.stopPropagation()"
+>
+  <header class="modal-header" (click)="$event.stopPropagation()">
+    <h3>Select Chief</h3>
+    <button type="button" class="pm-close done-btn" (click)="closeChiefModal()">Done</button>
+  </header>
+
+  <div (click)="$event.stopPropagation()">
+    <app-developers-search
+      (developerSelected)="onChiefSelected($event)"
+      [selectedIds]="selectedChief ? [selectedChief.id] : []">
+    </app-developers-search>
+  </div>
+</div>
+
+<!-- 🔹 Manager Selection Modal -->
+<div
+  class="dev-modal-backdrop"
+  *ngIf="showManagerModal"
+  (click)="closeManagerModal(); $event.stopPropagation();"
+></div>
+
+<div
+  class="dev-modal"
+  *ngIf="showManagerModal"
+  (click)="$event.stopPropagation()"
+>
+  <header class="modal-header" (click)="$event.stopPropagation()">
+    <h3>Select Project Manager</h3>
+    <button type="button" class="pm-close done-btn" (click)="closeManagerModal()">Done</button>
+  </header>
+
+  <div (click)="$event.stopPropagation()">
+    <app-developers-search
+      (developerSelected)="onManagerSelected($event)"
+      [selectedIds]="selectedManager ? [selectedManager.id] : []">
+    </app-developers-search>
+  </div>
+</div>
+
 </div>

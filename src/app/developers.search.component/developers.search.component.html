@@ -1,4 +1,3 @@
-<app-sidebar />
 
 <div class="container">
     <header class="header">
@@ -31,26 +30,48 @@
         <div *ngFor="let developer of filteredDevelopers; let i = index" class="card">
             <img src="images/user.png" alt="profile image">
             <h3>{{ developer.first_name }} {{ developer.last_name }}</h3>
-      
+
             <div class="skill-list">
               <ng-container *ngFor="let skill of developer.skills; let j = index">
                 <p *ngIf="j < 3" class="skill">{{ skill }}</p>
                 <p *ngIf="j === 3" class="skill">etc...</p>
               </ng-container>
             </div>
-      
+
             <div class="status-div">
               <!-- Example status display -->
               <!-- <p>Status: <span class="status busy">Busy</span></p> -->
             </div>
-            
+
             <div class="card-btns">
-              <button class="profile-button" (click)="viewProfile(developer.id)">View Profile</button>
-              <button class="add-button">+</button>
-            </div>
+<button type="button" class="profile-button" (click)="openProfile(developer.id)">View Profile</button>
+              <button
+                type="button"
+                class="add-button"
+                [ngClass]="{ 'selected': isSelected(developer.id) }"
+                (click)="selectDeveloper(developer)"
+              >
+                {{ isSelected(developer.id) ? "✓ Selected" : "+" }}
+              </button>
+
+
+
+                          </div>
           </div>
-        
+
     </div>
+<!-- 🔹 Developer Profile Popup -->
+<div class="profile-modal-backdrop" *ngIf="selectedProfileId" (click)="closeProfile()"></div>
+
+<div class="profile-modal" *ngIf="selectedProfileId" (click)="$event.stopPropagation()">
+  <iframe
+    [src]="'/profile/user/' + selectedProfileId | safeUrl"
+    frameborder="0"
+    class="profile-iframe"
+  ></iframe>
+
+  <button type="button" class="close-profile" (click)="closeProfile()">×</button>
+</div>
 
     <!-- <div class="pagination">
         <button class="page-button">1</button>

@@ -21,6 +21,7 @@ export const routes: Routes = [
   { path: 'projects', component: ProjectManagement, canActivate: [ AuthGuard ] },
   { path: 'projects/:projectId/services', component: ServicesComponent, canActivate: [ AuthGuard ] },
   { path: 'projects/:projectId/services/new', component: ServiceFormComponent, canActivate: [ AuthGuard ] },
+  { path: 'projects/:projectId/services/:serviceId/edit', component: ServiceFormComponent, canActivate: [ AuthGuard ] },
   { path: "auth/:mode", component: UserComponent },
   { path: 'dashboard', component: Dashboard, canActivate: [ AuthGuard ], data: { onlyAdmin: true } },
   { path: 'profile', component: ProfileComponent, canActivate: [ AuthGuard ] },

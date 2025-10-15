@@ -5,57 +5,72 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Project } from '@app/project';
 import { Service } from '@app/service';
-import { CreateServiceDto, ServiceService } from '@app/services/service.service';
+import { ServiceService } from '@app/services/service.service';
 import { Sidebar } from '@app/sidebar/sidebar';
 import { environment } from '@environments/environment';
+import { ServiceFormComponent } from '@app/service-form/service-form.component';
 
 @Component({
-  selector: 'app-services.component',
-  imports: [ CommonModule, FormsModule, Sidebar ],
+  selector: 'app-services',
+  standalone: true,
+  imports: [CommonModule, FormsModule, Sidebar, ServiceFormComponent],
   templateUrl: './services.component.html',
-  styleUrl: './services.component.css'
+  styleUrls: ['./services.component.css']
 })
-export class ServicesComponent
-{
+export class ServicesComponent {
   services: Service[] = [];
 
+  // popup
   showNewService = false;
-  newService: Partial<Service> = this.blankNewService();
 
+  // route / stats
   projectId: string | null = null;
+  projectIdNum: number | undefined;
 
-  servicesInfo =
-    {
-      totalServices: 0,
-      backloggedTasks: 0,
-      activeTasks: 0,
-      totalMembers: 0,
-      completionRate: 0.0,
-    }
+  servicesInfo = {
+    totalServices: 0,
+    backloggedTasks: 0,
+    activeTasks: 0,
+    totalMembers: 0,
+    completionRate: 0.0,
+  };
+
+  openMenuId: number | null = null;
 
   // Filters
   showFilter = false;
   selectedFilter: 'all' | 'active' | 'in-review' | 'urgent' = 'all';
   filterState = { active: true, inReview: true, urgent: true };
 
-  constructor(private http: HttpClient, private route: ActivatedRoute, private serviceService: ServiceService, private router: Router) { }
+  constructor(
+    private http: HttpClient,
+    private route: ActivatedRoute,
+    private serviceService: ServiceService,
+    private router: Router
+  ) {}
 
-  ngOnInit()
-  {
-    this.projectId = this.route.snapshot.paramMap.get('projectId');
+  ngOnInit() {
+    this.route.paramMap.subscribe(params => {
+      this.projectId = params.get('projectId');
+      this.projectIdNum = this.projectId ? +this.projectId : undefined;
+      this.loadServices();
+    });
+  }
+
+  loadServices() {
+    if (!this.projectId) return;
 
     this.http.get<Project>(`${environment.apiUrl}/project/${this.projectId}`).subscribe(
-      (res) =>
-      {
-        this.services = res.services; // Assuming res has a 'services' property
+      (res) => {
+        this.services = res.services ?? [];
         this.servicesInfo.totalServices = this.services.length;
 
         let totalTasksCount = 0;
         let completedTasksCount = 0;
+        this.servicesInfo.backloggedTasks = 0;
+        this.servicesInfo.activeTasks = 0;
 
-        this.servicesInfo.totalMembers = this.services.reduce((total, service) =>
-        {
-          // Count members from all fields
+        this.servicesInfo.totalMembers = this.services.reduce((total, service) => {
           const chiefCount = service.chief ? 1 : 0;
           const projectManagerCount = service.projectManager ? 1 : 0;
           const backupCount = service.backup ? 1 : 0;
@@ -64,100 +79,55 @@ export class ServicesComponent
           service.memberCount = chiefCount + projectManagerCount + backupCount + assignedResourcesCount;
           service.completionRate = 0;
 
-          let serviceBackloggedTasksCount = 0;
-          let serviceActiveTasksCount = 0;
           let serviceCompletedTasksCount = 0;
           let serviceTotalTasksCount = 0;
 
-          // Count tasks based on their status
-          if (service.taskBoard && service.taskBoard.cards)
-          {
-            service.taskBoard.cards.forEach(task =>
-            {
+          if (service.taskBoard?.cards) {
+            service.taskBoard.cards.forEach(task => {
               totalTasksCount++;
-              serviceTotalTasksCount++; // Count every task
+              serviceTotalTasksCount++;
 
-              if (task.column === 'new')
-              {
-                serviceBackloggedTasksCount++;
+              if (task.column === 'new') {
                 this.servicesInfo.backloggedTasks++;
-              } else if (task.column === 'work')
-              {
-                serviceActiveTasksCount++;
+              } else if (task.column === 'work') {
                 this.servicesInfo.activeTasks++;
-              } else if (task.column === 'done')
-              {
+              } else if (task.column === 'done') {
                 serviceCompletedTasksCount++;
                 completedTasksCount++;
               }
             });
+
             service.completionRate = serviceTotalTasksCount > 0
               ? (serviceCompletedTasksCount / serviceTotalTasksCount) * 100
               : 0;
           }
 
-          return (total + chiefCount + projectManagerCount + backupCount + assignedResourcesCount);
+          return total + chiefCount + projectManagerCount + backupCount + assignedResourcesCount;
         }, 0);
 
         this.servicesInfo.completionRate = totalTasksCount > 0
           ? (completedTasksCount / totalTasksCount) * 100
           : 0;
-
-        console.log('Services:', res.services);
-        console.log('Total Members:', this.servicesInfo.totalMembers);
       },
-      (error) =>
-      {
-        console.log(error);
-      }
+      (error) => console.error('❌ Failed to load project services:', error)
     );
   }
 
-  // card click from template
-  onCardClick(s: Service) // Updated parameter type
-  {
-    // Do whatever you want here (navigate, open details, etc.)
-    // For now just avoid the TS error:
-    console.log('Open service', s.serviceID); // Updated log
-
-    this.router.navigate([ `services/${s.serviceID}/taskboard/${s.taskBoard?.id}` ])
+  onCardClick(s: Service) {
+    this.router.navigate([`services/${s.serviceID}/taskboard/${s.taskBoard?.id}`]);
   }
 
-  // New service modal handlers
-  openNewService() { this.router.navigate([ `${this.router.url}/new` ]); } // Updated method
-  closeNewService() { this.showNewService = false; } // Updated method
+  openNewService() { this.showNewService = true; }
+  closeNewService() { this.showNewService = false; }
 
-  private blankNewService(): Partial<Service> // Updated method
-  {
-    const d = new Date();
-    d.setDate(d.getDate() + 14);
-    const yyyyMmDd = d.toISOString().slice(0, 10);
-    return { name: '' }; // Adjust fields as necessary
-  }
-
-  saveNewService(form: any) // Updated method
-  {
-    if (form.invalid) return;
-
-    if (!this.newService.deadline)
-    {
-      const d = new Date();
-      d.setDate(d.getDate() + 1);
-      this.newService.deadline = d;
-    }
-  }
-
-  // Filter panel
   openFilter() { this.showFilter = true; }
   closeFilter() { this.showFilter = false; }
   applyFilters() { }
 
-  matchesStatus(status?: string): boolean
-  {
+  matchesStatus(status?: string): boolean {
     if (!status) return false;
     const s = status.toLowerCase();
-    if (this.selectedFilter !== 'all')
-    {
+    if (this.selectedFilter !== 'all') {
       return (this.selectedFilter === 'active' && s === 'active')
         || (this.selectedFilter === 'in-review' && s === 'in review')
         || (this.selectedFilter === 'urgent' && s === 'urgent');
@@ -166,4 +136,26 @@ export class ServicesComponent
       || (s === 'in review' && this.filterState.inReview)
       || (s === 'urgent' && this.filterState.urgent);
   }
+
+  toggleMenu(id: number, event: Event) {
+    event.stopPropagation();
+    this.openMenuId = this.openMenuId === id ? null : id;
+  }
+
+  goToEdit(s: Service, event: Event) {
+    event.stopPropagation();
+    const projectId = this.projectId ?? this.route.snapshot.paramMap.get('projectId');
+    this.router.navigate([`/projects/${projectId}/services/${s.serviceID}/edit`]);
+  }
+
+  ngAfterViewInit() {
+    document.addEventListener('click', () => {
+      this.openMenuId = null;
+    });
+  }
+  onServiceCreated() {
+  this.closeNewService();   // close popup
+  this.loadServices();      // reload from backend ✅
+}
+
 }

@@ -2585,43 +2585,75 @@
   }
 
   /* Modal */
-  .pm-modal-backdrop {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.4);
-    z-index: 1000;
-  }
+/* ✅ Fullscreen Backdrop */
+.pm-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 1000;
+}
 
+/* ✅ Popup Container */
+.pm-modal {
+  position: fixed;
+  z-index: 1001;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 1050px;                       /* Bigger width */
+  max-width: calc(100vw - 80px);
+  max-height: 92vh;                    /* Limit height to screen */
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 40px 100px rgba(0, 0, 0, 0.45);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;                    /* Keeps shadow neat */
+}
+
+/* ✅ Header always visible */
+.pm-modal-header {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 32px 12px;
+  font-size: 17px;
+  font-weight: 600;
+  border-bottom: 1px solid #eee;
+}
+
+/* ✅ Make the inside scrollable */
+.pm-modal app-service-form {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 32px 24px;
+  max-height: calc(92vh - 80px);
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ✅ Close button */
+.pm-close {
+  background: transparent;
+  border: none;
+  font-size: 22px;
+  cursor: pointer;
+  color: #666;
+}
+.pm-close:hover { color: #000; }
+
+/* ✅ Responsive */
+@media (max-width: 768px) {
   .pm-modal {
-    position: fixed;
-    z-index: 1001;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    width: 520px;
-    max-width: calc(100vw - 32px);
-    background: #fff;
+    width: 95%;
+    max-height: 90vh;
     border-radius: 14px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
-    padding: 18px 18px 16px;
   }
+  .pm-modal app-service-form {
+    padding: 0 18px 20px;
+  }
+}
 
-  .pm-modal-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-size: 16px;
-    margin-bottom: 10px;
-  }
-
-  .pm-close {
-    background: transparent;
-    border: 0;
-    font-size: 20px;
-    line-height: 1;
-    cursor: pointer;
-    color: #6b7280;
-  }
 
   .pm-label {
     display: block;
@@ -2689,3 +2721,56 @@
     margin-top: 4px;
     display: block;
   }
+/* 🔹 Card menu styles */
+.pm-card-header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.pm-card-menu {
+  position: relative;
+  margin-left: auto;
+}
+
+.pm-card-menu .dots {
+  background: transparent;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: #555;
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+.pm-card-menu .dots:hover {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.pm-card-menu .menu {
+  position: absolute;
+  right: 0;
+  top: 28px;
+  background: #fff;
+  list-style: none;
+  margin: 0;
+  padding: 6px 0;
+  border: 1px solid #e3e3e3;
+  border-radius: 10px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  width: 130px;
+  z-index: 20;
+}
+
+.pm-card-menu .menu li {
+  padding: 8px 12px;
+  font-size: 14px;
+  cursor: pointer;
+}
+.pm-card-menu .menu li:hover {
+  background-color: #f7f7f7;
+}
+.pm-card-menu .menu li.danger {
+  color: #c0392b;
+}
+
