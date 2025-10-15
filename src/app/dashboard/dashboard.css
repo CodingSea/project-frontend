@@ -4,9 +4,6 @@
 
 body {
     margin: 0;
-    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
-        Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue",
-        sans-serif;
     background-color: #f9fafb;
     color: #222;
 }
@@ -115,11 +112,11 @@ a {
 }
 
 .dot.completed {
-    background-color: #4f46e5;
+    background-color: #22c55e;
 }
 
 .dot.inprogress {
-    background-color: #818cf8;
+    background-color: #6366f1;
 }
 
 .dot.pending {
@@ -127,7 +124,7 @@ a {
 }
 
 .dot.atrisk {
-    background-color: #ec4899;
+    background-color: #ef4444;
 }
 
 .progress-chart .percent {

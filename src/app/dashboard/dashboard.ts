@@ -39,6 +39,9 @@ export class Dashboard
   {
     const servicesArray: any[] = [];
 
+    // Get the current date for comparison
+    const currentDate = new Date();
+
     // Loop through projects to gather services and their deadlines
     this.projects?.forEach(project =>
     {
@@ -53,10 +56,35 @@ export class Dashboard
           // Calculate completion rate (as a percentage)
           const completionRate = totalCards > 0 ? ((totalCards - newCards) / totalCards) * 100 : 0;
 
+          // Determine the deadline date
+          const deadlineDate = new Date(service.deadline);
+          const timeDiff = deadlineDate.getTime() - currentDate.getTime();
+          const daysUntilDeadline = Math.ceil(timeDiff / (1000 * 3600 * 24)); // Convert to days
+
+          // Determine the status based on the logic provided
+          let status: 'Pending Approval' | 'In-Progress' | 'Completed' | 'At Risk' | 'Overdue';
+
+          if (completionRate === 100)
+          {
+            status = 'Completed';
+          } else if (daysUntilDeadline < 0)
+          {
+            status = 'Overdue';
+          } else if (daysUntilDeadline <= 10)
+          {
+            status = 'At Risk';
+          } else
+          {
+            status = 'In-Progress';
+          }
+
+          // Push service along with its project details
           servicesArray.push({
-            service,
-            deadline: new Date(service.deadline), // Convert to Date object
-            completionRate: completionRate // Add the calculated completion rate
+            ...service,
+            deadline: deadlineDate, // Store the deadline as a Date object
+            completionRate: completionRate, // Add the calculated completion rate
+            status: status, // Add the determined status
+            project: project // Include the project object
           });
         }
       });
@@ -68,11 +96,12 @@ export class Dashboard
       .map(item =>
       {
         return {
-          ...item.service,
-          completionRate: item.completionRate // Include the completion rate in the service object
+          ...item,
+          projectName: item.project.name // Optionally include project name for easier access
         };
-      }); // Extract the service object along with the completion rate
+      });
   }
+
   ngOnInit()
   {
     this.listProjects();
