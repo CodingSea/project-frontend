@@ -152,4 +152,21 @@ export class ProjectManagement implements OnInit
       || (s === 'in review' && this.filterState.inReview)
       || (s === 'urgent' && this.filterState.urgent);
   }
+
+  formatDecimal(num: number): string
+  {
+    // Round to one decimal place to handle cases like 1.123 -> 1.1 or 1.987 -> 2.0
+    const roundedNum = Math.round(num * 10) / 10;
+
+    // Convert to string
+    let result = String(roundedNum);
+
+    // Remove trailing .0 if present
+    if (result.endsWith(".0"))
+    {
+      result = result.substring(0, result.length - 2);
+    }
+
+    return result;
+  }
 }

@@ -42,7 +42,7 @@
                                     </li>
                                     <li class="stat-item">
                                         <span class="text-completion-rate">Completion Rate</span>
-                                        <span class="text-87">{{ servicesInfo.completionRate.toFixed(2) }}%</span>
+                                        <span class="text-87">{{ formatDecimal(servicesInfo.completionRate) }}%</span>
                                     </li>
                                 </ul>
                             </div>
@@ -129,9 +129,9 @@
                                             <span class="pm-due">Due: {{ p.deadline | date:'MMM d' }}</span>
                                             <div class="pm-progress">
                                                 <div class="pm-progress-fill"
-                                                    [style.width.%]="p.completionRate?.toFixed(2)"></div>
+                                                    [style.width.%]="getProgress(p)"></div>
                                             </div>
-                                            <span class="pm-progress-label">{{ p.completionRate }}%</span>
+                                            <span class="pm-progress-label">{{ formatDecimal(p.completionRate!) }}%</span>
                                         </footer>
                                     </article>
 

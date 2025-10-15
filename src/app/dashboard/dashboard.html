@@ -7,15 +7,6 @@
             <h1>Dashboard</h1>
         </header>
 
-
-
-        <select name="projectSelection">
-            @for (project of projects; track $index) 
-            {
-                <option [value]="project.name">{{ project.name }}</option>
-            }
-          </select>
-          
         <div class="dashboard-grid">
             <section class="card progress-chart">
                 <!-- Placeholder donut chart -->
@@ -34,72 +25,31 @@
                 <div class="label">Overall Completion</div>
             </section>
 
-            <section class="card">
-                <h2>Services Progress</h2>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Project Title</th>
-                            <th>Deadline</th>
-                            <th>Progress</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>
-                                <strong>E-commerce Platform</strong><br />
-                                <span class="subtitle">Web Development</span>
-                            </td>
-                            <td>Dec 15, 2024</td>
-                            <td class="progress-bar">
-                                <div class="progress-container">
-                                    <div class="progress-bar-filled" style="width: 85%"></div>
-                                </div>
-                                85%
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <strong>Mobile App Redesign</strong><br />
-                                <span class="subtitle">UI/UX Design</span>
-                            </td>
-                            <td>Jan 20, 2025</td>
-                            <td class="progress-bar">
-                                <div class="progress-container">
-                                    <div class="progress-bar-filled" style="width: 60%"></div>
-                                </div>
-                                60%
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <strong>Data Analytics Dashboard</strong><br />
-                                <span class="subtitle">Analytics</span>
-                            </td>
-                            <td>Nov 30, 2024</td>
-                            <td class="progress-bar">
-                                <div class="progress-container">
-                                    <div class="progress-bar-filled" style="width: 92%"></div>
-                                </div>
-                                92%
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <strong>Marketing Campaign</strong><br />
-                                <span class="subtitle">Marketing</span>
-                            </td>
-                            <td>Dec 05, 2024</td>
-                            <td class="progress-bar">
-                                <div class="progress-container">
-                                    <div class="progress-bar-filled" style="width: 45%"></div>
-                                </div>
-                                45%
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </section>
+            <div class="achievements-container">
+                <h2>Recent Achievements</h2>
+                <div class="achievement">
+                    <div class="icon completed"></div>
+                    <div class="achievement-details">
+                        <h3>Database Migration Completed</h3>
+                        <p>By Ali Mohammed • 2 days ago</p>
+                    </div>
+                </div>
+                <div class="achievement">
+                    <div class="icon certification"></div>
+                    <div class="achievement-details">
+                        <h3>Security Certification Obtained</h3>
+                        <p>By Fatima Al-Zahra • 5 days ago</p>
+                    </div>
+                </div>
+                <div class="achievement">
+                    <div class="icon optimization"></div>
+                    <div class="achievement-details">
+                        <h3>Performance Optimization</h3>
+                        <p>By Khalid Al-Rashid • 1 week ago</p>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
         <h2 class="tasks-header">Projects with the most imminent deadline</h2>
@@ -136,21 +86,21 @@
                         <div class="progress-container" style="width: 120px">
                             @if(service.status == "Completed")
                             {
-                                <div class="progress-bar-filled" style=" background: #22c55e"
+                            <div class="progress-bar-filled" style=" background: #22c55e"
                                 [style.width.%]="service.completionRate"></div>
                             }
                             @else if(service.status == "At Risk")
                             {
-                                <div class="progress-bar-filled" style=" background: #ef4444"
+                            <div class="progress-bar-filled" style=" background: #ef4444"
                                 [style.width.%]="service.completionRate"></div>
                             }
                             @else if(service.status == "In-Progress")
                             {
-                                <div class="progress-bar-filled" style=" background: #6366f1"
+                            <div class="progress-bar-filled" style=" background: #6366f1"
                                 [style.width.%]="service.completionRate"></div>
                             }
                         </div>
-                        {{ service.completionRate }}%
+                        {{ getProgress(service) }}%
                     </td>
                 </tr>
 
