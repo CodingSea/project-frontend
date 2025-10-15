@@ -39,7 +39,20 @@
             </section>
 
             <div class="achievements-container">
-                <h2>Recent Achievements</h2>
+                <h2>Recent Certificates</h2>
+
+                <div *ngFor="let c of certificates">
+                    <div class="achievement">
+                        <div class="icon completed"></div>
+                        <div class="achievement-details">
+                            <h3>{{ c.name }}</h3>
+                            <p>By {{c.userId?.first_name}} {{c.userId?.last_name}} • {{ c.createdAt | date:"dd/MM/yyyy" }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <hr>
+
                 <div class="achievement">
                     <div class="icon completed"></div>
                     <div class="achievement-details">
