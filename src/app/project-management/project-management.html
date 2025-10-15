@@ -78,7 +78,6 @@
                   <!-- Dynamic Project Cards -->
                   <article class="pm-card" *ngFor="let p of projects" [hidden]="!matchesStatus(p.status)"
                     (click)="onCardClick(p)">
-
                     <!-- Header -->
                     <header class="pm-card-header">
                       <h3>{{ p.name }}</h3> <!-- ✅ changed -->

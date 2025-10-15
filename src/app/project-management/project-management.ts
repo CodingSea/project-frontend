@@ -43,14 +43,14 @@ export class ProjectManagement implements OnInit
     this.projectService.getProjects().subscribe((data) =>
     {
       this.projects = data;
-      let totalCardsCount = 0; // Total cards across all services
-      let completedCardsCount = 0;
-      let closestDeadline: Date | null = null;
 
       data.map((p) =>
       {
+        let totalCardsCount = 0; // Reset total cards count for each project
+        let completedCardsCount = 0; // Reset completed cards count for each project
         const uniqueMembers = new Set(); // Create a Set to track unique member IDs
         p.members = 0; // Initialize member count to 0
+        let closestDeadline: Date | null = null;
 
         p.services.map((s) =>
         {
@@ -73,8 +73,8 @@ export class ProjectManagement implements OnInit
 
           if (s.taskBoard?.cards)
           { // Check if cards exist
-            totalCardsCount += s.taskBoard?.cards.length; // Add total number of cards
-            completedCardsCount += s.taskBoard?.cards.filter(card => card.column === 'done').length; // Count completed cards
+            totalCardsCount += s.taskBoard.cards.length; // Add total number of cards
+            completedCardsCount += s.taskBoard.cards.filter(card => card.column === 'done').length; // Count completed cards
           }
 
           // Determine the closest deadline
@@ -88,8 +88,9 @@ export class ProjectManagement implements OnInit
           }
         });
 
-        p.deadline = closestDeadline ? closestDeadline.toISOString() : '';
+        p.deadline = closestDeadline ? closestDeadline : '';
 
+        // Calculate the progress percentage for the current project
         p.progress = totalCardsCount > 0
           ? (completedCardsCount / totalCardsCount) * 100
           : 0;
