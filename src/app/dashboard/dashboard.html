@@ -12,7 +12,20 @@
                 <!-- Placeholder donut chart -->
                 <svg width="150" height="150" viewBox="0 0 36 36" class="circular-chart">
                     <circle class="circle-bg" stroke="#f3f4f6" stroke-width="3" fill="none" cx="18" cy="18" r="15" />
-                    <circle class="circle" stroke="#22c55e" stroke-width="3" stroke-dasharray="60, 100"
+
+                    <!-- At Risk Circle -->
+                    <circle class="circle" stroke="#ef4444" stroke-width="3"
+                        [attr.stroke-dasharray]="formatDecimal(projectStatusRate.completed + projectStatusRate.inProgress + projectStatusRate.atRisk) + ', 100'"
+                        stroke-linecap="round" fill="none" cx="18" cy="18" r="15" transform="rotate(-90,18,18)" />
+
+                    <!-- In Progress Circle (optional, if you want to visualize it separately) -->
+                    <circle class="circle" stroke="#6366f1" stroke-width="3"
+                        [attr.stroke-dasharray]="formatDecimal(projectStatusRate.completed + projectStatusRate.inProgress) + ', 100'"
+                        stroke-linecap="round" fill="none" cx="18" cy="18" r="15" transform="rotate(-90,18,18)" />
+
+                    <!-- Completed Circle -->
+                    <circle class="circle" stroke="#22c55e" stroke-width="3"
+                        [attr.stroke-dasharray]="formatDecimal(projectStatusRate.completed) + ', 100'"
                         stroke-linecap="round" fill="none" cx="18" cy="18" r="15" transform="rotate(-90,18,18)" />
                 </svg>
                 <div class="legend">
@@ -21,7 +34,7 @@
                     <!-- <span><span class="dot pending"></span>Pending</span> -->
                     <span><span class="dot atrisk"></span>At Risk</span>
                 </div>
-                <div class="percent">73%</div>
+                <div class="percent">{{ formatDecimal(projectStatusRate.completed) }}%</div>
                 <div class="label">Overall Completion</div>
             </section>
 
