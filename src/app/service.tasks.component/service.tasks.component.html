@@ -13,7 +13,7 @@
       <div class="header-progress">
         <p>Project Progress: </p>
         <div class="progress-bar">
-          <div class="progress" style="width: 78%;"></div>
+          <div class="progress" [style.width.%]="servicesInfo.completionRate"></div>
         </div>
         <strong>{{ formatDecimal(servicesInfo.completionRate) }}%</strong>
       </div>
