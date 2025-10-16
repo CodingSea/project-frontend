@@ -1,46 +1,39 @@
 <div class="container">
-  <app-sidebar/>
+  <app-sidebar></app-sidebar>
 
   <div class="kanban-container">
     <header class="kanban-header">
-      <h1>Government Portal Redesign</h1>
-      <div class="header-info">
-        <p>Led by: Sara Al-Mahmood</p>
-        <p>Started: Jan 15, 2025</p>
-        <p>Project Progress: <strong>78%</strong></p>
-      </div>
-      <div class="header-actions">
-        <button class="add-task" (click)="openPopup()">Add Task</button>
-        <button class="filter">Filter</button>
+      <div class="header-title">
+        <h2>{{ taskBoard?.service?.name }}</h2>
+        <div class="header-info">
+          <p>Deadline: {{ taskBoard?.service?.deadline | date: "dd/MM/yyyy"}}</p>
+        </div>
       </div>
 
-      <button type="button" class="btn btn-red-light" (click)="goBack()">
-        <span class="icon-left">
-          <svg viewBox="0 0 24 24" width="16" height="16">
-            <path
-              d="M15 18l-6-6 6-6"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
-          </svg>
-        </span>
-        Back
-      </button>
+      <div class="header-progress">
+        <p>Project Progress: </p>
+        <div class="progress-bar">
+          <div class="progress" style="width: 78%;"></div>
+        </div>
+        <strong>{{ formatDecimal(servicesInfo.completionRate) }}%</strong>
+      </div>
+
+      <div class="header-actions">
+        <button class="add-task" (click)="openPopup()">Add Task</button>
+        <button class="back-btn" (click)="goBack()">Back</button>
+      </div>
     </header>
 
     <div *ngIf="showKanban">
-      <jqxKanban #kanbanReference [width]="'100%'" [height]="'500px'" [columns]="columns" [source]="dataAdapter"
+      <jqxKanban #kanbanReference [width]="'100%'" [height]="'100%'" [columns]="columns" [source]="dataAdapter"
         (onItemAttrClicked)="openTaskDetailPopup($event.args.item)" (onItemMoved)="onItemMoved($event)">
       </jqxKanban>
     </div>
 
     <add-task-popup *ngIf="showPopup" (taskAdded)="onTaskAdded($event)" (close)="closePopup()"></add-task-popup>
 
-    <task-popup *ngIf="showTaskDetailPopup" [task]="selectedTask" (close)="closeTaskDetailPopup()" (delete)="deleteTask($event)">
+    <task-popup *ngIf="showTaskDetailPopup" [task]="selectedTask" (close)="closeTaskDetailPopup()"
+      (delete)="deleteTask($event)">
     </task-popup>
-
   </div>
 </div>

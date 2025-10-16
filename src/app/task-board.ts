@@ -1,8 +1,9 @@
+import { Service } from "./service";
 import { TaskCard } from "./task-card";
 
 export interface TaskBoard
 {
     id: number;
-    serviceId: number;
+    service: Service;
     cards: TaskCard[];
 }

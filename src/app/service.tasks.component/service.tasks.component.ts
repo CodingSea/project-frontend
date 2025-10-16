@@ -1,4 +1,4 @@
-import { CommonModule, Location  } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { AfterViewInit, ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { jqxKanbanComponent, jqxKanbanModule } from "jqwidgets-ng/jqxkanban";
 import { jqxSplitterModule } from 'jqwidgets-ng/jqxsplitter';
@@ -11,6 +11,8 @@ import { TaskBoard } from '@app/task-board';
 import { Sidebar } from "@app/sidebar/sidebar";
 import { firstValueFrom } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
+import { ServiceInfo } from '@app/service-info';
+import { Service } from '@app/service';
 
 @Component({
   selector: 'app-service-tasks',
@@ -35,6 +37,17 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
 
   serviceId!: number;
   taskBoardId!: number;
+  taskBoard: TaskBoard | null = null;
+
+  servicesInfo: ServiceInfo =
+    {
+      totalServices: 0,
+      backloggedTasks: 0,
+      activeTasks: 0,
+      completedTasks: 0,
+      totalMembers: 0,
+      completionRate: 0.0
+    }
 
   columns: any[] = [
     { text: 'Backlog', dataField: 'new', minWidth: 150 },
@@ -42,8 +55,8 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
     { text: 'Done', dataField: 'done', minWidth: 150 }
   ];
 
-  constructor(private cdr: ChangeDetectorRef, 
-    private http: HttpClient, 
+  constructor(private cdr: ChangeDetectorRef,
+    private http: HttpClient,
     private route: ActivatedRoute,
     private location: Location) { }
 
@@ -54,6 +67,97 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
       this.serviceId = params[ 'serviceId' ];
       this.taskBoardId = params[ 'taskBoardId' ];
     })
+
+    this.getCurrentServiceInfo();
+  }
+
+  getCurrentServiceInfo(): void
+  {
+    this.servicesInfo =
+    {
+      totalServices: 0,
+      backloggedTasks: 0,
+      activeTasks: 0,
+      completedTasks: 0,
+      totalMembers: 0,
+      completionRate: 0.0
+    }
+
+    this.http.get<TaskBoard>(`${environment.apiUrl}/tasks/task-board/${this.taskBoardId}`).subscribe(
+      (res) =>
+      {
+        console.log('Response from API:', res); // Log the response
+        this.taskBoard = res; // Assuming res is a TaskBoard
+        if (this.taskBoard === null) return;
+        const service = this.taskBoard.service; // Accessing the service
+
+        if (!service)
+        {
+          console.error('Service not found in the task board');
+          return;
+        }
+
+        this.servicesInfo.totalServices = 1; // Since we're getting a single service
+
+        const uniqueMembers = new Set<number>(); // Create a Set to track unique member IDs
+        let totalTasksCount = 0;
+
+        // Gather unique members
+        if (service.chief) uniqueMembers.add(service.chief.id);
+        if (service.projectManager) uniqueMembers.add(service.projectManager.id);
+        if (service.assignedResources)
+        {
+          service.assignedResources.forEach(resource => uniqueMembers.add(resource.id));
+        }
+        if (service.backup)
+        {
+          service.backup.forEach(b => uniqueMembers.add(b.id));
+        }
+
+        // Initialize task counters
+        let serviceBackloggedTasksCount = 0;
+        let serviceActiveTasksCount = 0;
+        let serviceCompletedTasksCount = 0;
+
+        // Count tasks based on their status
+        if (this.taskBoard.cards)
+        {
+          this.taskBoard.cards.forEach(task =>
+          {
+            totalTasksCount++;
+
+            if (task.column === 'new')
+            {
+              serviceBackloggedTasksCount++;
+              this.servicesInfo.backloggedTasks++;
+            } else if (task.column === 'work')
+            {
+              serviceActiveTasksCount++;
+              this.servicesInfo.activeTasks++;
+            } else if (task.column === 'done')
+            {
+              serviceCompletedTasksCount++;
+              this.servicesInfo.completedTasks++;
+            }
+          });
+        }
+
+        // Set the totalMembers from the uniqueMembers Set
+        this.servicesInfo.totalMembers = uniqueMembers.size;
+
+        // Calculate the overall completion rate
+        this.servicesInfo.completionRate = totalTasksCount > 0
+          ? (this.servicesInfo.completedTasks / totalTasksCount) * 100
+          : 0;
+
+        // Log the service information for debugging
+        console.log(this.servicesInfo);
+      },
+      (error) =>
+      {
+        console.log(error);
+      }
+    );
   }
 
   async getBoardCards(): Promise<void>
@@ -61,7 +165,6 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
     try
     {
       const response = await this.http.get<TaskCard[]>(`${environment.apiUrl}/service/${this.serviceId}/tasks`).toPromise();
-      console.log('API Response:', response); // Log the response
 
       if (!response || response.length === 0)
       {
@@ -77,13 +180,13 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
       }));
 
       this.data = this.data.map(task =>
+      {
+        if (typeof task.tags !== 'string' || task.tags.trim() === '')
         {
-          if (typeof task.tags !== 'string' || task.tags.trim() === '')
-          {
-            task.tags = ' '; // Set to empty string if no valid tags
-          }
-          return task;
-        });
+          task.tags = ' '; // Set to empty string if no valid tags
+        }
+        return task;
+      });
     } catch (error)
     {
       console.error('Error fetching board cards:', error);
@@ -147,6 +250,8 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
     {
       this.dragCooldown = false;
     }, 300);
+
+    this.getCurrentServiceInfo();
   }
 
   private async saveOrUpdateTask(task: any): Promise<void>
@@ -344,6 +449,23 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
   goBack()
   {
     this.location.back();
+  }
+
+  formatDecimal(num: number): string
+  {
+    // Round to one decimal place to handle cases like 1.123 -> 1.1 or 1.987 -> 2.0
+    const roundedNum = Math.round(num * 10) / 10;
+
+    // Convert to string
+    let result = String(roundedNum);
+
+    // Remove trailing .0 if present
+    if (result.endsWith(".0"))
+    {
+      result = result.substring(0, result.length - 2);
+    }
+
+    return result;
   }
 
 }

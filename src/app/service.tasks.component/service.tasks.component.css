@@ -1,5 +1,4 @@
-.container
-{
+.container {
   display: flex;
   width: 100%;
   overflow-y: hidden;
@@ -14,61 +13,72 @@
 
 .kanban-header {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
   background-color: #fff;
   padding: 15px;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
+.header-title {
+  display: flex;
+  flex-direction: column;
+}
+
 .header-info p {
   margin: 0;
 }
 
+.header-progress {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 10px 0;
+}
+
+.header-progress strong {
+  margin: 0.5em;
+}
+
+.progress-bar {
+  width: 90%;
+  height: 10px;
+  background-color: #e0e0e0;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.progress {
+  height: 100%;
+  background-color: #dc2626;
+  /* Red color */
+}
+
 .header-actions {
   display: flex;
-  gap: 10px;
+  justify-content: space-between;
+  /* Distribute space between items */
+  align-items: center;
+  /* Center items vertically */
+  width: 100%;
+  /* Ensure actions take up full width */
+  margin-top: 10px;
+  /* Optional: Adds space above the button row */
 }
 
 .add-task,
-.filter {
+.filter,
+.back-btn {
   padding: 10px 15px;
   border: none;
   border-radius: 5px;
-  background-color: #007bff;
+  background-color: #C21A25;
   color: white;
   cursor: pointer;
   transition: background-color 0.3s;
 }
 
-.add-task:hover,
-.filter:hover {
-  background-color: #0056b3;
-}
-
-.btn-red {
-  background: #dc2626;
-  color: #fff;
-  border-color: #dc2626;
-}
-
-.btn-red-light {
-  background: #fee2e2;
-  color: #b91c1c;
-  border-color: #fecaca;
-}
-
-.icon-left { display: inline-flex; }
-
-.btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  border-radius: 10px;
-  padding: 10px 14px;
-  font-size: 14px;
-  border: 1px solid transparent;
-  cursor: pointer;
-  user-select: none;
+.back-btn {
+  margin-left: auto;
+  /* Pushes the back button to the right end */
 }
