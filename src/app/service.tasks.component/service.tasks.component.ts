@@ -75,6 +75,15 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
         text: task.title,
         tags: this.arrayToString(task.tags as string[])
       }));
+
+      this.data = this.data.map(task =>
+        {
+          if (typeof task.tags !== 'string' || task.tags.trim() === '')
+          {
+            task.tags = ' '; // Set to empty string if no valid tags
+          }
+          return task;
+        });
     } catch (error)
     {
       console.error('Error fetching board cards:', error);
