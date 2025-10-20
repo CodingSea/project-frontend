@@ -1,19 +1,29 @@
-<div class="popup">
-    <div class="row">
-        <h2>Title: </h2>
-        <input type="text" placeholder="Add a title..." [(ngModel)]="title" (ngModelChange)="onInputChange()">
+<div class="modal">
+    <div class="modal-content">
+      <h2>Create New Task</h2>
+      <p>Fill in the details below to create your new task</p>
+      
+      <div class="form-group">
+        <label for="title">Title:</label>
+        <input id="title" type="text" placeholder="Add a title..." 
+               [(ngModel)]="title" (ngModelChange)="onInputChange()" />
+      </div>
+      
+      <div class="form-group">
+        <label for="description">Description:</label>
+        <textarea id="description" rows="4" placeholder="Add a description..." 
+                  [(ngModel)]="description" (ngModelChange)="onInputChange()"></textarea>
+      </div>
+      
+      <div class="form-group">
+        <label for="tags">Tags:</label>
+        <input id="tags" type="text" placeholder="Add tags... (comma-separated)" 
+               [(ngModel)]="tagsString" (ngModelChange)="onInputChange()" />
+      </div>
+      
+      <div class="popup-actions">
+          <button class="close-button" (click)="closePopup()">Cancel</button>
+        <button class="save-button" (click)="saveTask()">Create</button>
+      </div>
     </div>
-
-    <h3>Description:</h3>
-    <textarea rows="4" placeholder="Add a description..." [(ngModel)]="description"
-        (ngModelChange)="onInputChange()"></textarea>
-
-    <h3>Tags</h3>
-    <input type="text" placeholder="Add tags... (comma-separated)" [(ngModel)]="tagsString"
-        (ngModelChange)="onInputChange()">
-
-    <div class="popup-actions">
-        <button (click)="saveTask()">Create</button>
-        <button (click)="closePopup()">Cancel</button>
-    </div>
-</div>
+  </div>

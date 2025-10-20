@@ -1,9 +1,10 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { ServiceTasksComponent } from '@app/service.tasks.component/service.tasks.component';
 import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 
 @Component({
-  imports: [ FormsModule ],
+  imports: [ FormsModule, CommonModule ],
   selector: 'task-popup',
   templateUrl: './task-popup.html',
   styleUrls: [ './task-popup.css' ]

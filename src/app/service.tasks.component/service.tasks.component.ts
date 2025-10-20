@@ -364,7 +364,7 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
     if (typeof text !== 'string')
     {
       console.warn('Expected a string but received:', text);
-      return []; // Return an empty array if not a string
+      return [" "]; // Return an empty array if not a string
     }
     return text.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0);
   }
@@ -444,7 +444,16 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
 
   async createTask(taskText: string, column: string, tagsText: string, description: string): Promise<void>
   {
-    const formattedTags = this.textToArray(tagsText); // Convert to an array
+    let formattedTags;
+
+    if(tagsText.length === 0)
+    {
+      formattedTags = [" "];
+    }
+    else
+    {
+      formattedTags = this.textToArray(tagsText); // Convert to an array
+    }
 
     const newTaskOrder = this.data.filter(task => task.status === 'new').length;
 
@@ -472,9 +481,12 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
         id: createdTask?.id,
         status: column,
         text: taskText,
+        description: description,
         tags: formattedTags,
         order: newTaskOrder
       };
+
+      console.log(newTask02);
 
       this.data.push(newTask02);
       this.dataAdapter.localdata = this.data;
