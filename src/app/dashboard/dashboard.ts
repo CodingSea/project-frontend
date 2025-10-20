@@ -162,10 +162,10 @@ export class Dashboard
         {
           // Calculate total cards and new cards
           const totalCards = service.taskBoard?.cards?.length || 0;
-          const newCards = service.taskBoard?.cards?.filter(card => card.column === 'new').length || 0;
+          const unfinishedCards = service.taskBoard?.cards?.filter(card => card.column === 'new' || card.column === "work").length || 0;
 
           // Calculate completion rate (as a percentage)
-          const completionRate = totalCards > 0 ? ((totalCards - newCards) / totalCards) * 100 : 0;
+          const completionRate = totalCards > 0 ? ((totalCards - unfinishedCards) / totalCards) * 100 : 0;
 
           // Determine the deadline date
           const deadlineDate = new Date(service.deadline);
