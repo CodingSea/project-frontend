@@ -10,6 +10,15 @@
   border-color: #dc2626;
 }
 
+.back-btn {
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  background-color: #C21A25;
+  color: white;
+  cursor: pointer;
+}
+
 .btn-red-light {
   background: #fee2e2;
   color: #b91c1c;

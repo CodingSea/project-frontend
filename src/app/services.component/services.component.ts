@@ -117,9 +117,6 @@ export class ServicesComponent
         this.servicesInfo.completionRate = totalTasksCount > 0
           ? (this.servicesInfo.completedTasks / totalTasksCount) * 100
           : 0;
-
-        console.log('Services:', res.services);
-        console.log('Total Members:', this.servicesInfo.totalMembers);
       },
       (error) =>
       {

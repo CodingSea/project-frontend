@@ -39,26 +39,15 @@
             </section>
 
             <div class="achievements-container">
-                <h2>Recent Achievements</h2>
-                <div class="achievement">
-                    <div class="icon completed"></div>
-                    <div class="achievement-details">
-                        <h3>Database Migration Completed</h3>
-                        <p>By Ali Mohammed • 2 days ago</p>
-                    </div>
-                </div>
-                <div class="achievement">
-                    <div class="icon certification"></div>
-                    <div class="achievement-details">
-                        <h3>Security Certification Obtained</h3>
-                        <p>By Fatima Al-Zahra • 5 days ago</p>
-                    </div>
-                </div>
-                <div class="achievement">
-                    <div class="icon optimization"></div>
-                    <div class="achievement-details">
-                        <h3>Performance Optimization</h3>
-                        <p>By Khalid Al-Rashid • 1 week ago</p>
+                <h2>Recent Certificates</h2>
+
+                <div *ngFor="let c of certificates">
+                    <div class="achievement">
+                        <div class="icon completed"></div>
+                        <div class="achievement-details">
+                            <h3>{{ c.name }}</h3>
+                            <p>By {{c.userId?.first_name}} {{c.userId?.last_name}} • {{ c.createdAt | date:"dd/MM/yyyy" }}</p>
+                        </div>
                     </div>
                 </div>
             </div>
