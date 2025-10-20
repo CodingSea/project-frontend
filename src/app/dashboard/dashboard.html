@@ -65,12 +65,12 @@
                     <th>Progress</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody class="closest-services">
 
                 <tr *ngFor="let service of closestServices; let i = index">
                     <td>
-                        <strong>{{ service.name }}</strong><br />
-                        <small>{{ service.project.name }}</small>
+                        <strong (click)="goTo(`/services/${service.serviceID}/taskboard/${service.taskBoard?.id}`)">{{ service.name }}</strong><br />
+                        <small (click)="goTo(`/projects/${service.project.projectID}/services`)">{{ service.project.name }}</small>
                         <!-- You can add a subtitle or description here if needed -->
                     </td>
                     <td class="status">

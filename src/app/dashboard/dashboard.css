@@ -119,6 +119,10 @@ a {
     background-color: #6366f1;
 }
 
+.dot.overdue {
+    background-color: #0033ff;
+}
+
 .dot.pending {
     background-color: #c7d2fe;
 }
@@ -229,6 +233,10 @@ table td.progress-bar {
     color: #374151;
 }
 
+.overdue {
+    background-color: #202020;
+}
+
 .in-progress {
     background-color: #6366f1;
 }
@@ -293,4 +301,9 @@ h2 {
     margin: 5px 0 0;
     color: #888; /* Gray for the text */
     font-size: 0.9em;
+}
+
+.closest-services strong :hover
+{
+    color: #C21A25;
 }
