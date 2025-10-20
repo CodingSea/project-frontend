@@ -63,6 +63,8 @@ export class TaskPopup
       // console.log("popup", updatedTask)
 
       await this.taskService.updateTask(updatedTask); // Call the updateTask method
+
+      this.taskService.initializeKanbanDataSource();
     } catch (error)
     {
       console.error('Error saving description:', error);

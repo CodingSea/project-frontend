@@ -149,14 +149,68 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
           ? (this.servicesInfo.completedTasks / totalTasksCount) * 100
           : 0;
 
-        // Log the service information for debugging
-        console.log(this.servicesInfo);
       },
       (error) =>
       {
         console.log(error);
       }
     );
+  }
+
+  getCurrentServiceInfoFromData(): void
+  {
+    this.servicesInfo =
+    {
+      totalServices: 0,
+      backloggedTasks: 0,
+      activeTasks: 0,
+      completedTasks: 0,
+      totalMembers: 0,
+      completionRate: 0.0
+    }
+
+    if (!this.data)
+    {
+      console.error('Data not found in the task board');
+      return;
+    }
+
+    this.servicesInfo.totalServices = 1; // Since we're getting a single service
+
+    let totalTasksCount = 0;
+
+    // Initialize task counters
+    let serviceBackloggedTasksCount = 0;
+    let serviceActiveTasksCount = 0;
+    let serviceCompletedTasksCount = 0;
+
+    // Count tasks based on their status
+    if (this.data)
+    {
+      this.data.forEach(task =>
+      {
+        totalTasksCount++;
+
+        if (task.status === 'new')
+        {
+          serviceBackloggedTasksCount++;
+          this.servicesInfo.backloggedTasks++;
+        } else if (task.status === 'work')
+        {
+          serviceActiveTasksCount++;
+          this.servicesInfo.activeTasks++;
+        } else if (task.status === 'done')
+        {
+          serviceCompletedTasksCount++;
+          this.servicesInfo.completedTasks++;
+        }
+      });
+    }
+
+    // Calculate the overall completion rate
+    this.servicesInfo.completionRate = totalTasksCount > 0
+      ? (this.servicesInfo.completedTasks / totalTasksCount) * 100
+      : 0;
   }
 
   async getBoardCards(): Promise<void>
@@ -178,8 +232,6 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
         tags: this.arrayToString(task.tags as string[]),
         description: task.description || '' // Ensure description is included
       }));
-
-      console.log(this.data);
 
       this.data = this.data.map(task =>
       {
@@ -208,7 +260,6 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
     }
 
     const selectedTask = this.data.find(x => x.id === item.id);
-    console.log("selected ", selectedTask)
 
     this.selectedTask = selectedTask;
     this.showTaskDetailPopup = true;
@@ -245,7 +296,7 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
       // Save the updated task to the backend
       await this.updateTask(taskToUpdate); // Save task with new status and order
 
-      this.getCurrentServiceInfo();
+      this.getCurrentServiceInfoFromData();
     } else
     {
       console.error('Task to update not found:', movedTask);
@@ -286,7 +337,6 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
       const url = `${environment.apiUrl}/service/${this.serviceId}/tasks/${task.id}`;
       // Assuming you have a PUT or POST endpoint based on whether the task exists
       const response = await this.http.put(url, task).toPromise(); // Use PUT for updates
-      console.log('Task saved/updated successfully:', response);
     } catch (error)
     {
       console.error('Error saving/updating task:', error);
@@ -311,7 +361,7 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
 
   public textToArray(text: string): string[]
   {
-    if (!text) return [];
+    if (!text) return [" "];
     return text.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0);
   }
 
@@ -409,8 +459,6 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
       order: newTaskOrder
     };
 
-    console.log('Creating task with payload:', newTask);
-
     try
     {
       const response = await this.http.post<TaskCard>(
@@ -445,8 +493,6 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
       order: task.order // Include the order in the payload
     };
 
-    console.log("payload ",payload);
-
     try
     {
       const response = await this.http.patch<TaskCard>(
@@ -465,8 +511,6 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
           tags: payload.tags,
         };
       }
-
-      this.initializeKanbanDataSource();
     } catch (error)
     {
       console.error('Error updating task:', error);
@@ -483,6 +527,8 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
       this.dataAdapter.localdata = this.data;
       this.rebuildKanban();
       this.closeTaskDetailPopup();
+      // this.getCurrentServiceInfo();
+      this.getCurrentServiceInfoFromData();
     } catch (error)
     {
       console.error('Error deleting task:', error);

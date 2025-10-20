@@ -51,9 +51,26 @@ input
 .row
 {
   display: flex;
+  margin-top: 3em;
 }
 
 .row input
 {
   font-size: x-large;
+  padding: 0;
+}
+
+.close-button {
+  position: absolute;
+  top: 10px; /* Adjust as needed for vertical position */
+  right: 10px; /* Adjust as needed for horizontal position */
+  background: #C21A25;
+  border-radius: 5px;
+  color: white;
+  border: none;
+  font-size: large;
+  /* border: 1px solid #C21A25; */
+  cursor: pointer;
+  padding: 10px 15px;
+  /* Other styling for your close button (e.g., hover effects) */
 }
