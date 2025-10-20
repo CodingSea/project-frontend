@@ -12,9 +12,10 @@ import { Sidebar } from './sidebar/sidebar';
 import { HeaderComponent } from './header/header';
 import { filter } from 'rxjs';
 
+
 @Component({
   selector: 'app-root',
-  imports: [ CommonModule, RouterOutlet],
+  imports: [ CommonModule, RouterOutlet, FormsModule],
   templateUrl: './app.html',
   styleUrl: './app.css',
   providers: [

@@ -86,7 +86,6 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
     this.http.get<TaskBoard>(`${environment.apiUrl}/tasks/task-board/${this.taskBoardId}`).subscribe(
       (res) =>
       {
-        console.log('Response from API:', res); // Log the response
         this.taskBoard = res; // Assuming res is a TaskBoard
         if (this.taskBoard === null) return;
         const service = this.taskBoard.service; // Accessing the service
@@ -168,7 +167,7 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
 
       if (!response || response.length === 0)
       {
-        console.log('No tasks found for the service.'); // Log if no tasks found
+        console.log('No tasks found for the service.');
         return;
       }
 
@@ -176,14 +175,17 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
         id: task.id,
         status: task.column,
         text: task.title,
-        tags: this.arrayToString(task.tags as string[])
+        tags: this.arrayToString(task.tags as string[]),
+        description: task.description || '' // Ensure description is included
       }));
+
+      console.log(this.data);
 
       this.data = this.data.map(task =>
       {
         if (typeof task.tags !== 'string' || task.tags.trim() === '')
         {
-          task.tags = ' '; // Set to empty string if no valid tags
+          task.tags = ' ';
         }
         return task;
       });
@@ -205,7 +207,10 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
       return;
     }
 
-    this.selectedTask = item;
+    const selectedTask = this.data.find(x => x.id === item.id);
+    console.log("selected ", selectedTask)
+
+    this.selectedTask = selectedTask;
     this.showTaskDetailPopup = true;
   }
 
@@ -214,7 +219,6 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
     this.dragInProgress = true;
     this.dragCooldown = true;
 
-    // Access the moved task from event.args.itemData
     const movedTask = event.args.itemData;
 
     if (!movedTask)
@@ -225,16 +229,23 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
       return;
     }
 
+    const oldStatus = movedTask.status; // Get the old status (column)
     const newStatus = event.args.newColumn.dataField; // Get the new status (column)
 
-    // Update the task in the local data array
+    // Update task in the local data array
     const taskToUpdate = this.data.find(task => task.id === movedTask.id);
     if (taskToUpdate)
     {
-      taskToUpdate.status = newStatus; // Update the status
+      // Set the new status
+      taskToUpdate.status = newStatus;
 
-      // Save or update the task in the backend
-      await this.updateTask(taskToUpdate); // Call updateTask
+      // Update order for tasks in the new column
+      await this.updateTaskOrder(newStatus); // Update order for the new column
+
+      // Save the updated task to the backend
+      await this.updateTask(taskToUpdate); // Save task with new status and order
+
+      this.getCurrentServiceInfo();
     } else
     {
       console.error('Task to update not found:', movedTask);
@@ -250,8 +261,22 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
     {
       this.dragCooldown = false;
     }, 300);
+  }
 
-    this.getCurrentServiceInfo();
+  private async updateTaskOrder(column: string): Promise<void>
+  {
+    // Get tasks in the specified column
+    const tasksInColumn = this.data.filter(task => task.status === column);
+
+    // Update order for each task based on its position in the column
+    for (let index = 0; index < tasksInColumn.length; index++)
+    {
+      const task = tasksInColumn[ index ];
+      task.order = index; // Set the order based on the index
+
+      // Update the task in the backend
+      await this.updateTask(task); // Send the updated task to the backend
+    }
   }
 
   private async saveOrUpdateTask(task: any): Promise<void>
@@ -284,13 +309,13 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
     this.showPopup = false;
   }
 
-  private textToArray(text: string): string[]
+  public textToArray(text: string): string[]
   {
     if (!text) return [];
     return text.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0);
   }
 
-  private arrayToString(array: string[]): string
+  public arrayToString(array: string[]): string
   {
     if (!array || array.length === 0) return '';
     return array.join(', ');
@@ -317,7 +342,8 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
         { name: 'id', type: 'string' },
         { name: 'status', type: 'string' },
         { name: 'text', type: 'string' },
-        { name: 'tags', type: 'string' }
+        { name: 'tags', type: 'string' },
+        { name: 'description', type: 'string' },
       ]
     });
 
@@ -327,11 +353,14 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
 
   addTask(column: string, taskText: string, tagsText: string)
   {
+    const newTaskOrder = this.data.filter(task => task.status === 'new').length;
+
     const newTask = {
       id: (this.data.length + 1).toString(),
       status: column,
       text: taskText,
-      tags: this.textToArray(tagsText)
+      tags: this.textToArray(tagsText),
+      order: newTaskOrder,
     };
 
     this.data.push(newTask);
@@ -359,24 +388,28 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
   }
 
 
-  async createTask(taskText: string, column: string, tagsText: string): Promise<void>
+  async createTask(taskText: string, column: string, tagsText: string, description: string = ''): Promise<void>
   {
     const formattedTags = this.textToArray(tagsText); // Convert to an array
 
-    const newTask = {
+    const newTaskOrder = this.data.filter(task => task.status === 'new').length;
+
+    const newTask: TaskCard = {
       title: taskText,
-      column: column,
-      description: '', // Optional
-      tags: formattedTags // Ensure this is an array
+      column,
+      description, // Include the description here
+      tags: formattedTags,
+      order: newTaskOrder
     };
 
     const newTask02 = {
       status: column,
       text: taskText,
-      tags: formattedTags
+      tags: formattedTags,
+      order: newTaskOrder
     };
 
-    console.log('Creating task with payload:', newTask); // Log the task being added
+    console.log('Creating task with payload:', newTask);
 
     try
     {
@@ -393,10 +426,6 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
     } catch (error)
     {
       console.error('Error creating task:', error);
-      if (error)
-      {
-        console.error('Error response body:', error); // Log detailed error message
-      }
     }
   }
 
@@ -409,21 +438,34 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
     }
 
     const payload = {
-      column: task.status,
-      title: task.text,
-      description: '', // optional
-      tags: this.textToArray(task.tags) // ensure it's an array
+      column: task.status, // This represents the column (status)
+      title: task.text, // Ensure title is from the task object
+      description: task.description || '', // Optional
+      tags: Array.isArray(task.tags) ? task.tags : this.textToArray(task.tags) || [], // Ensure it's an array
+      order: task.order // Include the order in the payload
     };
+
+    console.log("payload ",payload);
 
     try
     {
-      const response = await this.http
-        .patch(
-          `${environment.apiUrl}/service/${this.taskBoardId}/tasks/${task.id}`,
-          payload,
-          { headers: { 'Content-Type': 'application/json' } }
-        )
-        .toPromise();
+      const response = await this.http.patch<TaskCard>(
+        `${environment.apiUrl}/service/${this.taskBoardId}/tasks/${task.id}`,
+        payload,
+        { headers: { 'Content-Type': 'application/json' } }
+      ).toPromise();
+
+      const index = this.data.findIndex(x => x.id === task.id);
+      if (index !== -1)
+      {
+        this.data[ index ] = {
+          ...this.data[ index ],
+          text: payload.title,
+          description: payload.description,
+        };
+      }
+
+      this.initializeKanbanDataSource();
     } catch (error)
     {
       console.error('Error updating task:', error);
@@ -466,6 +508,13 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
     }
 
     return result;
+  }
+
+  async updateTaskDescription(taskId: number, description: string)
+  {
+    const payload = { description }; // Prepare the payload
+
+    return this.http.patch(`${environment.apiUrl}/tasks/${taskId}`, payload).toPromise(); // Adjust the URL as necessary
   }
 
 }

@@ -1,6 +1,9 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { ServiceTasksComponent } from '@app/service.tasks.component/service.tasks.component';
+import { FormsModule } from '@angular/forms';
 
 @Component({
+  imports: [ FormsModule ],
   selector: 'task-popup',
   templateUrl: './task-popup.html',
   styleUrls: [ './task-popup.css' ]
@@ -11,9 +14,56 @@ export class TaskPopup
   @Output() close = new EventEmitter<void>();
   @Output() delete = new EventEmitter<number>();
 
-  closePopup()
+  title: string = '';
+  description: string = '';
+  tags: string[] = [];
+  hasChanges: boolean = false;
+
+  constructor(private taskService: ServiceTasksComponent) { }
+
+  ngOnInit()
   {
-    this.close.emit();
+    this.title = this.task?.text || '';
+    this.description = this.task?.description || '';
+
+    this.tags = this.taskService.textToArray(this.task?.tags);
+
+    console.log(this.task);
+  }
+
+  onInputChange()
+  {
+    this.hasChanges = true; // Mark that there are changes
+  }
+
+  async closePopup()
+  {
+    if (this.hasChanges)
+    {
+      // Update the task with the new description
+      await this.saveTask();
+    }
+    this.close.emit(); // Emit close event
+  }
+
+  async saveTask()
+  {
+    try
+    {
+      const updatedTask = {
+        ...this.task,
+        text: this.title,
+        order: this.task.order || 0,
+        description: this.description // Update description here
+      };
+
+      // console.log("popup", updatedTask)
+
+      await this.taskService.updateTask(updatedTask); // Call the updateTask method
+    } catch (error)
+    {
+      console.error('Error saving description:', error);
+    }
   }
 
   deleteTask()
