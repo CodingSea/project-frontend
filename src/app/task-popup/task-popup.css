@@ -1,4 +1,5 @@
-.popup {
+.popup 
+{
     position: fixed;
     width: 20em;
     top: 50%;
@@ -11,31 +12,48 @@
     z-index: 1000;
   }
 
-  .popup textarea
-  {
-    width: 100%;
-  }
-  
-  .popup-actions {
-    display: flex;
-    justify-content: flex-end;
-    margin-top: 20px;
-  }
+.popup textarea
+{
+  width: 100%;
+}
 
-  .tag-container
-  {
-    display: flex;
-    gap: 0.5em;
-  }
+.popup-actions 
+{
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
 
-  .tag
-  {
-    background-color: #f5e8e8;
-    border-radius: 4px;
-    padding: 10px;
-    border: 1px solid #ec8585; 
-    flex: 1 1 calc(48% - 10px); 
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    font-weight: bold;
-    transition: all 0.2s;
+.tag-container
+{
+  display: flex;
+  gap: 0.5em;
+}
+
+.tag
+{
+  background-color: #f5e8e8;
+  border-radius: 4px;
+  padding: 10px;
+  border: 1px solid #ec8585; 
+  flex: 1 1 calc(48% - 10px); 
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  font-weight: bold;
+  transition: all 0.2s;
+}
+
+input
+{
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.row
+{
+  display: flex;
+}
+
+.row input
+{
+  font-size: x-large;
 }

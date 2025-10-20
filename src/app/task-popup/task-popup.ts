@@ -16,6 +16,7 @@ export class TaskPopup
 
   title: string = '';
   description: string = '';
+  tagsString: string = '';
   tags: string[] = [];
   hasChanges: boolean = false;
 
@@ -25,6 +26,7 @@ export class TaskPopup
   {
     this.title = this.task?.text || '';
     this.description = this.task?.description || '';
+    this.tagsString = this.task?.tags || '';
 
     this.tags = this.taskService.textToArray(this.task?.tags);
 
@@ -54,7 +56,8 @@ export class TaskPopup
         ...this.task,
         text: this.title,
         order: this.task.order || 0,
-        description: this.description // Update description here
+        description: this.description,
+        tags: this.tagsString,
       };
 
       // console.log("popup", updatedTask)

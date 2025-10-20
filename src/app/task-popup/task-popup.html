@@ -1,12 +1,16 @@
 <div class="popup">
-    <h2>Title: </h2>
-    <input type="text" placeholder="Add a title..." [(ngModel)]="title" (ngModelChange)="onInputChange()">
+    <div class="row">
+        <h2>Title: </h2>
+        <input type="text" placeholder="Add a title..." [(ngModel)]="title" (ngModelChange)="onInputChange()">
+    </div>
 
     <h3>Description:</h3>
     <textarea rows="4" placeholder="Add a description..." [(ngModel)]="description"
         (ngModelChange)="onInputChange()"></textarea>
 
     <h3>Tags</h3>
+    <input type="text" placeholder="Add tags... (comma-separated)" [(ngModel)]="tagsString"
+        (ngModelChange)="onInputChange()">
     <div class="tag-container">
         @for (tag of tags; track $index)
         {

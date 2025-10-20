@@ -462,6 +462,7 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
           ...this.data[ index ],
           text: payload.title,
           description: payload.description,
+          tags: payload.tags,
         };
       }
 
