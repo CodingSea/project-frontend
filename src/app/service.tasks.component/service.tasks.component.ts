@@ -361,7 +361,11 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
 
   public textToArray(text: string): string[]
   {
-    if (!text) return [" "];
+    if (typeof text !== 'string')
+    {
+      console.warn('Expected a string but received:', text);
+      return []; // Return an empty array if not a string
+    }
     return text.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0);
   }
 
@@ -371,9 +375,9 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
     return array.join(', ');
   }
 
-  onTaskAdded(task: { text: string; tags: string }): void
+  onTaskAdded(task: { text: string; tags: string, description: string }): void
   {
-    this.createTask(task.text, 'new', task.tags); // Include empty description
+    this.createTask(task.text, 'new', task.tags, task.description); // Include empty description
   }
 
   async initializeKanbanDataSource(): Promise<void>
@@ -438,23 +442,17 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
   }
 
 
-  async createTask(taskText: string, column: string, tagsText: string, description: string = ''): Promise<void>
+  async createTask(taskText: string, column: string, tagsText: string, description: string): Promise<void>
   {
     const formattedTags = this.textToArray(tagsText); // Convert to an array
 
     const newTaskOrder = this.data.filter(task => task.status === 'new').length;
 
-    const newTask: TaskCard = {
+    const newTask: TaskCard =
+    {
       title: taskText,
       column,
       description, // Include the description here
-      tags: formattedTags,
-      order: newTaskOrder
-    };
-
-    const newTask02 = {
-      status: column,
-      text: taskText,
       tags: formattedTags,
       order: newTaskOrder
     };
@@ -466,6 +464,17 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
         newTask,
         { headers: { 'Content-Type': 'application/json' } }
       ).toPromise();
+
+      const createdTask = response;
+
+      const newTask02 =
+      {
+        id: createdTask?.id,
+        status: column,
+        text: taskText,
+        tags: formattedTags,
+        order: newTaskOrder
+      };
 
       this.data.push(newTask02);
       this.dataAdapter.localdata = this.data;

@@ -1,18 +1,76 @@
-.popup-overlay {
+.popup 
+{
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  .popup {
-    background: white;
-    padding: 20px;
-    border-radius: 5px;
+    width: 20em;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    border: 1px solid #ccc;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    z-index: 1000;
   }
+
+.popup textarea
+{
+  width: 100%;
+}
+
+.popup-actions 
+{
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+.tag-container
+{
+  display: flex;
+  gap: 0.5em;
+}
+
+.tag
+{
+  background-color: #f5e8e8;
+  border-radius: 4px;
+  padding: 10px;
+  border: 1px solid #ec8585; 
+  flex: 1 1 calc(48% - 10px); 
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  font-weight: bold;
+  transition: all 0.2s;
+}
+
+input
+{
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.row
+{
+  display: flex;
+  margin-top: 3em;
+}
+
+.row input
+{
+  font-size: x-large;
+  padding: 0;
+}
+
+.close-button {
+  position: absolute;
+  top: 10px; /* Adjust as needed for vertical position */
+  right: 10px; /* Adjust as needed for horizontal position */
+  background: #C21A25;
+  border-radius: 5px;
+  color: white;
+  border: none;
+  font-size: large;
+  /* border: 1px solid #C21A25; */
+  cursor: pointer;
+  padding: 10px 15px;
+  /* Other styling for your close button (e.g., hover effects) */
+}

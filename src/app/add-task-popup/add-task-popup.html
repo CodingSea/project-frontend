@@ -1,9 +1,19 @@
-<div class="popup-overlay">
-    <div class="popup">
-        <h3>Add Task</h3>
-        <input type="text" placeholder="Task Text" [(ngModel)]="taskText" />
-        <input type="text" placeholder="Tags (comma-separated)" [(ngModel)]="tagsText" />
-        <button (click)="addTask()">Add Task</button>
+<div class="popup">
+    <div class="row">
+        <h2>Title: </h2>
+        <input type="text" placeholder="Add a title..." [(ngModel)]="title" (ngModelChange)="onInputChange()">
+    </div>
+
+    <h3>Description:</h3>
+    <textarea rows="4" placeholder="Add a description..." [(ngModel)]="description"
+        (ngModelChange)="onInputChange()"></textarea>
+
+    <h3>Tags</h3>
+    <input type="text" placeholder="Add tags... (comma-separated)" [(ngModel)]="tagsString"
+        (ngModelChange)="onInputChange()">
+
+    <div class="popup-actions">
+        <button (click)="saveTask()">Create</button>
         <button (click)="closePopup()">Cancel</button>
     </div>
 </div>

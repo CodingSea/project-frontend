@@ -38,13 +38,18 @@ export class TaskPopup
     this.hasChanges = true; // Mark that there are changes
   }
 
-  async closePopup()
+  async closeAndSavePopup()
   {
     if (this.hasChanges)
     {
       // Update the task with the new description
       await this.saveTask();
     }
+    this.close.emit(); // Emit close event
+  }
+
+  async closePopup()
+  {
     this.close.emit(); // Emit close event
   }
 
