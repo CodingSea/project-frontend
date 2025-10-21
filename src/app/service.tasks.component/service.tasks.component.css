@@ -88,3 +88,43 @@
   margin-left: auto;
   /* Pushes the back button to the right end */
 }
+
+.nav-header
+{
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 0.5em;
+}
+
+.nav-section
+{
+  border: 1px solid black;
+  width: 100%;
+  text-align: center;
+  padding: 0.5em;
+  font-weight: bold;
+  background-color: white;
+  transition: filter 0.15s;
+}
+
+.nav-section.left
+{
+  border-radius: 15px 0px 0px 15px;
+}
+
+.nav-section.right
+{
+  border-radius: 0px 15px 15px 0px;
+}
+
+.nav-section.active
+{
+  background-color: #C21A25;
+  color: white;
+}
+
+.nav-section:hover
+{
+  filter: brightness(0.8);
+  cursor: pointer;
+}

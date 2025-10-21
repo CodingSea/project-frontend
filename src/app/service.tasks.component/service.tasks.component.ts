@@ -39,6 +39,8 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
   taskBoardId!: number;
   taskBoard: TaskBoard | null = null;
 
+  isTaskboardSelected: boolean = true;
+
   servicesInfo: ServiceInfo =
     {
       totalServices: 0,
@@ -593,6 +595,13 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
     const payload = { description }; // Prepare the payload
 
     return this.http.patch(`${environment.apiUrl}/tasks/${taskId}`, payload).toPromise(); // Adjust the URL as necessary
+  }
+
+
+  selectSection(isTaskboard: boolean)
+  {
+    this.isTaskboardSelected = isTaskboard;
+    this.initializeKanbanDataSource();
   }
 
 }
