@@ -8,22 +8,6 @@
           <div class="main_33-71">
             <div class="div_33-96">
               <div class="main-div">
-                <button type="button" class="btn btn-red-light" (click)="goBack()">
-                  <span class="icon-left">
-                    <svg viewBox="0 0 24 24" width="16" height="16">
-                      <path
-                        d="M15 18l-6-6 6-6"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      />
-                    </svg>
-                  </span>
-                  Back
-                </button>
-
                 <ul class="stats-list">
                   <li class="stat-item">
                     <span class="text-total-projects">Total Services</span>
@@ -52,39 +36,22 @@
                 </ul>
               </div>
 
+              <div class="header-actions">
+                <div class="filter-container">
+                    <!-- Dropdown Filter -->
+                    <select class="select" [(ngModel)]="selectedFilter" (change)="applyFilters()">
+                        <option value="all">All Services</option>
+                        <option value="active">Active</option>
+                        <option value="in-review">In Review</option>
+                        <option value="urgent">Urgent</option>
+                    </select>
+                </div>
+                <button class="back-btn" (click)="goBack()">Back</button>
+              </div>
+
               <div class="div_33-138">
                 <div class="recent-services">
                   <span class="text-recent-projects">Recent Services:</span>
-
-                  <div class="filter-container">
-                    <select
-                      class="select"
-                      [(ngModel)]="selectedFilter"
-                      (change)="applyFilters()"
-                    >
-                      <option value="all">All Services</option>
-                      <option value="active">Active</option>
-                      <option value="in-review">In Review</option>
-                      <option value="urgent">Urgent</option>
-                    </select>
-
-                    <button
-                      class="button"
-                      type="button"
-                      aria-label="Open filters"
-                      (click)="openFilter()"
-                    >
-                      <svg viewBox="0 0 24 24" width="16" height="16">
-                        <path
-                          d="M3 6h18M6 12h12M10 18h4"
-                          fill="none"
-                          stroke="currentColor"
-                          stroke-width="2"
-                          stroke-linecap="round"
-                        />
-                      </svg>
-                    </button>
-                  </div>
 
                   <div *ngIf="showFilter">
                     <div class="pm-filter-backdrop" (click)="closeFilter()"></div>
@@ -171,7 +138,7 @@
                           [style.width.%]="p.completionRate?.toFixed(2)"
                         ></div>
                       </div>
-                      <span class="pm-progress-label">{{ p.completionRate }}%</span>
+                      <span class="pm-progress-label">{{ formatDecimal(p.completionRate!) }}%</span>
                     </footer>
                   </article>
                 </div>
