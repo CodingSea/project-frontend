@@ -21,6 +21,18 @@
                [(ngModel)]="tagsString" (ngModelChange)="onInputChange()" />
       </div>
       
+      <div class="form-group">
+        <label for="priority">Priority:</label>
+        <select id="priority" [(ngModel)]="priority" (ngModelChange)="onInputChange()">
+          <option value="Low Priority">Low Priority</option>
+          <option value="Medium Priority">Medium Priority</option>
+          <option value="High Priority">High Priority</option>
+        </select>
+        <span class="priority-indicator" [ngClass]="getPriorityClass(priority)">
+          {{ priority }}
+        </span>
+      </div>
+      
       <div class="popup-actions">
           <button class="close-button" (click)="closePopup()">Cancel</button>
         <button class="save-button" (click)="saveTask()">Create</button>

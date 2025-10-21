@@ -8,4 +8,5 @@ export interface TaskCard
     comments?: Comment[];
     tags?: string[];
     order: number;
+    color?: string;
 }

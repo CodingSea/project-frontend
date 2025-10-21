@@ -230,7 +230,8 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
         status: task.column,
         text: task.title,
         tags: this.arrayToString(task.tags as string[]),
-        description: task.description || '' // Ensure description is included
+        description: task.description || '',
+        color: task.color === null ? "#008000" : task.color
       }));
 
       this.data = this.data.map(task =>
@@ -297,7 +298,7 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
       await this.updateTask(taskToUpdate); // Save task with new status and order
 
       this.getCurrentServiceInfoFromData();
-    } 
+    }
     else 
     {
       console.error('Task to update not found:', movedTask);
@@ -376,9 +377,9 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
     return array.join(', ');
   }
 
-  onTaskAdded(task: { text: string; tags: string, description: string }): void
+  onTaskAdded(task: { text: string; tags: string, description: string, color: string }): void
   {
-    this.createTask(task.text, 'new', task.tags, task.description); // Include empty description
+    this.createTask(task.text, 'new', task.tags, task.description, task.color); // Include empty description
   }
 
   async initializeKanbanDataSource(): Promise<void>
@@ -387,7 +388,7 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
 
     if (this.data.length == 0)
     {
-      this.data = [ { id: '1', status: 'eee', text: 'eee', tags: 'ss' } ]
+      this.data = [ { id: '1', status: 'new', text: 'eee', tags: 'ss', description: 'ssssee', assignee: "John sp", color: '#C21A25' } ]
     }
 
     this.dataAdapter = new jqx.dataAdapter({
@@ -399,6 +400,8 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
         { name: 'text', type: 'string' },
         { name: 'tags', type: 'string' },
         { name: 'description', type: 'string' },
+        { name: 'assignee', type: 'string' },
+        { name: 'color', type: 'string' }
       ]
     });
 
@@ -443,7 +446,7 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
   }
 
 
-  async createTask(taskText: string, column: string, tagsText: string, description: string): Promise<void>
+  async createTask(taskText: string, column: string, tagsText: string, description: string, color: string): Promise<void>
   {
     let formattedTags;
 
@@ -464,7 +467,8 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
       column,
       description, // Include the description here
       tags: formattedTags,
-      order: newTaskOrder
+      order: newTaskOrder,
+      color: color,
     };
 
     try
@@ -484,7 +488,8 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
         text: taskText,
         description: description,
         tags: formattedTags,
-        order: newTaskOrder
+        order: newTaskOrder,
+        color: color,
       };
 
       console.log(newTask02);
@@ -512,8 +517,11 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
       title: task.text, // Ensure title is from the task object
       description: task.description || '', // Optional
       tags: Array.isArray(task.tags) ? task.tags : this.textToArray(task.tags) || [], // Ensure it's an array
-      order: task.order // Include the order in the payload
+      order: task.order,
+      color: task.color === null ? "#008000" : task.color
     };
+
+    // console.log(payload)
 
     try
     {
@@ -531,6 +539,7 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
           text: payload.title,
           description: payload.description,
           tags: payload.tags,
+          color: payload.color
         };
       }
     } catch (error)

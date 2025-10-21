@@ -1,25 +1,26 @@
+import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ServiceTasksComponent } from '@app/service.tasks.component/service.tasks.component';
 
 @Component({
   selector: 'add-task-popup',
-  imports: [ FormsModule ],
+  imports: [ FormsModule, CommonModule ],
   templateUrl: './add-task-popup.html',
-  styleUrl: './add-task-popup.css'
+  styleUrls: [ './add-task-popup.css' ]
 })
 export class AddTaskPopup
 {
   @Input() task: any;
   @Output() close = new EventEmitter<void>();
   @Output() delete = new EventEmitter<number>();
-
-  @Output() taskAdded = new EventEmitter<{ text: string; tags: string; description: string; }>();
+  @Output() taskAdded = new EventEmitter<{ text: string; tags: string; description: string; color: string }>();
 
   title: string = '';
   description: string = '';
   tagsString: string = '';
   tags: string[] = [];
+  priority: string = 'Low Priority'; // Default priority
   hasChanges: boolean = false;
 
   constructor(private taskService: ServiceTasksComponent) { }
@@ -29,7 +30,7 @@ export class AddTaskPopup
     this.title = this.task?.text || '';
     this.description = this.task?.description || '';
     this.tagsString = this.task?.tags || '';
-
+    this.priority = this.task?.priority || 'Low Priority'; // Set priority if available
     this.tags = this.taskService.textToArray(this.task?.tags);
 
     console.log(this.task);
@@ -51,27 +52,42 @@ export class AddTaskPopup
     {
       const newTaskOrder = this.taskService.data.filter(task => task.status === 'new').length;
 
+      let selectedColor = "#008000";
+
+      if (this.priority == "Low Priority")
+      {
+        selectedColor = "#008000";
+      }
+      else if (this.priority == "Medium Priority")
+      {
+        selectedColor = "#FFD700";
+      }
+      else if (this.priority == "High Priority")
+      {
+        selectedColor = "#C21A25";
+      }
+
       const updatedTask = {
         ...this.task,
         text: this.title,
         order: newTaskOrder,
         description: this.description,
-        tags: this.tagsString,
+        tags: this.tagsString
       };
 
-      // console.log("popup", updatedTask)
+      // Emit the task added event with priority
+      this.taskAdded.emit({ text: updatedTask.text, tags: updatedTask.tags, description: updatedTask.description, color: selectedColor });
 
-      // await this.taskService.createTask(updatedTask.text, "new", updatedTask.tags, updatedTask.description); // Call the updateTask method
-
-      this.taskAdded.emit({ text: updatedTask.text, tags: updatedTask.tags, description: updatedTask.description });
+      // Reset form fields
       this.title = '';
       this.description = '';
       this.tagsString = '';
+      this.priority = 'Low Priority'; // Reset priority
 
       this.closePopup();
     } catch (error)
     {
-      console.error('Error saving description:', error);
+      console.error('Error saving task:', error);
     }
   }
 
@@ -79,4 +95,20 @@ export class AddTaskPopup
   {
     this.delete.emit(this.task.id); // Emit the task ID when deleting
   }
+
+  getPriorityClass(priority: string): string
+  {
+    switch (priority)
+    {
+      case 'Low Priority':
+        return 'low-priority';
+      case 'Medium Priority':
+        return 'medium-priority';
+      case 'High Priority':
+        return 'high-priority';
+      default:
+        return '';
+    }
+  }
+
 }
