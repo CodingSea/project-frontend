@@ -297,7 +297,8 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
       await this.updateTask(taskToUpdate); // Save task with new status and order
 
       this.getCurrentServiceInfoFromData();
-    } else
+    } 
+    else 
     {
       console.error('Task to update not found:', movedTask);
     }
@@ -364,7 +365,7 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
     if (typeof text !== 'string')
     {
       console.warn('Expected a string but received:', text);
-      return [" "]; // Return an empty array if not a string
+      return [ " " ]; // Return an empty array if not a string
     }
     return text.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0);
   }
@@ -446,9 +447,9 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
   {
     let formattedTags;
 
-    if(tagsText.length === 0)
+    if (tagsText.length === 0)
     {
-      formattedTags = [" "];
+      formattedTags = [ " " ];
     }
     else
     {
