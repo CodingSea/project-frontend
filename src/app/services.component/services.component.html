@@ -35,31 +35,27 @@
                                         <span class="text-87">{{ formatDecimal(servicesInfo.completionRate) }}%</span>
                                     </li>
                                 </ul>
-
-                                <button type="button" class="back-btn" (click)="goBack()">
-                                    Back
-                                </button>
                             </div>
+
+                            <div class="header-actions">
+                                <div class="filter-container">
+                                    <!-- Dropdown Filter -->
+                                    <select class="select" [(ngModel)]="selectedFilter" (change)="applyFilters()">
+                                        <option value="all">All Services</option>
+                                        <option value="active">Active</option>
+                                        <option value="in-review">In Review</option>
+                                        <option value="urgent">Urgent</option>
+                                    </select>
+                                </div>
+                                <button class="back-btn" (click)="goBack()">Back</button>
+                              </div>
 
                             <!-- Recent services Section -->
                             <div class="div_33-138">
+                                
                                 <div class="recent-services">
                                     <span class="text-recent-projects">Recent Services:</span>
-                                    <div class="filter-container">
-                                        <!-- Dropdown Filter -->
-                                        <select class="select" [(ngModel)]="selectedFilter" (change)="applyFilters()">
-                                            <option value="all">All Services</option>
-                                            <option value="active">Active</option>
-                                            <option value="in-review">In Review</option>
-                                            <option value="urgent">Urgent</option>
-                                        </select>
-
-                                        <!-- Button for filter panel -->
-                                        <button class="button" type="button" aria-label="Open filters"
-                                            (click)="openFilter()">
-                                            <!-- keep your filter SVG here -->
-                                        </button>
-                                    </div>
+                                    
 
                                     <!-- Side Filter Panel -->
                                     <div *ngIf="showFilter">

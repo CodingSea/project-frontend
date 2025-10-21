@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { Project } from '@app/project';
 import { Service } from '@app/service';
 import { Sidebar } from "@app/sidebar/sidebar";
@@ -11,7 +11,7 @@ import { Certificate } from '@app/certificate';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [ Sidebar, CommonModule ],
+  imports: [Sidebar, CommonModule],
   templateUrl: './dashboard.html',
   styleUrls: [ './dashboard.css' ] // Fixed typo: styleUrl to styleUrls
 })
@@ -266,4 +266,11 @@ export class Dashboard
 
     return result;
   }
+
+  goTo(url: string)
+  {
+    this.router.navigate([url])
+    window.scrollTo(0,0);
+  }
+
 }

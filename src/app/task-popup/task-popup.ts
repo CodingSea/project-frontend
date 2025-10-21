@@ -20,6 +20,7 @@ export class TaskPopup
   tagsString: string = '';
   tags: string[] = [];
   hasChanges: boolean = false;
+  priority: string = 'Low Priority';
 
   constructor(private taskService: ServiceTasksComponent) { }
 
@@ -28,6 +29,26 @@ export class TaskPopup
     this.title = this.task?.text || '';
     this.description = this.task?.description || '';
     this.tagsString = this.task?.tags || '';
+
+    if(this.tags = [" "])
+    {
+      this.tags = [];
+    }
+    
+    this.priority = this.task?.priority || 'Low Priority';
+
+    if (this.task.color == "#008000")
+    {
+      this.priority = 'Low Priority';
+    }
+    else if (this.task.color == "#FFD700")
+    {
+      this.priority = 'Medium Priority';
+    }
+    else if (this.task.color == "#C21A25")
+    {
+      this.priority = 'High Priority';
+    }
 
     this.tags = this.taskService.textToArray(this.task?.tags);
 
@@ -58,12 +79,29 @@ export class TaskPopup
   {
     try
     {
+
+      let selectedColor = "#008000";
+
+      if (this.priority == "Low Priority")
+      {
+        selectedColor = "#008000";
+      }
+      else if (this.priority == "Medium Priority")
+      {
+        selectedColor = "#FFD700";
+      }
+      else if (this.priority == "High Priority")
+      {
+        selectedColor = "#C21A25";
+      }
+
       const updatedTask = {
         ...this.task,
         text: this.title,
         order: this.task.order || 0,
         description: this.description,
         tags: this.tagsString,
+        color: selectedColor
       };
 
       // console.log("popup", updatedTask)
@@ -81,4 +119,20 @@ export class TaskPopup
   {
     this.delete.emit(this.task.id); // Emit the task ID when deleting
   }
+
+  getPriorityClass(priority: string): string
+  {
+    switch (priority)
+    {
+      case 'Low Priority':
+        return 'low-priority';
+      case 'Medium Priority':
+        return 'medium-priority';
+      case 'High Priority':
+        return 'high-priority';
+      default:
+        return '';
+    }
+  }
+
 }

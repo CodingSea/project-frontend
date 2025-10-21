@@ -39,6 +39,19 @@
   user-select: none;
 }
 
+.header-actions {
+  display: flex;
+  justify-content: space-between;
+  /* Distribute space between items */
+  align-items: center;
+  /* Center items vertically */
+  width: 100%;
+  /* Ensure actions take up full width */
+  margin-top: 10px;
+  margin-bottom: 0.5em;
+  /* Optional: Adds space above the button row */
+}
+
 .div_33-96 {
   position: relative;
   box-sizing: border-box;
@@ -698,7 +711,7 @@
 }
 
 .div_33-138 {
-  top: 170px;
+  
   position: absolute;
   display: flex;
   box-sizing: border-box;

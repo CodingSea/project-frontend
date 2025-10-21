@@ -68,3 +68,51 @@ textarea {
   background-color: #bdc3c7;
   color: white;
 }
+
+.tag-container
+{
+  display: flex;
+  gap: 0.5em;
+}
+
+.tag
+{
+  background-color: #f5e8e8;
+  border-radius: 4px;
+  padding: 10px;
+  border: 1px solid #ec8585; 
+  flex: 1 1 calc(48% - 10px); 
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  font-weight: bold;
+  transition: all 0.2s;
+}
+
+select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.priority-indicator {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 4px;
+  margin-top: 5px;
+  color: white; /* Text color */
+  font-weight: bold; /* Make the text bold */
+}
+
+.low-priority {
+  background-color: #008000; /* Green */
+}
+
+.medium-priority {
+  background-color: #FFD700; /* Orange */
+  color: black;
+}
+
+.high-priority {
+  background-color: #C21A25; /* Red */
+}

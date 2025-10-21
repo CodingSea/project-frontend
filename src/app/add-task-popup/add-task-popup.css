@@ -68,3 +68,33 @@ textarea {
   background-color: #bdc3c7;
   color: white;
 }
+
+select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.priority-indicator {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 4px;
+  margin-top: 5px;
+  color: white; /* Text color */
+  font-weight: bold; /* Make the text bold */
+}
+
+.low-priority {
+  background-color: #008000; /* Green */
+}
+
+.medium-priority {
+  background-color: #FFD700; /* Orange */
+  color: black;
+}
+
+.high-priority {
+  background-color: #C21A25; /* Red */
+}
