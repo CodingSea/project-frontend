@@ -14,26 +14,26 @@ import { DevelopersSearchComponent } from './developers.search.component/develop
 import { ServiceTasksComponent } from './service.tasks.component/service.tasks.component';
 import { ServicesComponent } from './services.component/services.component';
 
-
 export const routes: Routes = [
   { path: "", redirectTo: 'auth/signup', pathMatch: "full" },
-  { path: 'home', component: HomePage, title: 'Home', canActivate: [ AuthGuard ] },
-  { path: 'projects', component: ProjectManagement, canActivate: [ AuthGuard ], data: { onlyAdmin: true } },
-  { path: 'projects/:projectId/services', component: ServicesComponent, canActivate: [ AuthGuard ], data: { onlyAdmin: true } },
-  { path: 'projects/:projectId/services/new', component: ServiceFormComponent, canActivate: [ AuthGuard ], data: { onlyAdmin: true } },
+  { path: 'home', component: HomePage, title: 'Home', canActivate: [AuthGuard] },
+  { path: 'projects', component: ProjectManagement, canActivate: [AuthGuard], data: { onlyAdmin: true } },
+  { path: 'projects/:projectId/services', component: ServicesComponent, canActivate: [AuthGuard], data: { onlyAdmin: true } },
+  { path: 'projects/:projectId/services/new', component: ServiceFormComponent, canActivate: [AuthGuard], data: { onlyAdmin: true } },
+  { path: 'projects/:projectId/services/:serviceId/edit', component: ServiceFormComponent, canActivate: [AuthGuard], data: { onlyAdmin: true } },
   { path: "auth/:mode", component: UserComponent },
-  { path: 'dashboard', component: Dashboard, canActivate: [ AuthGuard ], data: { onlyAdmin: true } },
-  { path: 'profile', component: ProfileComponent, canActivate: [ AuthGuard ] },
-  { path: 'profile/user/:userId', component: ProfileComponent, canActivate: [ AuthGuard ] },
-  { path: 'profile/edit', component: ProfileEditComponent, canActivate: [ AuthGuard ] },
-  { path: 'certificate/new', component: CertificateCreateComponent, canActivate: [ AuthGuard ] },
-  { path: 'developers', component: DevelopersSearchComponent, canActivate: [ AuthGuard ], data: { onlyAdmin: true } },
-  { path: 'services/:serviceId/taskboard/:taskBoardId', component: ServiceTasksComponent, canActivate: [ AuthGuard ] },
+  { path: 'dashboard', component: Dashboard, canActivate: [AuthGuard], data: { onlyAdmin: true } },
+  { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard] },
+  { path: 'profile/user/:userId', component: ProfileComponent, canActivate: [AuthGuard] },
+  { path: 'profile/edit', component: ProfileEditComponent, canActivate: [AuthGuard] },
+  { path: 'certificate/new', component: CertificateCreateComponent, canActivate: [AuthGuard] },
+  { path: 'developers', component: DevelopersSearchComponent, canActivate: [AuthGuard], data: { onlyAdmin: true } },
+  { path: 'services/:serviceId/taskboard/:taskBoardId', component: ServiceTasksComponent, canActivate: [AuthGuard] },
   { path: '**', component: UserComponent }
 ];
 
 @NgModule({
-  imports: [ BrowserModule, RouterModule.forRoot(routes) ],
-  exports: [ RouterModule ],
+  imports: [BrowserModule, RouterModule.forRoot(routes)],
+  exports: [RouterModule],
 })
 export class RoutingModule { }

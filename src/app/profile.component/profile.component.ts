@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Sidebar } from "@app/sidebar/sidebar";
 import { HttpClient } from '@angular/common/http';
 import { User } from '@app/user';
@@ -7,176 +7,144 @@ import { jwtDecode } from 'jwt-decode';
 import { ActivatedRoute, ParamMap, Router, RouterLink } from '@angular/router';
 import { Certificate } from '@app/certificate';
 import { Service } from '@app/service';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-profile.component',
-  imports: [ Sidebar, RouterLink ],
+  imports: [Sidebar, RouterLink, CommonModule, FormsModule],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.css'
 })
-export class ProfileComponent
-{
-  isCurrentUser: boolean = false;
+export class ProfileComponent implements OnInit {
+  isCurrentUser = false;
+  isEditing = false;
+  currentUser: User | null = null;
+  certificates: Certificate[] | null = null;
+  services: Service[] | null = null;
+  isEmbedded = false;
+  isImageLoading = true;
 
-  constructor(private http: HttpClient, private activatedRoute: ActivatedRoute, private router: Router) { }
+  newSkill = '';
 
   currentUserInfo = {
     username: "",
     email: "",
     role: "",
-    skills: [] as string[]
+    skills: [] as string[],
+    profileImage: ""
   };
 
-  currentUser: User | null = null;
-  certificates: Certificate[] | null = null;
-  services: Service[] | null = null;
+  decodedToken: any | null = null;
 
-  ngOnInit()
-  {
-    window.scrollTo(0, 0);
+  constructor(private http: HttpClient, private activatedRoute: ActivatedRoute, private router: Router) {}
 
+  ngOnInit() {
+    this.isEmbedded = window !== window.parent;
     const token: string | null = localStorage.getItem("token");
-    if (token !== null)
-      this.activatedRoute.queryParamMap.subscribe((params: ParamMap) =>
-      {
-        if (this.activatedRoute.snapshot.paramMap.has("userId"))
-        {
-          this.isCurrentUser = false;
-          const userId = this.activatedRoute.snapshot.paramMap.get('userId');
+    if (!token) return;
+    this.decodedToken = jwtDecode(token);
 
-          const token: string | null = localStorage.getItem("token");
-          if (token !== null)
-          {
-            const decodedToken: any = jwtDecode(token);
-            this.isCurrentUser = decodedToken.sub == userId;
-          }
-
-          // ✅ Fetch user info
-          this.http.get<User>(`${environment.apiUrl}/user/${userId}`).subscribe(
-            (response) =>
-            {
-              this.currentUser = response;
-
-              this.currentUserInfo.username = this.currentUser.first_name + " " + this.currentUser.last_name;
-              this.currentUserInfo.email = this.currentUser.email;
-              this.currentUserInfo.skills = this.currentUser.skills;
-
-              if (this.currentUser.role === "admin")
-              {
-                this.currentUserInfo.role = "Admin";
-              } else if (this.currentUser.role === "developer")
-              {
-                this.currentUserInfo.role = "Developer";
-              }
-            },
-            (error) =>
-            {
-              console.log(error);
-            }
-          );
-
-          // ✅ Fetch certificates
-          this.http.get<Certificate[]>(`${environment.apiUrl}/certificate/${userId}`).subscribe(
-            (response) =>
-            {
-              this.certificates = response;
-            },
-            (error) =>
-            {
-              console.log(error);
-            }
-          );
-
-          // ✅ Fetch services (PLURAL FIX)
-          this.http.get<Service[]>(`${environment.apiUrl}/service/user/${userId}`).subscribe(
-            (response) =>
-            {
-              if (response.length === 0)
-              {
-                console.log("no services found");
-              } else
-              {
-                this.services = response;
-              }
-            },
-            (error) =>
-            {
-              console.log(error);
-            }
-          );
-        }
-        else
-        {
-          // ✅ Current user profile (decoded from token)
-          this.isCurrentUser = true;
-          const token: string | null = localStorage.getItem("token");
-          if (token !== null)
-          {
-            const decodedToken: any = jwtDecode(token);
-
-            if (decodedToken.role === "admin")
-            {
-              this.currentUserInfo.role = "Admin";
-            } else if (decodedToken.role === "developer")
-            {
-              this.currentUserInfo.role = "Developer";
-            }
-
-            // ✅ Fetch user info
-            this.http.get<User>(`${environment.apiUrl}/user/${decodedToken.sub}`).subscribe(
-              (response) =>
-              {
-                this.currentUser = response;
-
-                this.currentUserInfo.username = this.currentUser.first_name + " " + this.currentUser.last_name;
-                this.currentUserInfo.email = this.currentUser.email;
-                this.currentUserInfo.skills = this.currentUser.skills;
-              },
-              (error) =>
-              {
-                console.log(error);
-              }
-            );
-
-            // ✅ Fetch certificates
-            this.http.get<Certificate[]>(`${environment.apiUrl}/certificate/${decodedToken.sub}`).subscribe(
-              (response) =>
-              {
-                this.certificates = response;
-              },
-              (error) =>
-              {
-                console.log(error);
-              }
-            );
-
-            // ✅ Fetch services (PLURAL FIX)
-            this.http.get<Service[]>(`${environment.apiUrl}/service/user/${decodedToken.sub}`).subscribe(
-              (response) =>
-              {
-                if (response.length === 0)
-                {
-                  console.log("no services found");
-                } else
-                {
-                  this.services = response;
-                  
-                  console.log(this.services);
-                }
-              },
-              (error) =>
-              {
-                console.log(error);
-              }
-            );
-          }
-        }
-      });
+    this.activatedRoute.queryParamMap.subscribe(() => {
+      if (this.activatedRoute.snapshot.paramMap.has("userId")) {
+        this.loadOtherUserProfile();
+      } else {
+        this.loadCurrentUserProfile();
+      }
+    });
   }
 
-  switchPage(serviceId: number, taskBoardId?: number)
-  {
-    this.router.navigate([`/services/${serviceId}/taskboard/${taskBoardId}`])
-    window.scrollTo(0,0);
+  loadOtherUserProfile() {
+    const userId = this.activatedRoute.snapshot.paramMap.get('userId');
+    if (!userId) return;
+
+    this.isCurrentUser = this.decodedToken.sub == userId;
+
+    this.http.get<User>(`${environment.apiUrl}/user/${userId}`).subscribe((res) => this.setUserData(res));
+    this.http.get<Certificate[]>(`${environment.apiUrl}/certificate/${userId}`).subscribe((res) => (this.certificates = res));
+    this.http.get<Service[]>(`${environment.apiUrl}/service/user/${userId}`).subscribe((res) => (this.services = res));
+  }
+
+  loadCurrentUserProfile() {
+    const userId = this.decodedToken.sub;
+
+    this.isCurrentUser = true;
+    this.http.get<User>(`${environment.apiUrl}/user/${userId}`).subscribe((res) => this.setUserData(res));
+    this.http.get<Certificate[]>(`${environment.apiUrl}/certificate/${userId}`).subscribe((res) => (this.certificates = res));
+    this.http.get<Service[]>(`${environment.apiUrl}/service/user/${userId}`).subscribe((res) => (this.services = res));
+  }
+
+  setUserData(user: User) {
+    this.currentUser = user;
+    this.currentUserInfo.username = `${user.first_name} ${user.last_name}`;
+    this.currentUserInfo.email = user.email;
+    this.currentUserInfo.skills = user.skills || [];
+    this.currentUserInfo.profileImage = user.profileImage || '';
+    this.currentUserInfo.role = user.role === "admin" ? "Admin" : "Developer";
+    this.isImageLoading = false;
+  }
+
+  // === Edit Mode ===
+  toggleEdit() {
+    this.isEditing = !this.isEditing;
+    if (!this.isEditing && this.currentUser) {
+      this.loadCurrentUserProfile(); // revert if canceled
+    }
+  }
+
+  addSkill() {
+    if (this.newSkill.trim()) {
+      this.currentUserInfo.skills.push(this.newSkill.trim());
+      this.newSkill = '';
+    }
+  }
+
+  removeSkill(i: number) {
+    this.currentUserInfo.skills.splice(i, 1);
+  }
+
+  saveProfile() {
+    if (!this.currentUser) return;
+
+    const updatePayload = {
+      first_name: this.currentUser.first_name,
+      last_name: this.currentUser.last_name,
+      skills: this.currentUserInfo.skills
+    };
+
+    this.http.put(`${environment.apiUrl}/user/${this.decodedToken.sub}`, updatePayload).subscribe({
+      next: () => {
+        alert('✅ Profile updated successfully!');
+        this.isEditing = false;
+        this.loadCurrentUserProfile();
+      },
+      error: (err) => console.error('❌ Update failed', err)
+    });
+  }
+
+  // === Image ===
+  onImageLoad() { this.isImageLoading = false; }
+  onImageError() { this.isImageLoading = false; }
+
+  onProfileImageSelected(event: any) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const userId = this.decodedToken.sub;
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    this.http.post(`${environment.apiUrl}/user/${userId}/profile-image`, formData).subscribe({
+      next: () => {
+        alert('✅ Profile image updated!');
+        this.loadCurrentUserProfile();
+      },
+      error: (err) => console.error('❌ Upload failed', err)
+    });
+  }
+
+  switchPage(serviceId: number, taskBoardId?: number) {
+    this.router.navigate([`/services/${serviceId}/taskboard/${taskBoardId}`]);
+    window.scrollTo(0, 0);
   }
 }

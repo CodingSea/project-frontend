@@ -1,83 +1,111 @@
-import { HttpClient } from '@angular/common/http';
-import { Component } from '@angular/core';
-import { FormArray, FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Component, HostListener } from '@angular/core';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { Certificate } from '@app/certificate';
 import { Sidebar } from "@app/sidebar/sidebar";
-import { environment } from '@environments/environment';
-import { jwtDecode } from 'jwt-decode';
 import { CommonModule } from '@angular/common';
+import { jwtDecode } from 'jwt-decode';
+import { CertificateService, CreateCertificateDto } from '@app/services/certificate.service';
 
 @Component({
-  selector: 'app-certificate.create.component',
-  imports: [ Sidebar, RouterLink, ReactiveFormsModule, CommonModule ],
+  selector: 'app-certificate-create',
+  standalone: true,
+  imports: [Sidebar, RouterLink, ReactiveFormsModule, CommonModule],
   templateUrl: './certificate.create.component.html',
-  styleUrl: './certificate.create.component.css'
+  styleUrls: ['./certificate.create.component.css']
 })
-export class CertificateCreateComponent
-{
+export class CertificateCreateComponent {
   certificateForm: FormGroup;
   decodedToken: any | null = null;
+  isSubmitting = false;
 
-  constructor(private http: HttpClient, private router: Router, private fb: FormBuilder)
-  {
-    this.certificateForm = this.fb.group(
-      {
-        name: [ '', Validators.required ],
-        type: [ '', Validators.required ],
-        issuingOrganization: [ '', Validators.required ],
-        issueDate: [ '', Validators.required ],
-        expiryDate: [ '', Validators.required ],
-        description: [ '' ],
-      }
-    )
+  files: File[] = [];
+  isDragging = false;
+
+  constructor(
+    private fb: FormBuilder,
+    private router: Router,
+    private certificateService: CertificateService
+  ) {
+    this.certificateForm = this.fb.group({
+      name: ['', Validators.required],
+      type: ['', Validators.required],
+      issuingOrganization: ['', Validators.required],
+      issueDate: ['', Validators.required],
+      expiryDate: ['', Validators.required],
+      description: ['']
+    });
   }
 
-  onSubmit(): void
-  {
-    const token: string | null = localStorage.getItem("token");
+  //  File Upload Handlers
+  onFilesSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (!input.files) return;
+    this.addFileList(input.files);
+    input.value = '';
+  }
 
-    if (this.certificateForm.valid && token)
-    {
-      console.log('Form Values:', this.certificateForm.value);
+  addFileList(list: FileList) {
+    Array.from(list).forEach(file => this.files.push(file));
+  }
 
-      this.decodedToken = jwtDecode(token);
+  removeFile(index: number) {
+    this.files.splice(index, 1);
+  }
 
-      // Prepare the certificate object with proper date formatting
-      const certificate: Certificate = {
-        name: this.certificateForm.value.name,
-        type: this.certificateForm.value.type,
-        issuingOrganization: this.certificateForm.value.issuingOrganization,
-        issueDate: new Date(this.certificateForm.value.issueDate).toISOString(),
-        expiryDate: new Date(this.certificateForm.value.expiryDate).toISOString(),
-        description: this.certificateForm.value.description ? this.certificateForm.value.description : ""
-      };
-
-      console.log('Submitting Certificate:', certificate);
-
-      this.http.post(`${environment.apiUrl}/certificate/${this.decodedToken.sub}`, certificate).subscribe(
-        (response) =>
-        {
-          console.log(response);
-          this.router.navigate([ "/profile" ]);
-        },
-        (error) =>
-        {
-          console.log('Submission Error:', error);
-        }
-      );
-    } else
-    {
-      console.log('Form is invalid', this.certificateForm.errors);
+  //  Drag & Drop
+  @HostListener('dragover', ['$event'])
+  onDragOver(ev: DragEvent) {
+    ev.preventDefault();
+    this.isDragging = true;
+  }
+  @HostListener('dragleave', ['$event'])
+  onDragLeave(ev: DragEvent) {
+    ev.preventDefault();
+    this.isDragging = false;
+  }
+  @HostListener('drop', ['$event'])
+  onDrop(ev: DragEvent) {
+    ev.preventDefault();
+    this.isDragging = false;
+    if (ev.dataTransfer?.files?.length) {
+      this.addFileList(ev.dataTransfer.files);
     }
   }
 
-  // onFileChange(event: any): void
-  // {
-  //   const file = event.target.files[ 0 ];
-  //   this.certificateForm.patchValue({
-  //     certificateFile: file
-  //   });
-  // }
+  //  Submit
+  onSubmit(): void {
+    const token: string | null = localStorage.getItem('token');
+    if (!token) {
+      alert('User not logged in!');
+      return;
+    }
 
+    this.decodedToken = jwtDecode(token);
+    const userId = this.decodedToken?.sub;
+    if (!userId) {
+      alert('Invalid user token.');
+      return;
+    }
+
+    if (this.certificateForm.invalid) {
+      this.certificateForm.markAllAsTouched();
+      return;
+    }
+
+    const payload: CreateCertificateDto = this.certificateForm.value;
+    this.isSubmitting = true;
+
+    this.certificateService.createCertificate(userId, payload, this.files).subscribe({
+      next: () => {
+        alert('✅ Certificate created successfully!');
+        this.router.navigate(['/profile']);
+      },
+      error: (err) => {
+        console.error('❌ Upload failed:', err);
+        alert('Upload failed, please try again.');
+        this.isSubmitting = false;
+      },
+      complete: () => (this.isSubmitting = false),
+    });
+  }
 }

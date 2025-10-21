@@ -1,57 +1,116 @@
-<app-sidebar />
-<div class="container">
-  <h2>Create New Certificate</h2>
-  <form [formGroup]="certificateForm" (ngSubmit)="onSubmit()">
-    <div class="form-group">
-      <label for="name">Certificate Name</label>
-      <input type="text" id="name" formControlName="name" placeholder="Enter the name of the certificate" required>
+<div class="app">
+  <app-sidebar />
+
+  <div class="card-frame">
+    <div class="topbar">
+      <h1>Create New Certificate</h1>
     </div>
 
-    <div class="form-group">
-      <label for="certificateType">Certificate Type</label>
-      <select id="certificateType" formControlName="type" required>
-        <option value="" disabled selected>Select certificate type</option>
-        <option value="diploma">Diploma</option>
-        <option value="degree">Degree</option>
-        <option value="certification">Certification</option>
-        <option value="award">Award</option>
-        <option value="other">Other</option>
-      </select>
-    </div>
+    <form [formGroup]="certificateForm" (ngSubmit)="onSubmit()" novalidate>
+      <!--  Basic Info -->
+      <section class="section">
+        <header class="section__header">
+          <span class="bullet bullet-red"></span>
+          <h2>Basic Information</h2>
+        </header>
 
-    <div class="form-group">
-      <label for="issuingOrganization">Issuing Organization</label>
-      <input type="text" id="issuingOrganization" formControlName="issuingOrganization"
-        placeholder="Enter the issuing organization" required>
-    </div>
+        <div class="section__body">
+          <div class="grid-2">
+            <div class="field">
+              <label>Certificate Name<span class="req">*</span></label>
+              <input type="text" formControlName="name" placeholder="Enter certificate name" />
+            </div>
 
-    <div class="form-group">
-      <label for="issueDate">Issue Date</label>
-      <input type="date" id="issueDate" formControlName="issueDate" required>
-    </div>
+            <div class="field">
+              <label>Certificate Type<span class="req">*</span></label>
+              <select formControlName="type">
+                <option value="" disabled>Select certificate type</option>
+                <option value="diploma">Diploma</option>
+                <option value="degree">Degree</option>
+                <option value="certification">Certification</option>
+                <option value="award">Award</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+          </div>
 
-    <div class="form-group">
-      <label for="expiryDate">Expiry Date</label>
-      <input type="date" id="expiryDate" formControlName="expiryDate">
-      <div *ngIf="certificateForm.get('expiryDate')?.invalid && certificateForm.get('expiryDate')?.touched" class="error">
-        Expiry date is required if provided.
+          <div class="field mt-16">
+            <label>Issuing Organization<span class="req">*</span></label>
+            <input type="text" formControlName="issuingOrganization" placeholder="Enter issuing organization" />
+          </div>
+        </div>
+      </section>
+
+      <!-- Dates -->
+      <section class="section">
+        <header class="section__header">
+          <span class="bullet bullet-pink"></span>
+          <h2>Certificate Dates</h2>
+        </header>
+
+        <div class="section__body">
+          <div class="grid-2">
+            <div class="field">
+              <label>Issue Date<span class="req">*</span></label>
+              <input type="date" formControlName="issueDate" />
+            </div>
+
+            <div class="field">
+              <label>Expiry Date</label>
+              <input type="date" formControlName="expiryDate" />
+            </div>
+          </div>
+
+          <div class="field mt-16">
+            <label>Description</label>
+            <textarea rows="3" formControlName="description" placeholder="Enter description of certificate"></textarea>
+          </div>
+        </div>
+      </section>
+
+      <!-- Upload Section -->
+      <section class="section">
+        <header class="section__header">
+          <span class="bullet bullet-pink"></span>
+          <h2>Attachments</h2>
+        </header>
+
+        <div class="section__body">
+          <div class="dropzone" [class.dragging]="isDragging">
+            <div class="dz-inner">
+              <div class="cloud">
+                <svg viewBox="0 0 24 24" width="28" height="28">
+                  <path d="M19 18H6a4 4 0 110-8 5 5 0 019.9-.9A3.5 3.5 0 1119 18z" fill="currentColor" />
+                </svg>
+              </div>
+              <p>Drag and drop certificate files here or</p>
+
+              <label class="btn btn-red">
+                <input type="file" multiple (change)="onFilesSelected($event)" hidden />
+                Browse Files
+              </label>
+
+              <small>Upload files like PDFs or images (Max 10MB each)</small>
+            </div>
+          </div>
+
+          <ul class="file-list" *ngIf="files.length">
+            <li *ngFor="let file of files; let i = index">
+              {{ file.name }}
+              <button type="button" (click)="removeFile(i)">×</button>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <!--  Footer Buttons -->
+      <div class="footer-actions">
+        <button type="button" class="btn btn-ghost" routerLink="/profile">Cancel</button>
+        <button type="submit" class="btn btn-red" [disabled]="isSubmitting">
+          {{ isSubmitting ? 'Uploading...' : 'Create Certificate' }}
+        </button>
       </div>
-    </div>
+    </form>
+  </div>
 
-    <div class="form-group">
-      <label for="description">Description</label>
-      <textarea id="description" formControlName="description"
-        placeholder="Enter a brief description of the certificate"></textarea>
-    </div>
-
-    <!-- <div class="form-group">
-        <label for="certificateFile">Certificate File</label>
-        <input type="file" id="certificateFile" (change)="onFileChange($event)" accept=".pdf, .jpg, .png" required>
-      </div> -->
-
-    <div class="form-buttons">
-      <button type="button" class="cancel-button" routerLink="/profile">Cancel</button>
-      <button type="submit" class="submit-button">Create Certificate</button>
-    </div>
-  </form>
 </div>
