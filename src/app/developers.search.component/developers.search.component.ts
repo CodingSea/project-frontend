@@ -18,7 +18,7 @@ interface DeveloperSelectEvent extends User {
 @Component({
   selector: 'app-developers-search',
   standalone: true,
-  imports: [ Sidebar, CommonModule, ReactiveFormsModule,SafeUrlPipe ],
+  imports: [ CommonModule, ReactiveFormsModule,SafeUrlPipe ],
   templateUrl: './developers.search.component.html',
   styleUrl: './developers.search.component.css'
 })

@@ -8,6 +8,12 @@
   border-radius: 10px;
   box-shadow: 0 10px 20px rgba(0,0,0,.05);
   padding: 20px 24px 28px;
+  width: 50em;
+}
+
+.app {
+  display: flex;
+  height: 100vh;
 }
 
 .topbar {
