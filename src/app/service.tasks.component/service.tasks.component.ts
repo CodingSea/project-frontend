@@ -388,7 +388,7 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
 
     if (this.data.length == 0)
     {
-      this.data = [ { id: '1', status: 'new', text: 'eee', tags: 'ss', description: 'ssssee', assignee: "John sp", color: '#C21A25' } ]
+      this.data = [ { id: '1', status: 's', text: 'eee', tags: 'ss', description: 'ssssee', assignee: "John sp", color: '#C21A25' } ]
     }
 
     this.dataAdapter = new jqx.dataAdapter({
