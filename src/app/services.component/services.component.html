@@ -1,208 +1,208 @@
 <div class="container">
-    <app-sidebar />
+  <app-sidebar />
 
-    <div class="pm-container">
+  <div class="pm-container">
+    <div class="service-dashbaord_33-2">
+      <div class="body_33-3">
+        <div class="div_33-4">
+          <div class="main_33-71">
+            <div class="div_33-96">
+              <div class="main-div">
+                <button type="button" class="btn btn-red-light" (click)="goBack()">
+                  <span class="icon-left">
+                    <svg viewBox="0 0 24 24" width="16" height="16">
+                      <path
+                        d="M15 18l-6-6 6-6"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                    </svg>
+                  </span>
+                  Back
+                </button>
 
-        <div class="service-dashbaord_33-2">
-            <div class="body_33-3">
-                <div class="div_33-4">
-                    <div class="main_33-71">
-                        <div class="div_33-96">
-                            <div class="main-div">
-                                <ul class="stats-list">
-                                    <li class="stat-item">
-                                        <span class="text-total-projects">Total Services</span>
-                                        <span class="text-24">{{ servicesInfo.totalServices }}</span>
-                                    </li>
-                                    <li class="stat-item">
-                                        <span class="text-active-tasks">Backlogged Tasks</span>
-                                        <span class="text-156">{{ servicesInfo.backloggedTasks }}</span>
-                                    </li>
-                                    <li class="stat-item">
-                                        <span class="text-active-tasks">Active Tasks</span>
-                                        <span class="text-156">{{ servicesInfo.activeTasks }}</span>
-                                    </li>
-                                    <li class="stat-item">
-                                        <span class="text-active-tasks">Completed Tasks</span>
-                                        <span class="text-156">{{ servicesInfo.completedTasks }}</span>
-                                    </li>
-                                    <li class="stat-item">
-                                        <span class="text-team-members">Team Members</span>
-                                        <span class="text-32">{{ servicesInfo.totalMembers }}</span>
-                                    </li>
-                                    <li class="stat-item">
-                                        <span class="text-completion-rate">Completion Rate</span>
-                                        <span class="text-87">{{ formatDecimal(servicesInfo.completionRate) }}%</span>
-                                    </li>
-                                </ul>
-                            </div>
+                <ul class="stats-list">
+                  <li class="stat-item">
+                    <span class="text-total-projects">Total Services</span>
+                    <span class="text-24">{{ servicesInfo.totalServices }}</span>
+                  </li>
+                  <li class="stat-item">
+                    <span class="text-active-tasks">Backlogged Tasks</span>
+                    <span class="text-156">{{ servicesInfo.backloggedTasks }}</span>
+                  </li>
+                  <li class="stat-item">
+                    <span class="text-active-tasks">Active Tasks</span>
+                    <span class="text-156">{{ servicesInfo.activeTasks }}</span>
+                  </li>
+                  <li class="stat-item">
+                    <span class="text-active-tasks">Completed Tasks</span>
+                    <span class="text-156">{{ servicesInfo.completedTasks }}</span>
+                  </li>
+                  <li class="stat-item">
+                    <span class="text-team-members">Team Members</span>
+                    <span class="text-32">{{ servicesInfo.totalMembers }}</span>
+                  </li>
+                  <li class="stat-item">
+                    <span class="text-completion-rate">Completion Rate</span>
+                    <span class="text-87">{{ formatDecimal(servicesInfo.completionRate) }}%</span>
+                  </li>
+                </ul>
+              </div>
 
-                            <div class="header-actions">
-                                <div class="filter-container">
-                                    <!-- Dropdown Filter -->
-                                    <select class="select" [(ngModel)]="selectedFilter" (change)="applyFilters()">
-                                        <option value="all">All Services</option>
-                                        <option value="active">Active</option>
-                                        <option value="in-review">In Review</option>
-                                        <option value="urgent">Urgent</option>
-                                    </select>
-                                </div>
-                                <button class="back-btn" (click)="goBack()">Back</button>
-                              </div>
+              <div class="div_33-138">
+                <div class="recent-services">
+                  <span class="text-recent-projects">Recent Services:</span>
 
-                            <!-- Recent services Section -->
-                            <div class="div_33-138">
-                                
-                                <div class="recent-services">
-                                    <span class="text-recent-projects">Recent Services:</span>
-                                    
+                  <div class="filter-container">
+                    <select
+                      class="select"
+                      [(ngModel)]="selectedFilter"
+                      (change)="applyFilters()"
+                    >
+                      <option value="all">All Services</option>
+                      <option value="active">Active</option>
+                      <option value="in-review">In Review</option>
+                      <option value="urgent">Urgent</option>
+                    </select>
 
-                                    <!-- Side Filter Panel -->
-                                    <div *ngIf="showFilter">
-                                        <div class="pm-filter-backdrop" (click)="closeFilter()"></div>
-                                        <aside class="pm-filter-panel" role="dialog" aria-label="Filters">
-                                            <div class="pm-filter-header">
-                                                <strong>Filters</strong>
-                                                <button class="pm-close" type="button"
-                                                    (click)="closeFilter()">×</button>
-                                            </div>
-                                            <div class="pm-filter-body">
-                                                <div class="pm-row">
-                                                    <label><input type="checkbox" [(ngModel)]="filterState.active">
-                                                        Active</label>
-                                                </div>
-                                                <div class="pm-row">
-                                                    <label><input type="checkbox" [(ngModel)]="filterState.inReview"> In
-                                                        Review</label>
-                                                </div>
-                                                <div class="pm-row">
-                                                    <label><input type="checkbox" [(ngModel)]="filterState.urgent">
-                                                        Urgent</label>
-                                                </div>
-                                            </div>
-                                        </aside>
-                                    </div>
-                                </div>
+                    <button
+                      class="button"
+                      type="button"
+                      aria-label="Open filters"
+                      (click)="openFilter()"
+                    >
+                      <svg viewBox="0 0 24 24" width="16" height="16">
+                        <path
+                          d="M3 6h18M6 12h12M10 18h4"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                        />
+                      </svg>
+                    </button>
+                  </div>
 
-                                <!-- ✅ service Cards (Add New + Dynamic Services) -->
-                                <div class="pm-cards">
-
-                                    <!-- Add New service Card -->
-                                    <article class="pm-card add-new" (click)="openNewService()">
-                                        <div class="pm-plus-circle">
-                                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-                                                <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2"
-                                                    stroke-linecap="round" />
-                                            </svg>
-                                        </div>
-                                        <h3>Add New Service</h3>
-                                        <p>Start a new service and invite your team members</p>
-                                    </article>
-
-                                    <!-- Dynamic service Cards -->
-                                    <article class="pm-card" *ngFor="let p of services" (click)="onCardClick(p)">
-
-                                        <!-- Header -->
-                                        <header class="pm-card-header">
-                                            <h3>{{ p.name }}</h3> <!-- ✅ changed -->
-                                            <span class="pm-pill" [attr.data-status]="p.status">{{ p.status }}</span>
-                                        </header>
-
-                                        <!-- Description -->
-                                        <p class="pm-desc">{{ p.description }}</p>
-
-
-                                        <p class="pm-members">Members: {{ p.memberCount }}</p>
-
-                                        <!-- Footer -->
-                                        <footer class="pm-card-footer">
-                                            <span class="pm-due">Due: {{ p.deadline | date:'MMM d' }}</span>
-                                            @if(p.taskBoard?.cards?.length! > 0)
-                                            {
-                                                <div class="pm-progress">
-                                                    <div class="pm-progress-fill"
-                                                        [style.width.%]="getProgress(p)"></div>
-                                                </div>
-                                                <span class="pm-progress-label">{{ formatDecimal(p.completionRate!) }}%</span>
-                                            }
-                                            @else
-                                            {
-                                                <span class="pm-progress-label">No Tasks</span>
-                                            }
-                                            
-                                        </footer>
-                                    </article>
-
-                                </div>
-                                <!-- ✅ End service Cards -->
-
-                                <!-- New service Modal -->
-                                <ng-container *ngIf="showNewService">
-                                    <div class="pm-modal-backdrop" (click)="closeNewService()"></div>
-
-                                    <div class="pm-modal" role="dialog" aria-modal="true" aria-label="Create service"
-                                        (click)="$event.stopPropagation()">
-                                        <header class="pm-modal-header">
-                                            <strong>Create service</strong>
-                                            <button class="pm-close" type="button" (click)="closeNewService()"
-                                                aria-label="Close">×</button>
-                                        </header>
-
-                                        <form #serviceForm="ngForm" (ngSubmit)="saveNewService(serviceForm)">
-                                            <!-- ✅ service Name with Regex -->
-                                            <label class="pm-label">service name<span class="req">*</span></label>
-                                            <input class="pm-input" type="text" name="name" required
-                                                pattern="^[A-Za-z0-9 ]{3,50}$" #nameField="ngModel"
-                                                [(ngModel)]="newService.name" placeholder="e.g., Website Revamp">
-                                            <!-- Error message -->
-                                            <div *ngIf="nameField.invalid && (nameField.dirty || nameField.touched)"
-                                                class="pm-error">
-                                                <small *ngIf="nameField.errors?.['required']">service name is
-                                                    required.</small>
-                                                <small *ngIf="nameField.errors?.['pattern']">Only letters, numbers, and
-                                                    spaces (3–50
-                                                    chars).</small>
-                                            </div>
-
-                                            <!-- ✅ Description (optional but regex validated) -->
-                                            <label class="pm-label">Description</label>
-                                            <textarea class="pm-textarea" name="description" rows="3"
-                                                [(ngModel)]="newService.name"
-                                                pattern="^$|^[A-Za-z0-9.,!?()\\s-]{1,200}$" #descField="ngModel"
-                                                placeholder="(optional) brief summary"></textarea>
-
-                                            <!-- Error message -->
-                                            <div *ngIf="descField.invalid && (descField.dirty || descField.touched)"
-                                                class="pm-error">
-                                                <small *ngIf="descField.errors?.['pattern']">
-                                                    Only letters, numbers, spaces, and punctuation allowed (max 200
-                                                    chars).
-                                                </small>
-                                            </div>
-
-
-
-                                            <div class="pm-row-2">
-                                                <label class="pm-label">Deadline date</label>
-                                                <input class="pm-input" type="date" name="deadline"
-                                                    [(ngModel)]="newService.deadline">
-                                            </div>
-
-                                            <div class="pm-actions">
-                                                <button type="button" class="pm-btn">Cancel</button>
-                                                <button type="submit" class="pm-btn pm-btn-primary"
-                                                    [disabled]="serviceForm.invalid">Create</button>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </ng-container>
-
-                            </div>
+                  <div *ngIf="showFilter">
+                    <div class="pm-filter-backdrop" (click)="closeFilter()"></div>
+                    <aside class="pm-filter-panel" role="dialog" aria-label="Filters">
+                      <div class="pm-filter-header">
+                        <strong>Filters</strong>
+                        <button class="pm-close" type="button" (click)="closeFilter()">×</button>
+                      </div>
+                      <div class="pm-filter-body">
+                        <div class="pm-row">
+                          <label>
+                            <input type="checkbox" [(ngModel)]="filterState.active" />
+                            Active
+                          </label>
                         </div>
-                    </div>
+                        <div class="pm-row">
+                          <label>
+                            <input type="checkbox" [(ngModel)]="filterState.inReview" />
+                            In Review
+                          </label>
+                        </div>
+                        <div class="pm-row">
+                          <label>
+                            <input type="checkbox" [(ngModel)]="filterState.urgent" />
+                            Urgent
+                          </label>
+                        </div>
+                      </div>
+                    </aside>
+                  </div>
                 </div>
+
+                <div class="pm-cards">
+                  <article class="pm-card add-new" (click)="openNewService()">
+                    <div class="pm-plus-circle">
+                      <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+                        <path
+                          d="M12 5v14M5 12h14"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                        />
+                      </svg>
+                    </div>
+                    <h3>Add New Service</h3>
+                    <p>Start a new service and invite your team members</p>
+                  </article>
+
+                  <article
+                    class="pm-card"
+                    *ngFor="let p of services"
+                    (click)="onCardClick(p)"
+                  >
+                    <header class="pm-card-header">
+                      <h3>{{ p.name }}</h3>
+                      <span class="pm-pill" [attr.data-status]="p.status">
+                        {{ p.status }}
+                      </span>
+
+                      <div class="pm-card-menu" (click)="$event.stopPropagation()">
+                        <button
+                          class="dots"
+                          type="button"
+                          aria-label="Options"
+                          (click)="toggleMenu(p.serviceID, $event)"
+                        >
+                          ⋮
+                        </button>
+
+                        <ul class="menu" *ngIf="openMenuId === p.serviceID">
+                          <li (click)="goToEdit(p, $event)">Edit</li>
+                        </ul>
+                      </div>
+                    </header>
+
+                    <p class="pm-desc">{{ p.description }}</p>
+                    <p class="pm-members">Members: {{ p.memberCount }}</p>
+
+                    <footer class="pm-card-footer">
+                      <span class="pm-due">Due: {{ p.deadline | date: 'MMM d' }}</span>
+                      <div class="pm-progress">
+                        <div
+                          class="pm-progress-fill"
+                          [style.width.%]="p.completionRate?.toFixed(2)"
+                        ></div>
+                      </div>
+                      <span class="pm-progress-label">{{ p.completionRate }}%</span>
+                    </footer>
+                  </article>
+                </div>
+              </div>
             </div>
+          </div>
         </div>
+      </div>
     </div>
 
+    <div
+      class="pm-modal-backdrop"
+      *ngIf="showNewService"
+      (click)="closeNewService()"
+    ></div>
+
+    <div
+      class="pm-modal"
+      *ngIf="showNewService"
+      (click)="$event.stopPropagation()"
+    >
+      <header class="pm-modal-header">
+        <strong>Create New Service</strong>
+        <button class="pm-close" type="button" (click)="closeNewService()">×</button>
+      </header>
+
+      <app-service-form
+        [projectId]="projectIdNum"
+        (submitted)="onServiceCreated()"
+        (cancelled)="closeNewService()"
+      ></app-service-form>
+    </div>
+  </div>
 </div>

@@ -1,51 +1,132 @@
-<div class="container">
+<app-sidebar *ngIf="!isEmbedded" />
 
-    <app-sidebar />
+<div class="profile-wrapper">
+  <div class="profile-box">
 
-    <div class="profile-container">
-        <div class="profile-header">
-            <img src="images/user.png" width="150px" alt="Profile Image" class="profile-image">
-            <div class="profile-info">
-                <h1>{{currentUserInfo.username}}</h1>
-                <p class="email">{{ currentUserInfo.email }}</p>
-                <span class="role">{{currentUserInfo.role}}</span>
+    <!-- ===== Top Header with Edit Button ===== -->
+    <div class="profile-header">
+      <div class="profile-top">
+        <div class="avatar-section">
+          <div class="image-upload">
+            <div class="image-wrapper" [class.loading]="isImageLoading">
+              <img
+                [src]="currentUserInfo.profileImage || 'images/user.png'"
+                alt="Profile Image"
+                class="profile-image"
+                (load)="onImageLoad()"
+                (error)="onImageError()"
+                [style.opacity]="isImageLoading ? '0' : '1'"
+              />
             </div>
+
+            <label *ngIf="!currentUserInfo.profileImage" class="plus-icon-container">
+              <span class="plus-icon">+</span>
+              <input type="file" (change)="onProfileImageSelected($event)" hidden />
+            </label>
+          </div>
         </div>
 
-        <br>
-        @if(isCurrentUser == true)
-        {
-            <button class="edit-button" routerLink="/profile/edit">Edit Profile</button>
-        }
+        <div class="info-section">
+          <div *ngIf="!isEditing">
+            <h2>{{ currentUserInfo.username }}</h2>
+            <p class="email">{{ currentUserInfo.email }}</p>
+            <span class="role">{{ currentUserInfo.role }}</span>
+          </div>
 
-        <h2>Skill Tags</h2>
-        <div class="certificates">
-
-            @for (skill of currentUserInfo.skills; track $index) 
-            {
-                <span class="certificate">{{ skill }}</span>
-            }
+          <div *ngIf="isEditing" class="edit-fields">
+            <div class="name-inputs">
+              <div>
+                <label>First Name</label>
+                <input type="text" [(ngModel)]="currentUser!.first_name" />
+              </div>
+              <div>
+                <label>Last Name</label>
+                <input type="text" [(ngModel)]="currentUser!.last_name" />
+              </div>
+            </div>
+          </div>
         </div>
+      </div>
 
-        <h2>Certificates</h2>
-        <div class="certificates">
-            @if(isCurrentUser == true)
-            {
-                <button class="edit-button" routerLink="/certificate/new">+</button>
-            }
-
-            @for (c of certificates; track $index) 
-            {
-                <span class="certificate">{{c.name}}</span>
-            }
+      <!-- Edit button top-right -->
+      <div *ngIf="isCurrentUser" class="edit-btn-top">
+        <button *ngIf="!isEditing" class="btn btn-primary" (click)="toggleEdit()">Edit Profile</button>
+        <div *ngIf="isEditing" class="edit-buttons">
+          <button class="btn btn-secondary" (click)="toggleEdit()">Cancel</button>
+          <button class="btn btn-save" (click)="saveProfile()">Save</button>
         </div>
-
-        <h2>Services</h2>
-        <div class="services">
-            @for (service of services; track $index) 
-            {
-                <div class="service" (click)="switchPage(service.serviceID, service.taskBoard?.id)">{{ service.name }}</div>
-            }
-        </div>
+      </div>
     </div>
+
+    <hr class="divider" />
+
+    <!-- ===== Skills Section ===== -->
+    <div class="profile-section">
+      <div class="section-header">
+        <h3>Skills</h3>
+        <button *ngIf="isCurrentUser" class="btn btn-add" (click)="toggleEdit()">+ Add</button>
+      </div>
+
+      <!-- View Mode -->
+      <div *ngIf="!isEditing" class="tag-list">
+        <span class="tag" *ngFor="let skill of currentUserInfo.skills">{{ skill }}</span>
+        <p class="empty" *ngIf="currentUserInfo.skills?.length === 0">No skills added yet</p>
+      </div>
+
+      <!-- Edit Mode -->
+      <div *ngIf="isEditing" class="skills-edit">
+        <div class="skill-item" *ngFor="let skill of currentUserInfo.skills; let i = index">
+          <input type="text" [(ngModel)]="currentUserInfo.skills[i]" />
+          <button class="remove-skill" (click)="removeSkill(i)">×</button>
+        </div>
+        <div class="add-skill">
+          <input type="text" [(ngModel)]="newSkill" placeholder="Add new skill" />
+          <button class="btn btn-add" (click)="addSkill()">+ Add Skill</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== Certificates ===== -->
+    <div class="profile-section">
+      <div class="section-header">
+        <h3>Certificates</h3>
+        <button
+          *ngIf="isCurrentUser && !isEditing"
+          class="btn btn-add"
+          routerLink="/certificate/new"
+        >
+          + Add
+        </button>
+
+        <!-- ✅ Show Add Certificate in edit mode too -->
+        <button
+          *ngIf="isCurrentUser && isEditing"
+          class="btn btn-add"
+          routerLink="/certificate/new"
+        >
+          + Add Certificate
+        </button>
+      </div>
+
+      <div class="tag-list mt-8">
+        <span class="tag" *ngFor="let c of certificates">{{ c.name }}</span>
+        <p class="empty" *ngIf="!certificates?.length">No certificates uploaded</p>
+      </div>
+    </div>
+
+    <!-- ===== Services ===== -->
+    <div class="profile-section">
+      <h3>Services</h3>
+      <div class="services">
+        <div
+          class="service-card"
+          *ngFor="let service of services"
+          (click)="switchPage(service.serviceID, service.taskBoard?.id)"
+        >
+          <h4>{{ service.name }}</h4>
+        </div>
+        <p class="empty" *ngIf="!services?.length">No assigned services</p>
+      </div>
+    </div>
+  </div>
 </div>
