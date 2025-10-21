@@ -40,6 +40,8 @@ export class ProjectManagement implements OnInit
 
   ngOnInit()
   {
+    window.scrollTo(0, 0);
+
     this.projectService.getProjects().subscribe((data) =>
     {
       this.projects = data;

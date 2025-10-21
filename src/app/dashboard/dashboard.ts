@@ -1,16 +1,17 @@
 import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { Project } from '@app/project';
 import { Service } from '@app/service';
 import { Sidebar } from "@app/sidebar/sidebar";
 import { environment } from '@environments/environment';
 import { CommonModule } from '@angular/common';
 import { ProjectService } from '@app/services/project.service';
+import { Certificate } from '@app/certificate';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [ Sidebar, CommonModule ],
+  imports: [Sidebar, CommonModule],
   templateUrl: './dashboard.html',
   styleUrls: [ './dashboard.css' ] // Fixed typo: styleUrl to styleUrls
 })
@@ -29,6 +30,8 @@ export class Dashboard
       backlogged: 0,
     }
   strokeDashArray: string = '';
+
+  certificates: Certificate[] = [];
 
   getProjectStatus()
   {
@@ -115,9 +118,6 @@ export class Dashboard
         this.projectStatusRate.atRisk = 0;
         this.projectStatusRate.backlogged = 0; // Set backlogged to 0
       }
-
-      console.log(this.projects);
-      console.log(this.projectStatusRate);
     });
   }
 
@@ -162,10 +162,10 @@ export class Dashboard
         {
           // Calculate total cards and new cards
           const totalCards = service.taskBoard?.cards?.length || 0;
-          const newCards = service.taskBoard?.cards?.filter(card => card.column === 'new').length || 0;
+          const unfinishedCards = service.taskBoard?.cards?.filter(card => card.column === 'new' || card.column === "work").length || 0;
 
           // Calculate completion rate (as a percentage)
-          const completionRate = totalCards > 0 ? ((totalCards - newCards) / totalCards) * 100 : 0;
+          const completionRate = totalCards > 0 ? ((totalCards - unfinishedCards) / totalCards) * 100 : 0;
 
           // Determine the deadline date
           const deadlineDate = new Date(service.deadline);
@@ -213,13 +213,32 @@ export class Dashboard
       });
   }
 
+  getUserCertificates()
+  {
+     this.http.get<Certificate[]>(`${environment.apiUrl}/certificate`).subscribe(
+      (response) =>
+      {
+        this.certificates = response;
+        console.log(response);
+      },
+      (error) =>
+      {
+        console.log(error);
+      }
+    )
+  }
+
   ngOnInit()
   {
+    window.scrollTo(0, 0);
+
     this.listProjects();
 
     this.getProjectStatus();
 
     this.updateStrokeDashArray();
+
+    this.getUserCertificates();
   }
 
   formatDecimal(num: number): string
@@ -247,4 +266,11 @@ export class Dashboard
 
     return result;
   }
+
+  goTo(url: string)
+  {
+    this.router.navigate([url])
+    window.scrollTo(0,0);
+  }
+
 }

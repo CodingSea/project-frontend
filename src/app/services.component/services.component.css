@@ -10,6 +10,15 @@
   border-color: #dc2626;
 }
 
+.back-btn {
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  background-color: #C21A25;
+  color: white;
+  cursor: pointer;
+}
+
 .btn-red-light {
   background: #fee2e2;
   color: #b91c1c;
@@ -28,6 +37,19 @@
   border: 1px solid transparent;
   cursor: pointer;
   user-select: none;
+}
+
+.header-actions {
+  display: flex;
+  justify-content: space-between;
+  /* Distribute space between items */
+  align-items: center;
+  /* Center items vertically */
+  width: 100%;
+  /* Ensure actions take up full width */
+  margin-top: 10px;
+  margin-bottom: 0.5em;
+  /* Optional: Adds space above the button row */
 }
 
 .div_33-96 {
@@ -689,7 +711,7 @@
 }
 
 .div_33-138 {
-  top: 170px;
+  
   position: absolute;
   display: flex;
   box-sizing: border-box;

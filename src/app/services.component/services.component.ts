@@ -113,10 +113,9 @@ export class ServicesComponent implements AfterViewInit {
 
         this.servicesInfo.totalMembers = uniqueMembers.size;
 
-        this.servicesInfo.completionRate =
-          totalTasksCount > 0
-            ? (this.servicesInfo.completedTasks / totalTasksCount) * 100
-            : 0;
+        this.servicesInfo.completionRate = totalTasksCount > 0
+          ? (this.servicesInfo.completedTasks / totalTasksCount) * 100
+          : 0;
       },
       (error) => console.error('❌ Failed to load project services:', error)
     );
