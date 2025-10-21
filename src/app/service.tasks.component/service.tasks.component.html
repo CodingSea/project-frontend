@@ -6,6 +6,8 @@
       <div class="header-title">
         <h2>{{ taskBoard?.service?.name }}</h2>
         <div class="header-info">
+          <p>Cheif: {{ taskBoard?.service?.chief?.first_name}} {{ taskBoard?.service?.chief?.last_name}}</p>
+          <p>Project Manager: {{ taskBoard?.service?.projectManager?.first_name}} {{ taskBoard?.service?.projectManager?.last_name}}</p>
           <p>Deadline: {{ taskBoard?.service?.deadline | date: "dd/MM/yyyy"}}</p>
         </div>
       </div>

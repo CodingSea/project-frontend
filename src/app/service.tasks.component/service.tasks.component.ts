@@ -50,9 +50,9 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
     }
 
   columns: any[] = [
-    { text: 'Backlog', dataField: 'new', minWidth: 150 },
-    { text: 'In Progress', dataField: 'work', minWidth: 150 },
-    { text: 'Done', dataField: 'done', minWidth: 150 }
+    { text: 'Backlog', dataField: 'new', minWidth: 150, collapsible: false },
+    { text: 'In Progress', dataField: 'work', minWidth: 150, collapsible: false },
+    { text: 'Done', dataField: 'done', minWidth: 150, collapsible: false }
   ];
 
   constructor(private cdr: ChangeDetectorRef,
