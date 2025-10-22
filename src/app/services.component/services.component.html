@@ -123,6 +123,7 @@
 
                         <ul class="menu" *ngIf="openMenuId === p.serviceID">
                           <li (click)="goToEdit(p, $event)">Edit</li>
+                          <li (click)="deleteService(p)">Delete</li>
                         </ul>
                       </div>
                     </header>

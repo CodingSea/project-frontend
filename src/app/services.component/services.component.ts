@@ -218,8 +218,23 @@ export class ServicesComponent implements AfterViewInit
   goToEdit(s: Service, event: Event)
   {
     event.stopPropagation();
+    window.scroll(0, 0);
     const projectId = this.projectId ?? this.route.snapshot.paramMap.get('projectId');
     this.router.navigate([ `/projects/${projectId}/services/${s.serviceID}/edit` ]);
+  }
+
+  async deleteService(s: Service)
+  {
+    try
+    {
+      const response = await this.http.delete(`${environment.apiUrl}/service/${s.serviceID}`).toPromise();
+
+      this.loadServices();
+    }
+    catch (error)
+    {
+      console.error('Error deleting service:', error);
+    }
   }
 
   ngAfterViewInit()

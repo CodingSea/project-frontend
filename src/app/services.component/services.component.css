@@ -4,6 +4,11 @@
   width: 100%;
 }
 
+.menu li:hover
+{
+  filter: brightness(0.8);
+}
+
 .btn-red {
   background: #dc2626;
   color: #fff;
