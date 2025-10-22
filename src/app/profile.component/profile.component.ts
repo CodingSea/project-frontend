@@ -80,6 +80,7 @@ export class ProfileComponent implements OnInit {
     this.currentUserInfo.email = user.email;
     this.currentUserInfo.skills = user.skills || [];
     this.currentUserInfo.profileImage = user.profileImage || '';
+    console.log(user)
     this.currentUserInfo.role = user.role === "admin" ? "Admin" : "Developer";
     this.isImageLoading = false;
   }

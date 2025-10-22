@@ -28,7 +28,17 @@
     <div class="developer-cards">
 
         <div *ngFor="let developer of filteredDevelopers; let i = index" class="card">
-            <img src="images/user.png" alt="profile image">
+              
+            <div class="image-wrapper" [class.loading]="isImageLoading">
+              <img
+                [src]="developer.profileImage || 'images/user.png'"
+                alt="Profile Image"
+                class="profile-image"
+                (load)="onImageLoad()"
+                (error)="onImageError()"
+                [style.opacity]="isImageLoading ? '0' : '1'"
+            />
+            </div>
             <h3>{{ developer.first_name }} {{ developer.last_name }}</h3>
 
             <div class="skill-list">
