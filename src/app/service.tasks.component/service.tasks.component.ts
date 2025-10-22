@@ -57,7 +57,7 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
     { text: 'Done', dataField: 'done', minWidth: 150, collapsible: false }
   ];
 
-  constructor(private cdr: ChangeDetectorRef,
+  constructor(
     private http: HttpClient,
     private route: ActivatedRoute,
     private location: Location) { }

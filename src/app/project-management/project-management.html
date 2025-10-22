@@ -80,22 +80,19 @@
                     (click)="onCardClick(p)">
                     <!-- Header -->
                     <header class="pm-card-header">
-                      <h3>{{ p.name }}</h3> <!-- ✅ changed -->
+                      @if (p.name.length <= 25) 
+                      {
+                        <h3>{{ p.name }}</h3>
+                      }
+                      @else 
+                      {
+                        <h3>{{ getLimitedString(p.name, 25) }}</h3>
+                      }
                       <span class="pm-pill" [attr.data-status]="p.status">{{ p.status }}</span>
                     </header>
 
                     <!-- Description -->
                     <p class="pm-desc">{{ p.description }}</p>
-
-                    <!-- Members -->
-                    <!-- <div class="pm-members">
-                      <ng-container *ngFor="let m of p.members ?? []; let i = index">
-                        <img *ngIf="i < 3" [src]="m.avatar || ''" [alt]="m.name || ''" class="pm-avatar">
-                      </ng-container>
-                      <span *ngIf="(p.members?.length || 0) > 3" class="pm-more">
-                        +{{ (p.members?.length || 0) - 3 }}
-                      </span>
-                    </div> -->
 
                     <div class="pm-members">
                       <span class="pm-more">

@@ -172,4 +172,10 @@ export class ProjectManagement implements OnInit
 
     return result;
   }
+
+  getLimitedString(inputString: string, letterAmount: number): string
+  {
+    return inputString.slice(0, letterAmount) + "...";
+  }
+
 }

@@ -11,26 +11,28 @@ import { Output, EventEmitter } from '@angular/core';
 import { Input } from '@angular/core';
 import { SafeUrlPipe } from '@app/pipes/safe-url.pipe';
 
-interface DeveloperSelectEvent extends User {
+interface DeveloperSelectEvent extends User
+{
   remove: boolean;
 }
 
 @Component({
   selector: 'app-developers-search',
   standalone: true,
-  imports: [ CommonModule, ReactiveFormsModule,SafeUrlPipe ],
+  imports: [ CommonModule, ReactiveFormsModule, SafeUrlPipe ],
   templateUrl: './developers.search.component.html',
   styleUrl: './developers.search.component.css'
 })
 
 export class DevelopersSearchComponent implements OnInit
 {
-@Output() developerSelected = new EventEmitter<DeveloperSelectEvent>();
-@Input() selectedIds: number[] = [];  // ✅ receives currently selected dev IDs from parent
+  @Output() developerSelected = new EventEmitter<DeveloperSelectEvent>();
+  @Input() selectedIds: number[] = [];  // ✅ receives currently selected dev IDs from parent
 
-isSelected(id: number): boolean {
-  return this.selectedIds.includes(id);
-}
+  isSelected(id: number): boolean
+  {
+    return this.selectedIds.includes(id);
+  }
 
   constructor(private http: HttpClient, private router: Router) { }
 
@@ -38,29 +40,47 @@ isSelected(id: number): boolean {
   searchControl: FormControl = new FormControl('');
   filteredDevelopers: User[] | null = null;
 
-  ngOnInit() {
+  isImageLoading = true;
+
+  ngOnInit()
+  {
     this.loadDevelopers();
 
     this.searchControl.valueChanges.pipe(
       debounceTime(300),
       switchMap(searchTerm => this.getDevelopers(searchTerm)) // Call the service
     ).subscribe(
-      (response) => {
+      (response) =>
+      {
         this.filteredDevelopers = response;
       },
-      (error) => {
+      (error) =>
+      {
         console.log(error);
       }
     );
+
+    this.isImageLoading = false;
   }
 
-  loadDevelopers() {
+  getConsole(text: string)
+  {
+    console.log(text)
+  }
+
+  loadDevelopers()
+  {
     this.getDevelopers().subscribe(
-      (response) => {
+      (response) =>
+      {
         this.developers = response;
+        console.log("developers",response)
         this.filteredDevelopers = response; // Initialize filtered developers
+
+        console.log(response)
       },
-      (error) => {
+      (error) =>
+      {
         console.log(error);
       }
     );
@@ -71,35 +91,42 @@ isSelected(id: number): boolean {
     return this.http.get<User[]>(`${environment.apiUrl}/user/developers?search=${searchTerm}`);
   }
 
-  getDevelopers(searchTerm?: string): Observable<User[]> {
+  getDevelopers(searchTerm?: string): Observable<User[]>
+  {
     let params = new HttpParams();
 
-    if (searchTerm) {
+    if (searchTerm)
+    {
       params = params.set('search', searchTerm);
     }
 
     return this.http.get<User[]>(`${environment.apiUrl}/user/developers`, { params });
   }
 
-selectedProfileId: number | null = null;
+  selectedProfileId: number | null = null;
 
-openProfile(userId: number) {
-  this.selectedProfileId = userId;
-}
-
-closeProfile() {
-  this.selectedProfileId = null;
-}
-
-selectDeveloper(dev: User) {
-  if (this.isSelected(dev.id)) {
-    this.developerSelected.emit({ ...dev, remove: true });
-  } else {
-    this.developerSelected.emit({ ...dev, remove: false });
+  openProfile(userId: number)
+  {
+    this.selectedProfileId = userId;
   }
-}
 
+  closeProfile()
+  {
+    this.selectedProfileId = null;
+  }
 
+  selectDeveloper(dev: User)
+  {
+    if (this.isSelected(dev.id))
+    {
+      this.developerSelected.emit({ ...dev, remove: true });
+    } else
+    {
+      this.developerSelected.emit({ ...dev, remove: false });
+    }
+  }
 
+  onImageLoad() { this.isImageLoading = false; }
+  onImageError() { this.isImageLoading = false; }
 
 }
