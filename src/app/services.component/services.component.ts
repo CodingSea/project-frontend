@@ -14,11 +14,12 @@ import { ServiceFormComponent } from '@app/service-form/service-form.component';
 @Component({
   selector: 'app-services',
   standalone: true,
-  imports: [CommonModule, FormsModule, Sidebar, ServiceFormComponent],
+  imports: [ CommonModule, FormsModule, Sidebar, ServiceFormComponent ],
   templateUrl: './services.component.html',
-  styleUrls: ['./services.component.css'],
+  styleUrls: [ './services.component.css' ],
 })
-export class ServicesComponent implements AfterViewInit {
+export class ServicesComponent implements AfterViewInit
+{
   services: Service[] = [];
   showNewService = false;
 
@@ -46,21 +47,25 @@ export class ServicesComponent implements AfterViewInit {
     private serviceService: ServiceService,
     private router: Router,
     private location: Location
-  ) {}
+  ) { }
 
-  ngOnInit() {
-    this.route.paramMap.subscribe((params) => {
+  ngOnInit()
+  {
+    this.route.paramMap.subscribe((params) =>
+    {
       this.projectId = params.get('projectId');
       this.projectIdNum = this.projectId ? +this.projectId : undefined;
       this.loadServices();
     });
   }
 
-  loadServices() {
+  loadServices()
+  {
     if (!this.projectId) return;
 
     this.http.get<Project>(`${environment.apiUrl}/project/${this.projectId}`).subscribe(
-      (res) => {
+      (res) =>
+      {
         this.services = res.services ?? [];
         this.servicesInfo.totalServices = this.services.length;
 
@@ -71,32 +76,53 @@ export class ServicesComponent implements AfterViewInit {
         this.servicesInfo.backloggedTasks = 0;
         this.servicesInfo.activeTasks = 0;
 
-        this.servicesInfo.totalMembers = this.services.reduce((total, service) => {
-          if (service.chief) uniqueMembers.add(service.chief.id);
-          if (service.projectManager) uniqueMembers.add(service.projectManager.id);
-          if (service.assignedResources) {
-            service.assignedResources.forEach((r) => uniqueMembers.add(r.id));
+        this.servicesInfo.totalMembers = this.services.reduce((total, service) =>
+        {
+
+          const serviceUniqueMembers = new Set<number>();
+
+          if (service.chief)
+          {
+            uniqueMembers.add(service.chief.id);
+            serviceUniqueMembers.add(service.chief.id);
           }
-          if (service.backup) {
+          if (service.projectManager)
+          {
+            uniqueMembers.add(service.projectManager.id);
+            serviceUniqueMembers.add(service.projectManager.id);
+          }
+          if (service.assignedResources) 
+          {
+            service.assignedResources.forEach((r) => uniqueMembers.add(r.id));
+            service.assignedResources.forEach((r) => serviceUniqueMembers.add(r.id));
+          }
+          if (service.backup)
+          {
             service.backup.forEach((b) => uniqueMembers.add(b.id));
+            service.backup.forEach((b) => serviceUniqueMembers.add(b.id));
           }
 
-          service.memberCount = uniqueMembers.size;
+          service.memberCount = serviceUniqueMembers.size;
           service.completionRate = 0;
 
           let serviceCompletedTasksCount = 0;
           let serviceTotalTasksCount = 0;
 
-          if (service.taskBoard?.cards) {
-            service.taskBoard.cards.forEach((task) => {
+          if (service.taskBoard?.cards)
+          {
+            service.taskBoard.cards.forEach((task) =>
+            {
               totalTasksCount++;
               serviceTotalTasksCount++;
 
-              if (task.column === 'new') {
+              if (task.column === 'new')
+              {
                 this.servicesInfo.backloggedTasks++;
-              } else if (task.column === 'work') {
+              } else if (task.column === 'work')
+              {
                 this.servicesInfo.activeTasks++;
-              } else if (task.column === 'done') {
+              } else if (task.column === 'done')
+              {
                 serviceCompletedTasksCount++;
                 this.servicesInfo.completedTasks++;
               }
@@ -113,6 +139,8 @@ export class ServicesComponent implements AfterViewInit {
 
         this.servicesInfo.totalMembers = uniqueMembers.size;
 
+        console.log(res);
+
         this.servicesInfo.completionRate = totalTasksCount > 0
           ? (this.servicesInfo.completedTasks / totalTasksCount) * 100
           : 0;
@@ -121,30 +149,37 @@ export class ServicesComponent implements AfterViewInit {
     );
   }
 
-  onCardClick(s: Service) {
-    this.router.navigate([`services/${s.serviceID}/taskboard/${s.taskBoard?.id}`]);
+  onCardClick(s: Service)
+  {
+    this.router.navigate([ `services/${s.serviceID}/taskboard/${s.taskBoard?.id}` ]);
   }
 
-  openNewService() {
+  openNewService()
+  {
     this.showNewService = true;
   }
-  closeNewService() {
+  closeNewService()
+  {
     this.showNewService = false;
   }
 
-  openFilter() {
+  openFilter()
+  {
     this.showFilter = true;
   }
-  closeFilter() {
+  closeFilter()
+  {
     this.showFilter = false;
   }
 
-  applyFilters() {}
+  applyFilters() { }
 
-  matchesStatus(status?: string): boolean {
+  matchesStatus(status?: string): boolean
+  {
     if (!status) return false;
     const s = status.toLowerCase();
-    if (this.selectedFilter !== 'all') {
+    if (this.selectedFilter !== 'all')
+    {
       return (
         (this.selectedFilter === 'active' && s === 'active') ||
         (this.selectedFilter === 'in-review' && s === 'in review') ||
@@ -158,42 +193,51 @@ export class ServicesComponent implements AfterViewInit {
     );
   }
 
-  formatDecimal(num: number): string {
+  formatDecimal(num: number): string
+  {
     const roundedNum = Math.round(num * 10) / 10;
     let result = String(roundedNum);
-    if (result.endsWith('.0')) {
+    if (result.endsWith('.0'))
+    {
       result = result.substring(0, result.length - 2);
     }
     return result;
   }
 
-  getProgress(service: Service): string {
+  getProgress(service: Service): string
+  {
     return this.formatDecimal(service.completionRate!);
   }
 
-  toggleMenu(id: number, event: Event) {
+  toggleMenu(id: number, event: Event)
+  {
     event.stopPropagation();
     this.openMenuId = this.openMenuId === id ? null : id;
   }
 
-  goToEdit(s: Service, event: Event) {
+  goToEdit(s: Service, event: Event)
+  {
     event.stopPropagation();
     const projectId = this.projectId ?? this.route.snapshot.paramMap.get('projectId');
-    this.router.navigate([`/projects/${projectId}/services/${s.serviceID}/edit`]);
+    this.router.navigate([ `/projects/${projectId}/services/${s.serviceID}/edit` ]);
   }
 
-  ngAfterViewInit() {
-    document.addEventListener('click', () => {
+  ngAfterViewInit()
+  {
+    document.addEventListener('click', () =>
+    {
       this.openMenuId = null;
     });
   }
 
-  onServiceCreated() {
+  onServiceCreated()
+  {
     this.closeNewService();
     this.loadServices();
   }
 
-  goBack() {
+  goBack()
+  {
     this.location.back();
   }
 }
