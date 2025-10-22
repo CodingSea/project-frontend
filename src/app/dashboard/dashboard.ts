@@ -137,7 +137,7 @@ export class Dashboard
       (response) =>
       {
         this.projects = response;
-        this.getClosestServices(); // Call the function to get closest services
+        this.getClosestServices();
       },
       (error) =>
       {
@@ -158,7 +158,9 @@ export class Dashboard
     {
       project.services?.forEach(service =>
       {
-        if (service.deadline)
+        if(service.taskBoard?.cards === undefined) return;
+
+        if (service.deadline && service.taskBoard?.cards.length > 0)
         {
           // Calculate total cards and new cards
           const totalCards = service.taskBoard?.cards?.length || 0;
@@ -197,6 +199,7 @@ export class Dashboard
             status: status, // Add the determined status
             project: project // Include the project object
           });
+          console.log(servicesArray);
         }
       });
     });

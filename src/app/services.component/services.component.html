@@ -140,13 +140,20 @@
 
                     <footer class="pm-card-footer">
                       <span class="pm-due">Due: {{ p.deadline | date: 'MMM d' }}</span>
-                      <div class="pm-progress">
-                        <div
-                          class="pm-progress-fill"
-                          [style.width.%]="p.completionRate?.toFixed(2)"
-                        ></div>
-                      </div>
-                      <span class="pm-progress-label">{{ formatDecimal(p.completionRate!) }}%</span>
+                      @if(p.taskBoard?.cards?.length === 0)
+                      {
+                        <span class="pm-progress-label">No Tasks</span>
+                      }
+                      @else 
+                      {
+                        <div class="pm-progress">
+                          <div
+                            class="pm-progress-fill"
+                            [style.width.%]="p.completionRate?.toFixed(2)"
+                          ></div>
+                        </div>
+                        <span class="pm-progress-label">{{ formatDecimal(p.completionRate!) }}%</span>
+                      }
                     </footer>
                   </article>
                 </div>
