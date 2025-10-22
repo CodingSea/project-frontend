@@ -39,6 +39,8 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
   taskBoardId!: number;
   taskBoard: TaskBoard | null = null;
 
+  isTaskboardSelected: boolean = true;
+
   servicesInfo: ServiceInfo =
     {
       totalServices: 0,
@@ -50,9 +52,9 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
     }
 
   columns: any[] = [
-    { text: 'Backlog', dataField: 'new', minWidth: 150 },
-    { text: 'In Progress', dataField: 'work', minWidth: 150 },
-    { text: 'Done', dataField: 'done', minWidth: 150 }
+    { text: 'Backlog', dataField: 'new', minWidth: 150, collapsible: false },
+    { text: 'In Progress', dataField: 'work', minWidth: 150, collapsible: false },
+    { text: 'Done', dataField: 'done', minWidth: 150, collapsible: false }
   ];
 
   constructor(private cdr: ChangeDetectorRef,
@@ -593,6 +595,13 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
     const payload = { description }; // Prepare the payload
 
     return this.http.patch(`${environment.apiUrl}/tasks/${taskId}`, payload).toPromise(); // Adjust the URL as necessary
+  }
+
+
+  selectSection(isTaskboard: boolean)
+  {
+    this.isTaskboardSelected = isTaskboard;
+    this.initializeKanbanDataSource();
   }
 
 }

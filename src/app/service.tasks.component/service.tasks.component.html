@@ -2,10 +2,35 @@
   <app-sidebar></app-sidebar>
 
   <div class="kanban-container">
+
+    <div class="nav-header">
+      @if(isTaskboardSelected)
+      {
+      <div class="nav-section active left" (click)="selectSection(true)">Task Board</div>
+      <div class="nav-section right" (click)="selectSection(false)">Attachments</div>
+      }
+      @else
+      {
+      <div class="nav-section left" (click)="selectSection(true)">Task Board</div>
+      <div class="nav-section active right" (click)="selectSection(false)">Attachments</div>
+      }
+    </div>
+
+    @if(isTaskboardSelected)
+    {
     <header class="kanban-header">
+
       <div class="header-title">
         <h2>{{ taskBoard?.service?.name }}</h2>
         <div class="header-info">
+          <p>Cheif: {{ taskBoard?.service?.chief?.first_name}} {{ taskBoard?.service?.chief?.last_name}}</p>
+
+          @if(taskBoard?.service?.projectManager)
+          {
+            <p>Project Manager: {{ taskBoard?.service?.projectManager?.first_name}} {{
+            taskBoard?.service?.projectManager?.last_name}}</p>
+          }
+
           <p>Deadline: {{ taskBoard?.service?.deadline | date: "dd/MM/yyyy"}}</p>
         </div>
       </div>
@@ -35,5 +60,11 @@
     <task-popup *ngIf="showTaskDetailPopup" [task]="selectedTask" (close)="closeTaskDetailPopup()"
       (delete)="deleteTask($event)">
     </task-popup>
+    }
+    @else
+    {
+
+    }
+
   </div>
 </div>
