@@ -139,8 +139,6 @@ export class ServicesComponent implements AfterViewInit
 
         this.servicesInfo.totalMembers = uniqueMembers.size;
 
-        console.log(res);
-
         this.servicesInfo.completionRate = totalTasksCount > 0
           ? (this.servicesInfo.completedTasks / totalTasksCount) * 100
           : 0;
@@ -249,6 +247,11 @@ export class ServicesComponent implements AfterViewInit
   {
     this.closeNewService();
     this.loadServices();
+  }
+
+  getLimitedString(inputString: string, letterAmount: number): string
+  {
+    return inputString.slice(0, letterAmount) + "...";
   }
 
   goBack()

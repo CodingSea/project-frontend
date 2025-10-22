@@ -80,7 +80,14 @@
                     (click)="onCardClick(p)">
                     <!-- Header -->
                     <header class="pm-card-header">
-                      <h3>{{ p.name }}</h3> <!-- ✅ changed -->
+                      @if (p.name.length <= 25) 
+                      {
+                        <h3>{{ p.name }}</h3>
+                      }
+                      @else 
+                      {
+                        <h3>{{ getLimitedString(p.name, 25) }}</h3>
+                      }
                       <span class="pm-pill" [attr.data-status]="p.status">{{ p.status }}</span>
                     </header>
 
