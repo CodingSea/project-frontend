@@ -109,12 +109,12 @@
 
 .nav-section.left
 {
-  border-radius: 15px 0px 0px 15px;
+  border-radius: 8px 0px 0px 8px;
 }
 
 .nav-section.right
 {
-  border-radius: 0px 15px 15px 0px;
+  border-radius: 0px 8px 8px 0px;
 }
 
 .nav-section.active
@@ -127,4 +127,12 @@
 {
   filter: brightness(0.8);
   cursor: pointer;
+}
+
+.description-conatiner
+{
+  border: 1px solid black;
+  padding: 0.5em;
+  border-radius: 0.3em;
+  background-color: lightgray;
 }

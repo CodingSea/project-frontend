@@ -94,16 +94,6 @@
                     <!-- Description -->
                     <p class="pm-desc">{{ p.description }}</p>
 
-                    <!-- Members -->
-                    <!-- <div class="pm-members">
-                      <ng-container *ngFor="let m of p.members ?? []; let i = index">
-                        <img *ngIf="i < 3" [src]="m.avatar || ''" [alt]="m.name || ''" class="pm-avatar">
-                      </ng-container>
-                      <span *ngIf="(p.members?.length || 0) > 3" class="pm-more">
-                        +{{ (p.members?.length || 0) - 3 }}
-                      </span>
-                    </div> -->
-
                     <div class="pm-members">
                       <span class="pm-more">
                         <p>Services: {{ p.services.length }}</p>
