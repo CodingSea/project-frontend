@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ProjectService } from '@app/services/project.service';
@@ -15,7 +15,7 @@ import { ServiceInfo } from '@app/service-info';
   styleUrls: [ './project-management.scss' ] // ✅ plural
 })
 
-export class ProjectManagement implements OnInit
+export class ProjectManagement implements OnInit, AfterViewInit
 {
   projects: Project[] = [];
 
@@ -24,6 +24,8 @@ export class ProjectManagement implements OnInit
   // New Project Modal
   showNewProject = false;
   newProject: Partial<Project> = this.blankNewProject();
+
+  openMenuId: number | null = null;
 
   // Filters
   showFilter = false;
@@ -37,6 +39,13 @@ export class ProjectManagement implements OnInit
     }
 
   constructor(private projectService: ProjectService, private router: Router) { }
+  ngAfterViewInit(): void
+  {
+    document.addEventListener('click', () =>
+    {
+      this.openMenuId = null;
+    });
+  }
 
   ngOnInit()
   {
@@ -176,6 +185,34 @@ export class ProjectManagement implements OnInit
   getLimitedString(inputString: string, letterAmount: number): string
   {
     return inputString.slice(0, letterAmount) + "...";
+  }
+
+  toggleMenu(id: number, event: Event)
+  {
+    event.stopPropagation();
+    this.openMenuId = this.openMenuId === id ? null : id;
+  }
+
+  goToEdit(s: Project, event: Event)
+  {
+    event.stopPropagation();
+    window.scroll(0, 0);
+    // const projectId = this.projectId ?? this.route.snapshot.paramMap.get('projectId');
+    // this.router.navigate([ `/projects/${projectId}/services/${s.serviceID}/edit` ]);
+  }
+
+  async deleteService(s: Project)
+  {
+    try
+    {
+      // const response = await this.http.delete(`${environment.apiUrl}/service/${s.serviceID}`).toPromise();
+
+      // this.loadServices();
+    }
+    catch (error)
+    {
+      console.error('Error deleting service:', error);
+    }
   }
 
 }

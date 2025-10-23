@@ -89,6 +89,22 @@
                         <h3>{{ getLimitedString(p.name, 25) }}</h3>
                       }
                       <span class="pm-pill" [attr.data-status]="p.status">{{ p.status }}</span>
+
+                      <div class="pm-card-menu" (click)="$event.stopPropagation()">
+                        <button
+                          class="dots"
+                          type="button"
+                          aria-label="Options"
+                          (click)="toggleMenu(p.projectID, $event)"
+                        >
+                          ⋮
+                        </button>
+
+                        <ul class="menu" *ngIf="openMenuId === p.projectID">
+                          <li (click)="goToEdit(p, $event)">Edit</li>
+                          <li (click)="deleteService(p)">Delete</li>
+                        </ul>
+                      </div>
                     </header>
 
                     <!-- Description -->

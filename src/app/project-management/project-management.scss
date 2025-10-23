@@ -4,6 +4,52 @@
   width: 100%;
 }
 
+.pm-card-menu {
+  position: relative;
+  margin-left: auto;
+}
+
+.pm-card-menu .dots {
+  background: transparent;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: #555;
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+.pm-card-menu .dots:hover {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.pm-card-menu .menu {
+  position: absolute;
+  right: 0;
+  top: 28px;
+  background: #fff;
+  list-style: none;
+  margin: 0;
+  padding: 6px 0;
+  border: 1px solid #e3e3e3;
+  border-radius: 10px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  width: 130px;
+  z-index: 20;
+}
+
+.pm-card-menu .menu li {
+  padding: 8px 12px;
+  font-size: 14px;
+  cursor: pointer;
+}
+.pm-card-menu .menu li:hover {
+  background-color: #f7f7f7;
+}
+.pm-card-menu .menu li.danger {
+  color: #c0392b;
+}
+
+
 .div_33-96 {
   position: relative;
   box-sizing: border-box;
