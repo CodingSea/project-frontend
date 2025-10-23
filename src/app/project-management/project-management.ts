@@ -25,7 +25,9 @@ export class ProjectManagement implements OnInit, AfterViewInit
 
   // New Project Modal
   showNewProject = false;
+  showEditProject = false;
   newProject: Partial<Project> = this.blankNewProject();
+  editProject: Partial<Project> = this.blankNewProject();
 
   openMenuId: number | null = null;
 
@@ -130,11 +132,11 @@ export class ProjectManagement implements OnInit, AfterViewInit
   openNewProject() { this.showNewProject = true; this.newProject = this.blankNewProject(); }
   closeNewProject() { this.showNewProject = false; }
 
+  openEditProject() { this.showEditProject = true; this.editProject = this.blankNewProject(); }
+  closeEditProject() { this.showEditProject = false; }
+
   private blankNewProject(): Partial<Project>
   {
-    const d = new Date();
-    d.setDate(d.getDate() + 14);
-    const yyyyMmDd = d.toISOString().slice(0, 10);
     return { name: '', status: 'Active', progress: 0 };
   }
 
@@ -198,12 +200,41 @@ export class ProjectManagement implements OnInit, AfterViewInit
     this.openMenuId = this.openMenuId === id ? null : id;
   }
 
-  goToEdit(s: Project, event: Event)
+  async goToEdit(s: Project, event: Event)
   {
     event.stopPropagation();
-    window.scroll(0, 0);
-    // const projectId = this.projectId ?? this.route.snapshot.paramMap.get('projectId');
-    // this.router.navigate([ `/projects/${projectId}/services/${s.serviceID}/edit` ]);
+
+    this.openEditProject();
+
+    this.editProject = s;
+    console.log(this.editProject);
+  }
+
+  async updateProject(form: any)
+  {
+    // if (form.invalid) return;
+
+    console.log(this.editProject)
+
+    const updatedProject =
+    {
+      name: this.editProject.name,
+      description: this.editProject.description,
+      status: this.editProject.status
+    }
+
+    await this.http.patch(`${environment.apiUrl}/project/${this.editProject.projectID}`, updatedProject).subscribe(
+      (res) =>
+      {
+        
+      },
+      (err) =>
+      {
+        console.log(err);
+      }
+    )
+
+    this.closeEditProject()
   }
 
   async deleteProject(s: Project)

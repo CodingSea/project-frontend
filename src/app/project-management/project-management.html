@@ -189,6 +189,71 @@
                   </div>
                 </ng-container>
 
+
+
+
+
+                
+
+                <!-- Edit Form -->
+                <ng-container *ngIf="showEditProject">
+                  <div class="pm-modal-backdrop" (click)="closeEditProject()"></div>
+
+                  <div class="pm-modal" role="dialog" aria-modal="true" aria-label="Create Project"
+                    (click)="$event.stopPropagation()">
+                    <header class="pm-modal-header">
+                      <strong>Edit Project</strong>
+                      <button class="pm-close" type="button" (click)="closeEditProject()" aria-label="Close">×</button>
+                    </header>
+
+                    <form #projectForm2="ngForm" (ngSubmit)="updateProject(projectForm2)">
+                      <!-- ✅ Project Name with Regex -->
+                      <label class="pm-label">Project name<span class="req">*</span></label>
+                      <input class="pm-input" type="text" name="name" required pattern="^[A-Za-z0-9 ]{3,50}$"
+                        #nameField="ngModel" [(ngModel)]="editProject.name" placeholder="e.g., Website Revamp">
+
+                      <!-- Error message -->
+                      <div *ngIf="nameField.invalid && (nameField.dirty || nameField.touched)" class="pm-error">
+                        <small *ngIf="nameField.errors?.['required']">Project name is required.</small>
+                        <small *ngIf="nameField.errors?.['pattern']">Only letters, numbers, and spaces (3–50
+                          chars).</small>
+                      </div>
+
+                      <!-- ✅ Description (optional but regex validated) -->
+                      <label class="pm-label">Description</label>
+                      <textarea class="pm-textarea" name="description" rows="3" [(ngModel)]="editProject.description"
+                        pattern="^$|^[A-Za-z0-9.,!?()\\s-]{1,200}$" #descField="ngModel"
+                        placeholder="(optional) brief summary"></textarea>
+
+                      <!-- Error message -->
+                      <div *ngIf="descField.invalid && (descField.dirty || descField.touched)" class="pm-error">
+                        <small *ngIf="descField.errors?.['pattern']">
+                          Only letters, numbers, spaces, and punctuation allowed (max 200 chars).
+                        </small>
+                      </div>
+
+
+
+                      <div class="pm-row-2">
+
+                        <div>
+                          <label class="pm-label">Status</label>
+                          <select class="pm-input" name="status" [(ngModel)]="editProject.status">
+                            <option value="Active">Active</option>
+                            <option value="In Review">In Review</option>
+                            <option value="Urgent">Urgent</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div class="pm-actions">
+                        <button type="button" class="pm-btn" (click)="closeEditProject()">Cancel</button>
+                        <button type="submit" class="pm-btn pm-btn-primary">Update</button>
+                      </div>
+                    </form>
+                  </div>
+                </ng-container>
+
               </div>
             </div>
           </div>
