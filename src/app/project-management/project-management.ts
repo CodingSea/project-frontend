@@ -6,6 +6,8 @@ import { Sidebar } from "@app/sidebar/sidebar"; // ✅ use one Project type
 import { Router } from '@angular/router';
 import { Project } from '@app/project';
 import { ServiceInfo } from '@app/service-info';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '@environments/environment';
 
 @Component({
   selector: 'app-project-management',
@@ -38,7 +40,7 @@ export class ProjectManagement implements OnInit, AfterViewInit
 
     }
 
-  constructor(private projectService: ProjectService, private router: Router) { }
+  constructor(private projectService: ProjectService, private router: Router, private http: HttpClient) { }
   ngAfterViewInit(): void
   {
     document.addEventListener('click', () =>
@@ -51,6 +53,11 @@ export class ProjectManagement implements OnInit, AfterViewInit
   {
     window.scrollTo(0, 0);
 
+    this.loadProjects();
+  }
+
+  loadProjects()
+  {
     this.projectService.getProjects().subscribe((data) =>
     {
       this.projects = data;
@@ -108,8 +115,6 @@ export class ProjectManagement implements OnInit, AfterViewInit
 
         p.members = uniqueMembers.size;
       });
-
-      console.log(this.projects);
     });
   }
 
@@ -205,9 +210,9 @@ export class ProjectManagement implements OnInit, AfterViewInit
   {
     try
     {
-      // const response = await this.http.delete(`${environment.apiUrl}/service/${s.serviceID}`).toPromise();
-
-      // this.loadServices();
+      await this.http.delete(`${environment.apiUrl}/project/${s.projectID}`).toPromise();
+      
+      this.loadProjects();
     }
     catch (error)
     {

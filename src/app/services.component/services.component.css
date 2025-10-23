@@ -2428,7 +2428,7 @@
    .pm-cards {
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-around;
+    justify-content: start;
     grid-template-columns: repeat(3, 1fr); /* ✅ 3 columns */
     gap: 10px;                             /* ✅ fixed spacing between rows/cols */
     margin-top: 50px;
@@ -2448,10 +2448,10 @@
     cursor: pointer;
     transition: transform 0.2s, box-shadow 0.2s;
 
-    width: 18em;
+    width: 17em;
 
     /* 🔴 fixed height for all cards */
-    height: 12em;
+    height: 11em;
     min-height: unset;
     overflow: hidden; /* prevent uneven stretching */
   }
