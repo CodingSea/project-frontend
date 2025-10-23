@@ -85,24 +85,38 @@
                         <strong>{{ service.deadline | date:'MMM d, y' }}</strong>
                     </td>
                     <td>
-                        <div class="progress-container" style="width: 120px">
-                            @if(service.status == "Completed")
-                            {
-                            <div class="progress-bar-filled" style=" background: #22c55e"
-                                [style.width.%]="service.completionRate"></div>
-                            }
-                            @else if(service.status == "At Risk")
-                            {
-                            <div class="progress-bar-filled" style=" background: #ef4444"
-                                [style.width.%]="service.completionRate"></div>
-                            }
-                            @else if(service.status == "In-Progress")
-                            {
-                            <div class="progress-bar-filled" style=" background: #6366f1"
-                                [style.width.%]="service.completionRate"></div>
-                            }
-                        </div>
-                        {{ getProgress(service) }}%
+                        @if(service.taskBoard?.cards?.length === 0)
+                        {
+                            <strong>No Tasks</strong>
+                        }
+                        @else 
+                        {
+                            <div class="progress-container" style="width: 120px">
+                                @if(service.status == "Completed")
+                                {
+                                <div class="progress-bar-filled" style=" background: #22c55e"
+                                    [style.width.%]="service.completionRate"></div>
+                                }
+                                @else if(service.status == "At Risk")
+                                {
+                                <div class="progress-bar-filled" style=" background: #ef4444"
+                                    [style.width.%]="service.completionRate"></div>
+                                }
+                                @else if(service.status == "In-Progress")
+                                {
+                                <div class="progress-bar-filled" style=" background: #6366f1"
+                                    [style.width.%]="service.completionRate"></div>
+                                }
+                                @else if(service.status == "Overdue")
+                                {
+                                <div class="progress-bar-filled" style=" background: #000000"
+                                    [style.width.%]="service.completionRate"></div>
+                                }
+                            </div>
+                            {{ formatDecimal(service.completionRate!) }}%
+                        }
+
+                        
                     </td>
                 </tr>
 

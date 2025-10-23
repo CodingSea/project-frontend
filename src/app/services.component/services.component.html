@@ -38,13 +38,7 @@
 
               <div class="header-actions">
                 <div class="filter-container">
-                    <!-- Dropdown Filter -->
-                    <!-- <select class="select" [(ngModel)]="selectedFilter" (change)="applyFilters()">
-                        <option value="all">All Services</option>
-                        <option value="active">Active</option>
-                        <option value="in-review">In Review</option>
-                        <option value="urgent">Urgent</option>
-                    </select> -->
+
                 </div>
                 <button class="back-btn" (click)="goBack()">Back</button>
               </div>
@@ -106,13 +100,13 @@
                     (click)="onCardClick(p)"
                   >
                     <header class="pm-card-header">
-                      @if (p.name.length <= 25) 
+                      @if (p.name.length <= 15) 
                       {
                         <h3>{{ p.name }}</h3>
                       }
                       @else 
                       {
-                        <h3>{{ getLimitedString(p.name, 25) }}</h3>
+                        <h3>{{ getLimitedString(p.name, 15) }}</h3>
                       }
                       <span class="pm-pill" [attr.data-status]="p.status">
                         {{ p.status }}
@@ -140,13 +134,20 @@
 
                     <footer class="pm-card-footer">
                       <span class="pm-due">Due: {{ p.deadline | date: 'MMM d' }}</span>
-                      <div class="pm-progress">
-                        <div
-                          class="pm-progress-fill"
-                          [style.width.%]="p.completionRate?.toFixed(2)"
-                        ></div>
-                      </div>
-                      <span class="pm-progress-label">{{ formatDecimal(p.completionRate!) }}%</span>
+                      @if(p.taskBoard?.cards?.length === 0)
+                      {
+                        <span class="pm-progress-label">No Tasks</span>
+                      }
+                      @else 
+                      {
+                        <div class="pm-progress">
+                          <div
+                            class="pm-progress-fill"
+                            [style.width.%]="p.completionRate?.toFixed(2)"
+                          ></div>
+                        </div>
+                        <span class="pm-progress-label">{{ formatDecimal(p.completionRate!) }}%</span>
+                      }
                     </footer>
                   </article>
                 </div>

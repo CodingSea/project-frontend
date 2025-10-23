@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ProjectService } from '@app/services/project.service';
@@ -6,6 +6,8 @@ import { Sidebar } from "@app/sidebar/sidebar"; // ✅ use one Project type
 import { Router } from '@angular/router';
 import { Project } from '@app/project';
 import { ServiceInfo } from '@app/service-info';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '@environments/environment';
 
 @Component({
   selector: 'app-project-management',
@@ -15,7 +17,7 @@ import { ServiceInfo } from '@app/service-info';
   styleUrls: [ './project-management.scss' ] // ✅ plural
 })
 
-export class ProjectManagement implements OnInit
+export class ProjectManagement implements OnInit, AfterViewInit
 {
   projects: Project[] = [];
 
@@ -23,7 +25,11 @@ export class ProjectManagement implements OnInit
 
   // New Project Modal
   showNewProject = false;
+  showEditProject = false;
   newProject: Partial<Project> = this.blankNewProject();
+  editProject: Partial<Project> = this.blankNewProject();
+
+  openMenuId: number | null = null;
 
   // Filters
   showFilter = false;
@@ -36,12 +42,24 @@ export class ProjectManagement implements OnInit
 
     }
 
-  constructor(private projectService: ProjectService, private router: Router) { }
+  constructor(private projectService: ProjectService, private router: Router, private http: HttpClient) { }
+  ngAfterViewInit(): void
+  {
+    document.addEventListener('click', () =>
+    {
+      this.openMenuId = null;
+    });
+  }
 
   ngOnInit()
   {
     window.scrollTo(0, 0);
 
+    this.loadProjects();
+  }
+
+  loadProjects()
+  {
     this.projectService.getProjects().subscribe((data) =>
     {
       this.projects = data;
@@ -99,8 +117,6 @@ export class ProjectManagement implements OnInit
 
         p.members = uniqueMembers.size;
       });
-
-      console.log(this.projects);
     });
   }
 
@@ -116,11 +132,11 @@ export class ProjectManagement implements OnInit
   openNewProject() { this.showNewProject = true; this.newProject = this.blankNewProject(); }
   closeNewProject() { this.showNewProject = false; }
 
+  openEditProject() { this.showEditProject = true; this.editProject = this.blankNewProject(); }
+  closeEditProject() { this.showEditProject = false; }
+
   private blankNewProject(): Partial<Project>
   {
-    const d = new Date();
-    d.setDate(d.getDate() + 14);
-    const yyyyMmDd = d.toISOString().slice(0, 10);
     return { name: '', status: 'Active', progress: 0 };
   }
 
@@ -176,6 +192,63 @@ export class ProjectManagement implements OnInit
   getLimitedString(inputString: string, letterAmount: number): string
   {
     return inputString.slice(0, letterAmount) + "...";
+  }
+
+  toggleMenu(id: number, event: Event)
+  {
+    event.stopPropagation();
+    this.openMenuId = this.openMenuId === id ? null : id;
+  }
+
+  async goToEdit(s: Project, event: Event)
+  {
+    event.stopPropagation();
+
+    this.openEditProject();
+
+    this.editProject = s;
+    console.log(this.editProject);
+  }
+
+  async updateProject(form: any)
+  {
+    // if (form.invalid) return;
+
+    console.log(this.editProject)
+
+    const updatedProject =
+    {
+      name: this.editProject.name,
+      description: this.editProject.description,
+      status: this.editProject.status
+    }
+
+    await this.http.patch(`${environment.apiUrl}/project/${this.editProject.projectID}`, updatedProject).subscribe(
+      (res) =>
+      {
+        
+      },
+      (err) =>
+      {
+        console.log(err);
+      }
+    )
+
+    this.closeEditProject()
+  }
+
+  async deleteProject(s: Project)
+  {
+    try
+    {
+      await this.http.delete(`${environment.apiUrl}/project/${s.projectID}`).toPromise();
+      
+      this.loadProjects();
+    }
+    catch (error)
+    {
+      console.error('Error deleting service:', error);
+    }
   }
 
 }

@@ -127,6 +127,10 @@ a {
     background-color: #c7d2fe;
 }
 
+.dot.none {
+    background-color: #c7d2fe;
+}
+
 .dot.atrisk {
     background-color: #ef4444;
 }
@@ -277,18 +281,6 @@ h2 {
     align-items: center;
     font-size: 16px;
     color: white;
-}
-
-.completed {
-    background-color: #4caf50; /* Green */
-}
-
-.certification {
-    background-color: #2196f3; /* Blue */
-}
-
-.optimization {
-    background-color: #ff9800; /* Orange */
 }
 
 .achievement-details h3 {

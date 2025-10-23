@@ -4,6 +4,70 @@
   width: 100%;
 }
 
+.main-div {
+  
+  justify-content: space-between;
+  padding: 20px;
+  background-color: #f9f9f9; /* Background color for the main div */
+  border-radius: 8px; /* Rounded corners */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Light shadow for depth */
+
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr 1fr;
+}
+
+.pm-card-menu {
+  position: relative;
+  margin-left: auto;
+}
+
+.pm-card-menu .dots {
+  background: transparent;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: #555;
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+.pm-card-menu .dots:hover {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.pm-card-menu .menu {
+  position: absolute;
+  right: 0;
+  top: 28px;
+  background: #fff;
+  list-style: none;
+  margin: 0;
+  padding: 6px 0;
+  border: 1px solid #e3e3e3;
+  border-radius: 10px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  width: 130px;
+  z-index: 20;
+}
+
+.menu li:hover
+{
+  filter: brightness(0.8);
+}
+
+.pm-card-menu .menu li {
+  padding: 8px 12px;
+  font-size: 14px;
+  cursor: pointer;
+}
+.pm-card-menu .menu li:hover {
+  background-color: #f7f7f7;
+}
+.pm-card-menu .menu li.danger {
+  color: #c0392b;
+}
+
+
 .div_33-96 {
   position: relative;
   box-sizing: border-box;
@@ -11,11 +75,9 @@
   border-style: solid;
   border-width: 0px;
   background: #00000000;
-  width: 1184px;
-  height: 878px;
+  height: 100%;
 }
 .div_33-97 {
-  position: absolute;
   display: flex;
   box-sizing: border-box;
   border-color: #e5e7eb;
@@ -26,7 +88,6 @@
   height: 106px;
 }
 .div_33-98 {
-  position: absolute;
   display: flex;
   box-sizing: border-box;
   border-radius: 12px;
@@ -549,29 +610,28 @@
   display: flex;
 }
 
-.div_33-138 {
-  top: 170px;
+.div_33-138 
+{
   position: absolute;
-  display: flex;
+  
   box-sizing: border-box;
   border-color: #e5e7eb;
   border-style: solid;
   border-width: 0px;
   background: #00000000;
-  width: 1120px;
-  height: 676px;
+  width: 100%;
+  height: 30%;
 }
+
 .div_33-139 {
   top: 0px;
   left: 0px;
-  position: absolute;
   display: flex;
   box-sizing: border-box;
   border-color: #e5e7eb;
   border-style: solid;
   border-width: 0px;
   background: #00000000;
-  width: 1120px;
   height: 40px;
 }
 .text-recent-projects_33-140 {
@@ -593,7 +653,8 @@
 
 .div_33-141 {
   top: 0px;
-  left: 966px;
+  right: 10em;
+  margin-right: 0em;
   position: absolute;
   display: flex;
   box-sizing: border-box;
@@ -601,8 +662,6 @@
   border-style: solid;
   border-width: 0px;
   background: #00000000;
-  width: 154px;
-  height: 40px;
 }
 .select_33-142 {
   top: 0px;
@@ -2132,7 +2191,6 @@
 /* Center the page content within the .content area */
 .pm-container{
   width: 100%;
-  max-width: 1200px;        /* pick 1100–1280 as you like */         /* <-- centers horizontally */
 }
 .select_33-142,
 .button_33-146 {
@@ -2252,14 +2310,15 @@
    Card Grid + Card Styles
    ============================== */
    .pm-cards {
-    display: grid;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: start;
     grid-template-columns: repeat(3, 1fr); /* ✅ 3 columns */
-    gap: 20px;                             /* ✅ fixed spacing between rows/cols */
+    gap: 10px;                             /* ✅ fixed spacing between rows/cols */
     margin-top: 50px;
 
     /* ✅ Prevent parent flex/grid from stretching rows unevenly */
     align-content: start;
-    justify-content: start;
   }
 
   .pm-card {
@@ -2273,12 +2332,22 @@
     cursor: pointer;
     transition: transform 0.2s, box-shadow 0.2s;
 
+    width: 17em;
+
     /* 🔴 fixed height for all cards */
-    height: 200px;
+    height: 11em;
     min-height: unset;
     overflow: hidden; /* prevent uneven stretching */
   }
 
+  @media (max-width: 1200px)
+  {
+    .pm-card
+    {
+      width: 9em;
+      height: 6em;
+    }
+  }
   .pm-card:hover {
     transform: translateY(-4px);
     box-shadow: 0 4px 12px rgba(0,0,0,0.08);
@@ -2300,11 +2369,6 @@
     background: #fff;
     color: #6b7280;
     transition: border-color 0.2s, background 0.2s;
-  }
-
-  .pm-card.add-new:hover {
-    border-color: #c7d2fe;
-    background: #f9fafb;
   }
 
   .pm-plus-circle {
@@ -2350,6 +2414,7 @@
     font-size: 12px;
     font-weight: 500;
     padding: 2px 8px;
+    margin: auto 0.5em;
     border-radius: 9999px;
     text-transform: capitalize;
   }
@@ -2441,11 +2506,6 @@
     transition: border-color 0.2s, background 0.2s;
   }
 
-  .pm-card.add-new:hover {
-    border-color: #c7d2fe;
-    background: #f9fafb;
-  }
-
   .pm-plus-circle {
     width: 56px;
     height: 56px;
@@ -2487,6 +2547,7 @@
     transform: translate(-50%, -50%);
     width: 520px;
     max-width: calc(100vw - 32px);
+    max-height: calc(92vh - 80px);
     background: #fff;
     border-radius: 14px;
     box-shadow: 0 20px 60px rgba(0,0,0,0.2);
@@ -2559,16 +2620,16 @@
     cursor: pointer;
   }
 
-  .pm-btn:hover { background: #f9fafb; }
+  .pm-btn:hover { filter: brightness(0.7); }
 
   .pm-btn-primary {
-    background: #4f46e5;
-    border-color: #4f46e5;
+    background: #C21A25;
+    border-color: #C21A25;
   }
 
   .pm-btn-primary,
   .pm-btn-primary:hover {
-    color: #fff;
+    color: #ffffff;
   }
   .pm-error small {
     color: #dc2626;  /* red */
