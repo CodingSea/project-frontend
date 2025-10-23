@@ -8,7 +8,7 @@
         <div class="div_33-4">
           <div class="main_33-71">
             <div class="div_33-96">
-              <div class="div_33-97">
+              <div class="main_div">
                 <div class="div_33-98">
                   <div class="div_33-99">
                     <div class="div_33-100">
@@ -71,7 +71,7 @@
                         <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
                       </svg>
                     </div>
-                    <h3>Add New Service</h3>
+                    <h3>Add New Project</h3>
                     <p>Start a new project and invite your team members</p>
                   </article>
 
@@ -102,7 +102,7 @@
 
                         <ul class="menu" *ngIf="openMenuId === p.projectID">
                           <li (click)="goToEdit(p, $event)">Edit</li>
-                          <li (click)="deleteService(p)">Delete</li>
+                          <li (click)="deleteProject(p)">Delete</li>
                         </ul>
                       </div>
                     </header>
@@ -112,7 +112,7 @@
 
                     <div class="pm-members">
                       <span class="pm-more">
-                        <p>Services: {{ p.services.length }}</p>
+                        <p>Services number: {{ p.services.length }}</p>
                         <p>Members: {{ p.members }}</p>
                       </span>
                     </div>

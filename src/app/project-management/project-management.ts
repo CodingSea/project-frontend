@@ -201,7 +201,7 @@ export class ProjectManagement implements OnInit, AfterViewInit
     // this.router.navigate([ `/projects/${projectId}/services/${s.serviceID}/edit` ]);
   }
 
-  async deleteService(s: Project)
+  async deleteProject(s: Project)
   {
     try
     {
