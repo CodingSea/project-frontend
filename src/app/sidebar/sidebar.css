@@ -12,12 +12,12 @@
   flex-direction: column;
   padding: 1.5rem 1rem;
   float: left;
+  margin-right: 1rem;
 }
 
 .sidebar {
   width: 220px;
   background-color: white;
-  border-right: 1px solid #e5e7eb;
   display: flex;
   flex-direction: column;
   position: fixed;
