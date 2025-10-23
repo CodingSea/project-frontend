@@ -199,7 +199,6 @@ export class Dashboard
             status: status, // Add the determined status
             project: project // Include the project object
           });
-          console.log(servicesArray);
         }
       });
     });
@@ -222,7 +221,6 @@ export class Dashboard
       (response) =>
       {
         this.certificates = response;
-        console.log(response);
       },
       (error) =>
       {
