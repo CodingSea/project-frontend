@@ -21,7 +21,9 @@ export class ProfileComponent implements OnInit
   isCurrentUser = false;
   isEditing = false;
   currentUser: User | null = null;
-  certificates: Certificate[] | null = null;
+  certificates: Certificate[] = [];
+  displayedCertificates: Certificate[] = [];
+  editModeCertificates: Certificate[] = [];
   services: Service[] | null = null;
   isEmbedded = false;
   isImageLoading = true;
@@ -69,6 +71,16 @@ export class ProfileComponent implements OnInit
     this.http.get<User>(`${environment.apiUrl}/user/${userId}`).subscribe((res) => this.setUserData(res));
     this.http.get<Certificate[]>(`${environment.apiUrl}/certificate/${userId}`).subscribe((res) => (this.certificates = res));
     this.http.get<Service[]>(`${environment.apiUrl}/service/user/${userId}`).subscribe((res) => (this.services = res));
+
+    if(this.certificates == null)
+    {
+      this.certificates = [];
+      this.displayedCertificates = [];
+    }
+    else
+    {
+      this.displayedCertificates = this.certificates;
+    }
   }
 
   loadCurrentUserProfile()
@@ -77,8 +89,21 @@ export class ProfileComponent implements OnInit
 
     this.isCurrentUser = true;
     this.http.get<User>(`${environment.apiUrl}/user/${userId}`).subscribe((res) => this.setUserData(res));
-    this.http.get<Certificate[]>(`${environment.apiUrl}/certificate/${userId}`).subscribe((res) => (this.certificates = res));
+    this.http.get<Certificate[]>(`${environment.apiUrl}/certificate/${userId}`).subscribe((res) => 
+    {
+      this.certificates = res;
+    });
     this.http.get<Service[]>(`${environment.apiUrl}/service/user/${userId}`).subscribe((res) => (this.services = res));
+
+    if(this.certificates == null)
+    {
+      this.certificates = [];
+      this.displayedCertificates = [];
+    }
+    else
+    {
+      this.displayedCertificates = this.certificates;
+    }
   }
 
   setUserData(user: User)
@@ -99,6 +124,17 @@ export class ProfileComponent implements OnInit
     if (!this.isEditing && this.currentUser)
     {
       this.loadCurrentUserProfile(); // revert if canceled
+      this.editModeCertificates.length = 0;
+    }
+    
+    if(this.certificates == null)
+    {
+      this.certificates = [];
+      this.displayedCertificates = [];
+    }
+    else
+    {
+      this.displayedCertificates = this.certificates;
     }
   }
 
@@ -116,7 +152,7 @@ export class ProfileComponent implements OnInit
     this.currentUserInfo.skills.splice(i, 1);
   }
 
-  saveProfile()
+  async saveProfile()
   {
     if (!this.currentUser) return;
 
@@ -125,6 +161,15 @@ export class ProfileComponent implements OnInit
       last_name: this.currentUser.last_name,
       skills: this.currentUserInfo.skills
     };
+
+    if (this.editModeCertificates !== null)
+    {
+      for (let c of this.editModeCertificates)
+      {
+        console.log(c);
+        await this.http.delete(`${environment.apiUrl}/certificate/${c.certificateID}`).toPromise();
+      }
+    }
 
     this.http.put(`${environment.apiUrl}/user/${this.decodedToken.sub}`, updatePayload).subscribe({
       next: () =>
@@ -170,14 +215,25 @@ export class ProfileComponent implements OnInit
   {
     try
     {
-      await this.http.delete(`${environment.apiUrl}/certificate/${i}`).toPromise();
+      // await this.http.delete(`${environment.apiUrl}/certificate/${i}`).toPromise();
+      // this.loadCurrentUserProfile();
 
-      this.loadCurrentUserProfile();
+      const index: number | undefined = this.certificates?.findIndex(x => x.certificateID === Number(i));
+
+      if(index)
+      {
+        this.editModeCertificates?.push(this.certificates[index]);
+      }
     }
-    catch(err)
+    catch (err)
     {
       console.log(err);
     }
+  }
+
+  getFiltredCertificates(): Certificate[] | null
+  {
+    return this.certificates.filter((c) => !this.editModeCertificates.some((editCert) => editCert.certificateID === c.certificateID))
   }
 
 }

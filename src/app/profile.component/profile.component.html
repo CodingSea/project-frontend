@@ -109,9 +109,9 @@
       </div>
 
       <div class="tag-list mt-8">
-        <div *ngFor="let c of certificates">
+        <div *ngFor="let c of getFiltredCertificates()">
           <span class="tag">{{ c.name }}</span>
-          <p class="empty" *ngIf="!certificates?.length">No certificates uploaded</p>
+          <p class="empty" *ngIf="!getFiltredCertificates()?.length">No certificates uploaded</p>
           <button *ngIf="isEditing" class="remove-skill" style="margin: auto 0.3em;" (click)="removeCertificate(c.certificateID!)">×</button>
         </div>
         
