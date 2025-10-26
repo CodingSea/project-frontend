@@ -2,7 +2,6 @@
 
 <div class="profile-wrapper">
   <div class="profile-box">
-
     <!-- ===== Top Header with Edit Button ===== -->
     <div class="profile-header">
       <div class="profile-top">
@@ -10,20 +9,47 @@
           <div class="image-upload">
             <div class="image-wrapper" [class.loading]="isImageLoading">
               <img
-                [src]="currentUserInfo.profileImage || 'images/user.png'"
+                [src]="previewImage || currentUserInfo.profileImage || 'images/user.png'"
                 alt="Profile Image"
                 class="profile-image"
+                (click)="onProfileImageClick()"
                 (load)="onImageLoad()"
                 (error)="onImageError()"
                 [style.opacity]="isImageLoading ? '0' : '1'"
               />
             </div>
 
-            <label *ngIf="!currentUserInfo.profileImage" class="plus-icon-container">
+            <!-- Plus icon (if no image) -->
+            <label *ngIf="isEditing && !currentUserInfo.profileImage && !previewImage" class="plus-icon-container">
               <span class="plus-icon">+</span>
-              <input type="file" (change)="onProfileImageSelected($event)" hidden />
+              <input type="file" accept="image/*" (change)="onProfileImageSelected($event)" hidden />
             </label>
           </div>
+
+          <!-- Image Options Popup (only in edit mode) -->
+          <div *ngIf="isEditing && showImageOptions" class="image-options-overlay" (click)="closeImageOptions($event)">
+            <div class="image-options-modal center" (click)="$event.stopPropagation()">
+              <h4 class="image-options-title">Profile Image</h4>
+              <button class="option" (click)="triggerChangeImage()">
+                <i class="fa fa-image"></i> Change Image
+              </button>
+              <button class="option delete" (click)="removeTempImage()">
+                <i class="fa fa-trash"></i> Remove Image
+              </button>
+              <button class="option cancel" (click)="showImageOptions = false">Cancel</button>
+            </div>
+          </div>
+
+          <!-- Hidden file input for change -->
+          <input
+            id="fileInput"
+            type="file"
+            #fileInput
+            accept="image/*"
+            (change)="onProfileImageSelected($event)"
+            hidden
+          />
+
         </div>
 
         <div class="info-section">
@@ -64,16 +90,14 @@
     <div class="profile-section">
       <div class="section-header">
         <h3>Skills</h3>
-        <button *ngIf="isCurrentUser" class="btn btn-add" (click)="toggleEdit()">+ Add</button>
+        <button *ngIf="isCurrentUser && !isEditing" class="btn btn-add" (click)="toggleEdit()">+ Add</button>
       </div>
 
-      <!-- View Mode -->
       <div *ngIf="!isEditing" class="tag-list">
         <span class="tag" *ngFor="let skill of currentUserInfo.skills">{{ skill }}</span>
         <p class="empty" *ngIf="currentUserInfo.skills?.length === 0">No skills added yet</p>
       </div>
 
-      <!-- Edit Mode -->
       <div *ngIf="isEditing" class="skills-edit">
         <div class="skill-item" *ngFor="let skill of currentUserInfo.skills; let i = index">
           <input type="text" [(ngModel)]="currentUserInfo.skills[i]" />
@@ -90,26 +114,17 @@
     <div class="profile-section">
       <div class="section-header">
         <h3>Certificates</h3>
-        <button
-          *ngIf="isCurrentUser && !isEditing"
-          class="btn btn-add"
-          routerLink="/certificate/new"
-        >
-          + Add
-        </button>
-
-        <!-- ✅ Show Add Certificate in edit mode too -->
-        <button
-          *ngIf="isCurrentUser && isEditing"
-          class="btn btn-add"
-          routerLink="/certificate/new"
-        >
-          + Add Certificate
-        </button>
+        <button *ngIf="isCurrentUser && !isEditing" class="btn btn-add" routerLink="/certificate/new">+ Add</button>
       </div>
 
       <div class="tag-list mt-8">
-        <span class="tag" *ngFor="let c of certificates">{{ c.name }}</span>
+        <div class="certificate-tag" *ngFor="let c of certificates; let i = index">
+          <span class="tag" [class.clickable]="isEditing" (click)="isEditing && editCertificate(c.certificateID)">
+            {{ c.name }}
+          </span>
+          <button *ngIf="isEditing && isCurrentUser" class="remove-skill" (click)="removeCertificateTemp(i); $event.stopPropagation()">×</button>
+        </div>
+
         <p class="empty" *ngIf="!certificates?.length">No certificates uploaded</p>
       </div>
     </div>
@@ -118,11 +133,7 @@
     <div class="profile-section">
       <h3>Services</h3>
       <div class="services">
-        <div
-          class="service-card"
-          *ngFor="let service of services"
-          (click)="switchPage(service.serviceID, service.taskBoard?.id)"
-        >
+        <div class="service-card" *ngFor="let service of services" (click)="switchPage(service.serviceID, service.taskBoard?.id)">
           <h4>{{ service.name }}</h4>
         </div>
         <p class="empty" *ngIf="!services?.length">No assigned services</p>

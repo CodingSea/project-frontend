@@ -339,3 +339,201 @@ body {
 .section-header .btn-add {
   margin-left: 10px;
 }
+/* ===== Clickable certificate tags ===== */
+.clickable {
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+.clickable:hover {
+  background-color: #fee2e2;
+  transform: scale(1.05);
+}
+/* ===== Certificates Edit Mode ===== */
+.certificate-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.certificate-item input {
+  flex: 1;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 13px;
+}
+
+.remove-skill {
+  background: #fee2e2;
+  border: none;
+  color: #dc2626;
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  cursor: pointer;
+}
+
+.remove-skill:hover {
+  background: #fecaca;
+}
+
+
+.certificate-tag {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.remove-skill {
+  background: #fee2e2;
+  border: none;
+  color: #dc2626;
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.remove-skill:hover {
+  background: #fecaca;
+}
+/* ===== Fix clickable area overlap ===== */
+.certificate-tag {
+  position: relative;
+  z-index: 1;
+}
+
+.certificate-tag .clickable {
+  pointer-events: auto;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.certificate-tag .remove-skill {
+  z-index: 3;
+  position: relative;
+}
+/* ===== Image Options Popup ===== */
+.image-options-popup {
+  position: absolute;
+  top: 140px;
+  left: 0;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 10;
+}
+
+.image-options-popup button {
+  background: #f3f4f6;
+  border: none;
+  border-radius: 8px;
+  padding: 6px 10px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: 0.2s;
+}
+
+.image-options-popup button:hover {
+  background: #e5e7eb;
+}
+
+.image-options-popup .delete-btn {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.image-options-popup .delete-btn:hover {
+  background: #fecaca;
+}
+/* ===== ProjectHub Style Profile Image Modal ===== */
+.image-options-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.image-options-modal.center {
+  background: #fff;
+  border-radius: 14px;
+  padding: 20px;
+  width: 320px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.15);
+  animation: fadeIn 0.25s ease-out;
+  text-align: center;
+}
+
+.image-options-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 12px;
+  border-bottom: 1px solid #f3f4f6;
+  padding-bottom: 10px;
+}
+
+.image-options-modal .option {
+  display: block;
+  width: 100%;
+  text-align: center;
+  background: #f9fafb;
+  border: 1px solid #f3f4f6;
+  color: #111827;
+  padding: 10px;
+  font-size: 14px;
+  border-radius: 8px;
+  margin-top: 8px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.image-options-modal .option:hover {
+  background: #fee2e2;
+  color: #b91c1c;
+  border-color: #fecaca;
+}
+
+.image-options-modal .delete {
+  background: #fff1f2;
+  border-color: #fecaca;
+  color: #dc2626;
+  font-weight: 500;
+}
+
+.image-options-modal .delete:hover {
+  background: #fecaca;
+  color: #991b1b;
+}
+
+.image-options-modal .cancel {
+  background: #f3f4f6;
+  color: #374151;
+  font-weight: 500;
+}
+
+.image-options-modal .cancel:hover {
+  background: #e5e7eb;
+}
+
+@keyframes fadeIn {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}

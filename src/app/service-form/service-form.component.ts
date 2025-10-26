@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, HostListener, OnInit, Input, Output, EventEmitter, OnDestroy } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import {
   FormArray,
@@ -9,9 +9,14 @@ import {
   Validators,
 } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { ServiceService, CreateServiceDto } from '../services/service.service';
+import { ServiceService, CreateServiceDto, Service } from '../services/service.service';
 import { UserService, User } from '@app/services/user.service';
 import { DevelopersSearchComponent } from '@app/developers.search.component/developers.search.component';
+
+interface ExistingFile {
+  name: string;
+  url: string;
+}
 
 @Component({
   selector: 'app-service-form',
@@ -20,13 +25,15 @@ import { DevelopersSearchComponent } from '@app/developers.search.component/deve
   templateUrl: './service-form.component.html',
   styleUrls: ['./service-form.component.scss'],
 })
-export class ServiceFormComponent implements OnInit {
+export class ServiceFormComponent implements OnInit, OnDestroy {
   @Input() projectId?: number;
   @Output() submitted = new EventEmitter<void>();
   @Output() cancelled = new EventEmitter<void>();
 
   form!: FormGroup;
   files: File[] = [];
+  existingFiles: ExistingFile[] = [];
+  filesToDelete: ExistingFile[] = [];
   isDragging = false;
   isSubmitting = false;
 
@@ -37,7 +44,6 @@ export class ServiceFormComponent implements OnInit {
   isEditMode = false;
   serviceId!: number;
 
-  // 🔹 Modals + Selected Users
   showDevelopersModal = false;
   showChiefModal = false;
   showManagerModal = false;
@@ -60,7 +66,7 @@ export class ServiceFormComponent implements OnInit {
         [Validators.pattern(/^$|^[A-Za-z0-9.,!?()\s-]{1,300}$/), Validators.maxLength(300)],
       ],
       chiefId: [null, Validators.required],
-      managerId: [null, Validators.required],
+      managerId: [null],
       resources: this.fb.array<number>([] as number[]),
     });
   }
@@ -81,6 +87,11 @@ export class ServiceFormComponent implements OnInit {
     this.loadUsers();
   }
 
+  ngOnDestroy(): void {
+    // ensure scroll is restored if component unmounts while modal is open
+    this.unlockBodyScroll();
+  }
+
   private toYmd(dateStr?: string | Date | null): string {
     if (!dateStr) return '';
     const d = new Date(dateStr);
@@ -91,7 +102,7 @@ export class ServiceFormComponent implements OnInit {
 
   private loadServiceForEdit(id: number) {
     this.serviceService.getService(id).subscribe({
-      next: (svc) => {
+      next: (svc: Service) => {
         this.form.patchValue({
           name: svc.name ?? '',
           deadline: this.toYmd(svc.deadline),
@@ -100,21 +111,10 @@ export class ServiceFormComponent implements OnInit {
           managerId: svc.projectManager?.id ?? null,
         });
 
-        if (svc.chief) {
-          this.selectedChief = {
-            id: svc.chief.id,
-            first_name: svc.chief.first_name,
-            last_name: svc.chief.last_name,
-          } as User;
-        }
+        this.existingFiles = svc.files ? svc.files.map((f) => ({ name: f.name, url: f.url })) : [];
 
-        if (svc.projectManager) {
-          this.selectedManager = {
-            id: svc.projectManager.id,
-            first_name: svc.projectManager.first_name,
-            last_name: svc.projectManager.last_name,
-          } as User;
-        }
+        if (svc.chief) this.selectedChief = svc.chief as User;
+        if (svc.projectManager) this.selectedManager = svc.projectManager as User;
 
         this.resourcesFA.clear();
         (svc.assignedResources ?? []).forEach((r) => {
@@ -151,9 +151,7 @@ export class ServiceFormComponent implements OnInit {
     if (idx > -1) this.resourcesFA.removeAt(idx);
   }
 
-  // ===============================
-  // 🔹 FILE HANDLING
-  // ===============================
+  // FILE HANDLING
   onFilesSelected(e: Event) {
     const input = e.target as HTMLInputElement;
     if (!input.files) return;
@@ -163,6 +161,11 @@ export class ServiceFormComponent implements OnInit {
 
   addFileList(list: FileList) {
     Array.from(list).forEach((f) => this.files.push(f));
+  }
+
+  markFileForDeletion(file: ExistingFile) {
+    this.existingFiles = this.existingFiles.filter((f) => f !== file);
+    this.filesToDelete.push(file);
   }
 
   @HostListener('dragover', ['$event'])
@@ -184,24 +187,17 @@ export class ServiceFormComponent implements OnInit {
     }
   }
 
-  // ===============================
-  // 🔹 Navigation
-  // ===============================
+  // Navigation
   goBack() {
     this.location.back();
   }
 
   cancel() {
-    if (this.cancelled.observed) {
-      this.cancelled.emit();
-    } else {
-      this.location.back();
-    }
+    if (this.cancelled.observed) this.cancelled.emit();
+    else this.location.back();
   }
 
-  // ===============================
-  // 🔹 SUBMIT
-  // ===============================
+  // SUBMIT
   submit() {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
@@ -217,7 +213,22 @@ export class ServiceFormComponent implements OnInit {
     this.isSubmitting = true;
 
     if (this.isEditMode) {
-      this.serviceService.updateService(this.serviceId, payload).subscribe({
+      const updatedFiles = this.existingFiles;
+
+      const formData = new FormData();
+      formData.append('name', payload.name);
+      formData.append('deadline', payload.deadline);
+      if (payload.description) formData.append('description', payload.description);
+      formData.append('projectId', String(payload.projectId));
+      formData.append('chiefId', String(payload.chiefId));
+      if (payload.managerId) formData.append('managerId', String(payload.managerId));
+      payload.resources.forEach((r) => formData.append('resources', String(r)));
+
+      formData.append('files', JSON.stringify(updatedFiles));
+      this.files.forEach((file) => formData.append('newFiles', file));
+      formData.append('filesToDelete', JSON.stringify(this.filesToDelete));
+
+      this.serviceService.updateServiceWithFiles(this.serviceId, formData).subscribe({
         next: () => {
           alert('Service updated successfully!');
           if (this.submitted.observed) this.submitted.emit();
@@ -245,54 +256,56 @@ export class ServiceFormComponent implements OnInit {
     }
   }
 
-  // ===============================
-  // 🔹 RESOURCE MODAL
-  // ===============================
+  // ===== MODALS (with scroll lock) =====
+  private lockBodyScroll() { document.body.style.overflow = 'hidden'; }
+  private unlockBodyScroll() { document.body.style.overflow = ''; }
+  private updateScrollLock() {
+    if (this.showDevelopersModal || this.showChiefModal || this.showManagerModal) this.lockBodyScroll();
+    else this.unlockBodyScroll();
+  }
+
   openDevelopersModal(event?: Event) {
     if (event) event.stopPropagation();
     this.showDevelopersModal = true;
+    this.updateScrollLock();
+  }
+  closeDevelopersModal(event?: Event) {
+    if (event) { event.stopPropagation(); event.preventDefault(); }
+    this.showDevelopersModal = false;
+    this.updateScrollLock();
   }
 
-  closeDevelopersModal(event?: Event) {
-    if (event) {
-      event.stopPropagation();
-      event.preventDefault();
-    }
-    this.showDevelopersModal = false;
+  openChiefModal(event?: Event) {
+    if (event) event.stopPropagation();
+    this.showChiefModal = true;
+    this.updateScrollLock();
+  }
+  closeChiefModal() {
+    this.showChiefModal = false;
+    this.updateScrollLock();
+  }
+
+  openManagerModal(event?: Event) {
+    if (event) event.stopPropagation();
+    this.showManagerModal = true;
+    this.updateScrollLock();
+  }
+  closeManagerModal() {
+    this.showManagerModal = false;
+    this.updateScrollLock();
   }
 
   onDeveloperSelected(dev: any) {
     if (dev.remove) {
       const idx = this.resourcesFA.value.findIndex((v) => v === dev.id);
       if (idx > -1) this.resourcesFA.removeAt(idx);
-    } else {
-      if (!this.resourcesFA.value.includes(dev.id)) {
-        this.resourcesFA.push(new FormControl(dev.id));
-      }
+    } else if (!this.resourcesFA.value.includes(dev.id)) {
+      this.resourcesFA.push(new FormControl(dev.id));
     }
   }
 
   get selectedResourceIds(): number[] {
     return this.resourcesFA.value.filter((v): v is number => typeof v === 'number');
-  }
-
-  // ===============================
-  // 🔹 CHIEF + MANAGER MODALS
-  // ===============================
-  openChiefModal(event?: Event) {
-    if (event) event.stopPropagation();
-    this.showChiefModal = true;
-  }
-  closeChiefModal() {
-    this.showChiefModal = false;
-  }
-
-  openManagerModal(event?: Event) {
-    if (event) event.stopPropagation();
-    this.showManagerModal = true;
-  }
-  closeManagerModal() {
-    this.showManagerModal = false;
   }
 
   onChiefSelected(dev: any) {
@@ -319,9 +332,12 @@ export class ServiceFormComponent implements OnInit {
     this.selectedChief = null;
     this.form.patchValue({ chiefId: null });
   }
-
   removeManager() {
     this.selectedManager = null;
     this.form.patchValue({ managerId: null });
+  }
+
+  removeNewFile(file: File) {
+    this.files = this.files.filter((f) => f !== file);
   }
 }

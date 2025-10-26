@@ -61,7 +61,7 @@
                   </div>
                 </div>
 
-                <!-- ✅ Project Cards (Add New + Dynamic Projects) -->
+                <!--  Project Cards (Add New + Dynamic Projects) -->
                 <div class="pm-cards">
 
                   <!-- Add New Project Card -->
@@ -80,7 +80,7 @@
                     (click)="onCardClick(p)">
                     <!-- Header -->
                     <header class="pm-card-header">
-                      <h3>{{ p.name }}</h3> <!-- ✅ changed -->
+                      <h3>{{ p.name }}</h3> <!--  changed -->
                       <span class="pm-pill" [attr.data-status]="p.status">{{ p.status }}</span>
                     </header>
 
@@ -114,7 +114,7 @@
                   </article>
 
                 </div>
-                <!-- ✅ End Project Cards -->
+                <!--  End Project Cards -->
 
                 <!-- New Project Modal -->
                 <ng-container *ngIf="showNewProject">
@@ -128,7 +128,7 @@
                     </header>
 
                     <form #projectForm="ngForm" (ngSubmit)="saveNewProject(projectForm)">
-                      <!-- ✅ Project Name with Regex -->
+                      <!--  Project Name with Regex -->
                       <label class="pm-label">Project name<span class="req">*</span></label>
                       <input class="pm-input" type="text" name="name" required pattern="^[A-Za-z0-9 ]{3,50}$"
                         #nameField="ngModel" [(ngModel)]="newProject.name" placeholder="e.g., Website Revamp">
@@ -140,7 +140,7 @@
                           chars).</small>
                       </div>
 
-                      <!-- ✅ Description (optional but regex validated) -->
+                      <!--  Description (optional but regex validated) -->
                       <label class="pm-label">Description</label>
                       <textarea class="pm-textarea" name="description" rows="3" [(ngModel)]="newProject.description"
                         pattern="^$|^[A-Za-z0-9.,!?()\\s-]{1,200}$" #descField="ngModel"

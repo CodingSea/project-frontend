@@ -1,11 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Sidebar } from "@app/sidebar/sidebar";
 import { HttpClient } from '@angular/common/http';
 import { User } from '@app/user';
 import { environment } from '@environments/environment';
 import { jwtDecode } from 'jwt-decode';
-import { ActivatedRoute, ParamMap, Router, RouterLink } from '@angular/router';
-import { Certificate } from '@app/certificate';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { Certificate } from '@app/services/certificate.service';
 import { Service } from '@app/service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -17,6 +17,8 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './profile.component.css'
 })
 export class ProfileComponent implements OnInit {
+  @ViewChild('fileInput') fileInputRef!: any;
+
   isCurrentUser = false;
   isEditing = false;
   currentUser: User | null = null;
@@ -26,6 +28,14 @@ export class ProfileComponent implements OnInit {
   isImageLoading = true;
 
   newSkill = '';
+  deletedCertificates: number[] = [];
+  showImageOptions = false;
+
+  // ===== Image-related variables =====
+  pendingImageFile: File | null = null;
+  originalImage: string | null = null;
+  previewImage: string | null = null;
+  imageRemoved: boolean = false;
 
   currentUserInfo = {
     username: "",
@@ -54,10 +64,10 @@ export class ProfileComponent implements OnInit {
     });
   }
 
+  // ===== LOAD USER DATA =====
   loadOtherUserProfile() {
     const userId = this.activatedRoute.snapshot.paramMap.get('userId');
     if (!userId) return;
-
     this.isCurrentUser = this.decodedToken.sub == userId;
 
     this.http.get<User>(`${environment.apiUrl}/user/${userId}`).subscribe((res) => this.setUserData(res));
@@ -67,8 +77,8 @@ export class ProfileComponent implements OnInit {
 
   loadCurrentUserProfile() {
     const userId = this.decodedToken.sub;
-
     this.isCurrentUser = true;
+
     this.http.get<User>(`${environment.apiUrl}/user/${userId}`).subscribe((res) => this.setUserData(res));
     this.http.get<Certificate[]>(`${environment.apiUrl}/certificate/${userId}`).subscribe((res) => (this.certificates = res));
     this.http.get<Service[]>(`${environment.apiUrl}/service/user/${userId}`).subscribe((res) => (this.services = res));
@@ -84,14 +94,26 @@ export class ProfileComponent implements OnInit {
     this.isImageLoading = false;
   }
 
-  // === Edit Mode ===
+  // ===== EDIT MODE =====
   toggleEdit() {
     this.isEditing = !this.isEditing;
-    if (!this.isEditing && this.currentUser) {
-      this.loadCurrentUserProfile(); // revert if canceled
+
+    if (this.isEditing) {
+      this.originalImage = this.currentUserInfo.profileImage;
+      this.previewImage = this.currentUserInfo.profileImage;
+    } else {
+      // Cancel pressed
+      this.previewImage = this.originalImage;
+      this.currentUserInfo.profileImage = this.originalImage || '';
+      this.pendingImageFile = null;
+      this.imageRemoved = false;
+      this.showImageOptions = false;
+      this.deletedCertificates = [];
+      if (this.currentUser) this.loadCurrentUserProfile();
     }
   }
 
+  // ===== SKILLS =====
   addSkill() {
     if (this.newSkill.trim()) {
       this.currentUserInfo.skills.push(this.newSkill.trim());
@@ -103,46 +125,129 @@ export class ProfileComponent implements OnInit {
     this.currentUserInfo.skills.splice(i, 1);
   }
 
-  saveProfile() {
-    if (!this.currentUser) return;
-
-    const updatePayload = {
-      first_name: this.currentUser.first_name,
-      last_name: this.currentUser.last_name,
-      skills: this.currentUserInfo.skills
-    };
-
-    this.http.put(`${environment.apiUrl}/user/${this.decodedToken.sub}`, updatePayload).subscribe({
-      next: () => {
-        alert('✅ Profile updated successfully!');
-        this.isEditing = false;
-        this.loadCurrentUserProfile();
-      },
-      error: (err) => console.error('❌ Update failed', err)
-    });
+  // ===== CERTIFICATES =====
+  removeCertificateTemp(index: number) {
+    const cert = this.certificates?.[index];
+    if (cert && cert.certificateID) this.deletedCertificates.push(cert.certificateID);
+    this.certificates?.splice(index, 1);
   }
 
-  // === Image ===
+  editCertificate(certId: any) {
+    if (!certId) return;
+    this.router.navigate([`/certificate/edit/${certId}`]);
+  }
+
+  // ===== PROFILE IMAGE =====
   onImageLoad() { this.isImageLoading = false; }
   onImageError() { this.isImageLoading = false; }
+
+  onProfileImageClick() {
+    if (this.isEditing && (this.previewImage || this.currentUserInfo.profileImage)) {
+      this.showImageOptions = !this.showImageOptions;
+    }
+  }
+
+  triggerChangeImage() {
+    const input = this.fileInputRef?.nativeElement;
+    if (input) input.click();
+    this.showImageOptions = false;
+  }
 
   onProfileImageSelected(event: any) {
     const file = event.target.files[0];
     if (!file) return;
-    const userId = this.decodedToken.sub;
 
-    const formData = new FormData();
-    formData.append('file', file);
+    //  Allow only image files
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    if (!allowedTypes.includes(file.type)) {
+      alert('❌ Only image files (JPG, PNG, GIF, WebP) are allowed.');
+      return;
+    }
 
-    this.http.post(`${environment.apiUrl}/user/${userId}/profile-image`, formData).subscribe({
-      next: () => {
-        alert('✅ Profile image updated!');
-        this.loadCurrentUserProfile();
-      },
-      error: (err) => console.error('❌ Upload failed', err)
-    });
+    // Preview image locally before saving
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.previewImage = reader.result as string;
+      this.currentUserInfo.profileImage = this.previewImage!;
+      this.imageRemoved = false;
+    };
+    reader.readAsDataURL(file);
+
+    this.pendingImageFile = file;
+    this.showImageOptions = false;
   }
 
+  removeTempImage() {
+    this.previewImage = null;
+    this.currentUserInfo.profileImage = '';
+    this.pendingImageFile = null;
+    this.imageRemoved = true; // Mark for deletion on save
+    this.showImageOptions = false;
+  }
+
+  closeImageOptions(event: MouseEvent) {
+    const target = event.target as HTMLElement;
+    if (target.classList.contains('image-options-overlay')) {
+      this.showImageOptions = false;
+    }
+  }
+
+// ===== SAVE PROFILE =====
+async saveProfile() {
+  if (!this.currentUser) return;
+  const userId = this.decodedToken.sub;
+
+  const updatePayload = {
+    first_name: this.currentUser.first_name,
+    last_name: this.currentUser.last_name,
+    skills: this.currentUserInfo.skills
+  };
+
+  try {
+    //  Remove profile image if marked
+    if (this.imageRemoved) {
+      await this.http.delete(`${environment.apiUrl}/user/${userId}/profile-image`).toPromise();
+      this.imageRemoved = false;
+    }
+
+    //  Upload new image if selected
+    if (this.pendingImageFile) {
+      const formData = new FormData();
+      formData.append('file', this.pendingImageFile);
+      await this.http.post(`${environment.apiUrl}/user/${userId}/profile-image`, formData).toPromise();
+      this.pendingImageFile = null;
+    }
+
+    //  Delete marked certificates
+    if (this.deletedCertificates.length > 0) {
+      for (const certId of this.deletedCertificates) {
+        try {
+          await this.http.delete(`${environment.apiUrl}/certificate/${certId}`).toPromise();
+          console.log(`🗑️ Deleted certificate ID ${certId}`);
+        } catch (err) {
+          console.warn(`⚠️ Failed to delete certificate ${certId}:`, err);
+        }
+      }
+      this.deletedCertificates = [];
+    }
+
+    //  Update profile info
+    await this.http.put(`${environment.apiUrl}/user/${userId}`, updatePayload).toPromise();
+
+    alert(' Profile updated successfully!');
+    this.isEditing = false;
+    this.pendingImageFile = null;
+    this.originalImage = this.currentUserInfo.profileImage;
+    this.showImageOptions = false;
+    this.loadCurrentUserProfile();
+
+  } catch (err) {
+    console.error('❌ Error saving profile:', err);
+  }
+}
+
+
+  // ===== SERVICES =====
   switchPage(serviceId: number, taskBoardId?: number) {
     this.router.navigate([`/services/${serviceId}/taskboard/${taskBoardId}`]);
     window.scrollTo(0, 0);
