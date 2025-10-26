@@ -2,19 +2,29 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '@environments/environment';
-import { Service } from '@app/service';
 
-// ✅ Define TypeScript interface (matches backend DTO)
+// ✅ Full Service interface to match backend entity
+export interface Service {
+  serviceID: number;
+  name: string;
+  description?: string;
+  deadline?: string;
+  files?: { name: string; url: string }[]; // ✅ match backend: list of { name, url }
+  chief?: any;
+  projectManager?: any;
+  assignedResources?: any[];
+}
+
+// ✅ DTO interface (create/update)
 export interface CreateServiceDto {
   name: string;
   deadline: string;
-  description: string;
-  projectId: number;   // ✅ <— this was missing
+  description?: string;
+  projectId: number;
   chiefId: number;
-  managerId: number;
+  managerId?: number;
   resources: number[];
 }
-
 
 @Injectable({
   providedIn: 'root',
@@ -24,39 +34,40 @@ export class ServiceService {
 
   constructor(private http: HttpClient) {}
 
+  // ✅ Create service with file upload
   createService(data: CreateServiceDto, files: File[]): Observable<any> {
     const formData = new FormData();
 
-    // Append normal fields
-    Object.entries(data).forEach(([key, value]) => {
-      if (Array.isArray(value)) {
-        value.forEach(v => formData.append(key, v.toString()));
-      } else if (value !== null && value !== undefined) {
-        formData.append(key, value.toString());
-      }
-    });
+    formData.append('name', data.name);
+    formData.append('deadline', data.deadline);
+    if (data.description) formData.append('description', data.description);
 
-    // Append files
-    files.forEach(file => formData.append('files', file));
+    formData.append('projectId', String(data.projectId));
+    formData.append('chiefId', String(data.chiefId));
+    if (data.managerId) formData.append('managerId', String(data.managerId));
+
+    data.resources.forEach((r) => formData.append('resources', String(r)));
+    files.forEach((file) => formData.append('files', file));
 
     return this.http.post(this.apiUrl, formData);
   }
 
-
-  // ✅ GET: all services (optional for listing later)
-  getAllServices(): Observable<any[]> {
-    return this.http.get<any[]>(this.apiUrl);
+  // ✅ Fetch all services
+  getAllServices(): Observable<Service[]> {
+    return this.http.get<Service[]>(this.apiUrl);
   }
 
-  // ✅ Get a single service by ID (for edit form prefill)
-getService(id: number): Observable<Service> {
-  return this.http.get<Service>(`${this.apiUrl}/${id}`);
-}
+  // ✅ Fetch single service by ID
+  getService(id: number): Observable<Service> {
+    return this.http.get<Service>(`${this.apiUrl}/${id}`);
+  }
 
-// ✅ Update an existing service
-updateService(id: number, payload: Partial<CreateServiceDto>): Observable<any> {
-  // backend PATCH expects JSON — not multipart
-  return this.http.patch(`${this.apiUrl}/${id}`, payload);
-}
+  // ✅ Update service
+  updateService(id: number, payload: Partial<CreateServiceDto>): Observable<any> {
+    return this.http.patch(`${this.apiUrl}/${id}`, payload);
+  }
 
+  updateServiceWithFiles(id: number, formData: FormData): Observable<any> {
+  return this.http.patch(`${this.apiUrl}/${id}`, formData);
+}
 }

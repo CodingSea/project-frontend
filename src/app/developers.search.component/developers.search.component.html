@@ -1,90 +1,73 @@
-
 <div class="container">
-    <header class="header">
-        <h1>DevHub</h1>
-        <!-- <button class="add-button-main">+ Add Developer</button> -->
-    </header>
+  <header class="header">
+    <h1>DevHub</h1>
+  </header>
 
-    <div class="filter-section">
-        <input type="search" placeholder="Search developers by name or skills..." [formControl]="searchControl" >
+  <div class="filter-section">
+    <input
+      type="search"
+      placeholder="Search developers by name or skills..."
+      [formControl]="searchControl"
+    />
+  </div>
 
-        <!-- <select>
-            <option>All Skills</option>
-            <option>JavaScript</option>
-            <option>Python</option>
-            <option>Java</option>
-        </select> -->
-        <!-- <select>
-            <option>All Status</option>
-            <option>Available</option>
-            <option>Busy</option>
-            <option>Offline</option>
-        </select>
-        <button class="clear-button">Clear all</button> -->
+  <div class="developer-count">
+    {{ filteredDevelopers?.length || 0 }} Developers Found
+  </div>
+
+  <div class="developer-cards">
+    <div *ngFor="let developer of filteredDevelopers; let i = index" class="card">
+      <div class="image-wrapper" [class.loading]="isImageLoading">
+        <img
+          [src]="getProfileImage(developer.profileImage)"
+          alt="Profile Image"
+          class="profile-img"
+          (load)="onImageLoad()"
+          (error)="onImageError($event)"
+          [style.opacity]="isImageLoading ? '0' : '1'"
+        />
+      </div>
+
+      <h3>{{ developer.first_name }} {{ developer.last_name }}</h3>
+
+      <div class="skill-list">
+        <ng-container *ngFor="let skill of developer.skills; let j = index">
+          <p *ngIf="j < 3" class="skill">{{ skill }}</p>
+          <p *ngIf="j === 3" class="skill">etc...</p>
+        </ng-container>
+      </div>
+
+      <div class="card-btns">
+        <button
+          type="button"
+          class="profile-button"
+          (click)="openProfile(developer.id)"
+        >
+          View Profile
+        </button>
+
+        <button
+          type="button"
+          class="add-button"
+          [ngClass]="{ selected: isSelected(developer.id) }"
+          (click)="selectDeveloper(developer)"
+        >
+          {{ isSelected(developer.id) ? "✓ Selected" : "+" }}
+        </button>
+      </div>
     </div>
+  </div>
 
-    <div class="developer-count">{{developers?.length}} Developers Found</div>
+  <!-- 🔹 Developer Profile Popup -->
+  <div class="profile-modal-backdrop" *ngIf="selectedProfileId" (click)="closeProfile()"></div>
 
-    <div class="developer-cards">
+  <div class="profile-modal" *ngIf="selectedProfileId" (click)="$event.stopPropagation()">
+    <iframe
+      [src]="'/profile/user/' + selectedProfileId | safeUrl"
+      frameborder="0"
+      class="profile-iframe"
+    ></iframe>
 
-        <div *ngFor="let developer of filteredDevelopers; let i = index" class="card">
-              
-            <div class="image-wrapper" [class.loading]="isImageLoading">
-              <img
-                [src]="developer.profileImage || 'images/user.png'"
-                alt="Profile Image"
-                class="profile-image"
-                (load)="onImageLoad()"
-                (error)="onImageError()"
-                [style.opacity]="isImageLoading ? '0' : '1'"
-            />
-            </div>
-            <h3>{{ developer.first_name }} {{ developer.last_name }}</h3>
-
-            <div class="skill-list">
-              <ng-container *ngFor="let skill of developer.skills; let j = index">
-                <p *ngIf="j < 3" class="skill">{{ skill }}</p>
-                <p *ngIf="j === 3" class="skill">etc...</p>
-              </ng-container>
-            </div>
-
-            <div class="status-div">
-              <!-- Example status display -->
-              <!-- <p>Status: <span class="status busy">Busy</span></p> -->
-            </div>
-
-            <div class="card-btns">
-<button type="button" class="profile-button" (click)="openProfile(developer.id)">View Profile</button>
-              <button
-                type="button"
-                class="add-button"
-                [ngClass]="{ 'selected': isSelected(developer.id) }"
-                (click)="selectDeveloper(developer)"
-              >
-                {{ isSelected(developer.id) ? "✓ Selected" : "+" }}
-              </button>
-
-
-
-                          </div>
-          </div>
-
-    </div>
-<!-- 🔹 Developer Profile Popup -->
-<div class="profile-modal-backdrop" *ngIf="selectedProfileId" (click)="closeProfile()"></div>
-
-<div class="profile-modal" *ngIf="selectedProfileId" (click)="$event.stopPropagation()">
-  <iframe
-    [src]="'/profile/user/' + selectedProfileId | safeUrl"
-    frameborder="0"
-    class="profile-iframe"
-  ></iframe>
-
-  <button type="button" class="close-profile" (click)="closeProfile()">×</button>
-</div>
-
-    <!-- <div class="pagination">
-        <button class="page-button">1</button>
-        <button class="page-button">2</button>
-    </div> -->
+    <button type="button" class="close-profile" (click)="closeProfile()">×</button>
+  </div>
 </div>

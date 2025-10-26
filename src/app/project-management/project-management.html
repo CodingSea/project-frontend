@@ -2,7 +2,6 @@
   <app-sidebar />
 
   <div class="pm-container">
-
     <div class="service-dashbaord_33-2">
       <div class="body_33-3">
         <div class="div_33-4">
@@ -18,242 +17,233 @@
                   </div>
                 </div>
 
-              <!-- Recent Projects Section -->
-              <div class="div_33-138">
-                <div class="div_33-139">
-                  <span class="text-recent-projects_33-140">Recent Projects</span>
-                  <div class="div_33-141">
+                <!-- Recent Projects Section -->
+                <div class="div_33-138">
+                  <div class="div_33-139">
+                    <span class="text-recent-projects_33-140">Recent Projects</span>
+                    <div class="div_33-141">
 
-                    <!-- Dropdown Filter -->
-                    <select class="select_33-142" [(ngModel)]="selectedFilter" (change)="applyFilters()">
-                      <option value="all">All Projects</option>
-                      <option value="active">Active</option>
-                      <option value="in-review">In Review</option>
-                      <option value="urgent">Urgent</option>
-                    </select>
+                      <!-- Dropdown Filter -->
+                      <select class="select_33-142" [(ngModel)]="selectedFilter" (change)="applyFilters()">
+                        <option value="all">All Projects</option>
+                        <option value="active">Active</option>
+                        <option value="in-review">In Review</option>
+                        <option value="urgent">Urgent</option>
+                      </select>
 
-                    <!-- Button for filter panel -->
-                    <button class="button_33-146" type="button" aria-label="Open filters" (click)="openFilter()">
-                      <!-- keep your filter SVG here -->
-                    </button>
-                  </div>
-
-                  <!-- Side Filter Panel -->
-                  <div *ngIf="showFilter">
-                    <div class="pm-filter-backdrop" (click)="closeFilter()"></div>
-                    <aside class="pm-filter-panel" role="dialog" aria-label="Filters">
-                      <div class="pm-filter-header">
-                        <strong>Filters</strong>
-                        <button class="pm-close" type="button" (click)="closeFilter()">×</button>
-                      </div>
-                      <div class="pm-filter-body">
-                        <div class="pm-row">
-                          <label><input type="checkbox" [(ngModel)]="filterState.active"> Active</label>
-                        </div>
-                        <div class="pm-row">
-                          <label><input type="checkbox" [(ngModel)]="filterState.inReview"> In Review</label>
-                        </div>
-                        <div class="pm-row">
-                          <label><input type="checkbox" [(ngModel)]="filterState.urgent"> Urgent</label>
-                        </div>
-                      </div>
-                    </aside>
-                  </div>
-                </div>
-
-                <!-- ✅ Project Cards (Add New + Dynamic Projects) -->
-                <div class="pm-cards">
-
-                  <!-- Add New Project Card -->
-                  <article class="pm-card add-new" (click)="openNewProject()">
-                    <div class="pm-plus-circle">
-                      <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-                        <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-                      </svg>
-                    </div>
-                    <h3>Add New Project</h3>
-                    <p>Start a new project and invite your team members</p>
-                  </article>
-
-                  <!-- Dynamic Project Cards -->
-                  <article class="pm-card" *ngFor="let p of projects" [hidden]="!matchesStatus(p.status)"
-                    (click)="onCardClick(p)">
-                    <!-- Header -->
-                    <header class="pm-card-header">
-                      @if (p.name.length <= 25) 
-                      {
-                        <h3>{{ p.name }}</h3>
-                      }
-                      @else 
-                      {
-                        <h3>{{ getLimitedString(p.name, 25) }}</h3>
-                      }
-                      <span class="pm-pill" [attr.data-status]="p.status">{{ p.status }}</span>
-
-                      <div class="pm-card-menu" (click)="$event.stopPropagation()">
-                        <button
-                          class="dots"
-                          type="button"
-                          aria-label="Options"
-                          (click)="toggleMenu(p.projectID, $event)"
-                        >
-                          ⋮
-                        </button>
-
-                        <ul class="menu" *ngIf="openMenuId === p.projectID">
-                          <li (click)="goToEdit(p, $event)">Edit</li>
-                          <li (click)="deleteProject(p)">Delete</li>
-                        </ul>
-                      </div>
-                    </header>
-
-                    <!-- Description -->
-                    <p class="pm-desc">{{ p.description }}</p>
-
-                    <div class="pm-members">
-                      <span class="pm-more">
-                        <p>Services number: {{ p.services.length }}</p>
-                        <p>Members: {{ p.members }}</p>
-                      </span>
+                      <!-- Button for filter panel -->
+                      <button class="button_33-146" type="button" aria-label="Open filters" (click)="openFilter()">
+                        <!-- keep your filter SVG here -->
+                      </button>
                     </div>
 
-                    <footer class="pm-card-footer">
-                      <span *ngIf="p.deadline" class="pm-due">Due: {{ p.deadline | date:'MMM d' }}</span>
-                      <div class="pm-progress">
-                        <div class="pm-progress-fill" [style.width.%]="p.progress"></div>
-                      </div>
-                      <span class="pm-progress-label">{{ formatDecimal(p.progress) }}%</span>
-                    </footer>
-                  </article>
+                    <!-- Side Filter Panel -->
+                    <div *ngIf="showFilter">
+                      <div class="pm-filter-backdrop" (click)="closeFilter()"></div>
+                      <aside class="pm-filter-panel" role="dialog" aria-label="Filters">
+                        <div class="pm-filter-header">
+                          <strong>Filters</strong>
+                          <button class="pm-close" type="button" (click)="closeFilter()">×</button>
+                        </div>
+                        <div class="pm-filter-body">
+                          <div class="pm-row">
+                            <label><input type="checkbox" [(ngModel)]="filterState.active"> Active</label>
+                          </div>
+                          <div class="pm-row">
+                            <label><input type="checkbox" [(ngModel)]="filterState.inReview"> In Review</label>
+                          </div>
+                          <div class="pm-row">
+                            <label><input type="checkbox" [(ngModel)]="filterState.urgent"> Urgent</label>
+                          </div>
+                        </div>
+                      </aside>
+                    </div>
+                  </div>
 
+                  <!-- Project Cards (Add New + Dynamic Projects) -->
+                  <div class="pm-cards">
+                    <!-- Add New Project Card -->
+                    <article class="pm-card add-new" (click)="openNewProject()">
+                      <div class="pm-plus-circle">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+                          <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                        </svg>
+                      </div>
+                      <h3>Add New Project</h3>
+                      <p>Start a new project and invite your team members</p>
+                    </article>
+
+                    <!-- Dynamic Project Cards -->
+                    <article class="pm-card" *ngFor="let p of projects" [hidden]="!matchesStatus(p.status)" (click)="onCardClick(p)">
+                      <!-- Header -->
+                      <header class="pm-card-header">
+                        <h3>
+                          {{ p.name.length <= 25 ? p.name : (getLimitedString ? getLimitedString(p.name, 25) : (p.name | slice:0:25) + '...') }}
+                        </h3>
+                        <span class="pm-pill" [attr.data-status]="p.status">{{ p.status }}</span>
+
+                        <div class="pm-card-menu" (click)="$event.stopPropagation()">
+                          <button
+                            class="dots"
+                            type="button"
+                            aria-label="Options"
+                            (click)="toggleMenu(p.projectID, $event)"
+                          >
+                            ⋮
+                          </button>
+
+                          <ul class="menu" *ngIf="openMenuId === p.projectID">
+                            <li (click)="goToEdit(p, $event)">Edit</li>
+                            <li (click)="deleteProject(p)">Delete</li>
+                          </ul>
+                        </div>
+                      </header>
+
+                      <!-- Description -->
+                      <p class="pm-desc">{{ p.description }}</p>
+
+                      <div class="pm-members">
+                        <span class="pm-more">
+                          <p>Services number: {{ p.services.length }}</p>
+                          <p>Members: {{ p.members }}</p>
+                        </span>
+                      </div>
+
+                      <footer class="pm-card-footer">
+                        <span *ngIf="p.deadline" class="pm-due">Due: {{ p.deadline | date:'MMM d' }}</span>
+                        <div class="pm-progress">
+                          <div class="pm-progress-fill" [style.width.%]="p.progress"></div>
+                        </div>
+                        <span class="pm-progress-label">{{ formatDecimal(p.progress) }}%</span>
+                      </footer>
+                    </article>
+                  </div>
+                  <!-- End Project Cards -->
+
+                  <!-- New Project Modal -->
+                  <ng-container *ngIf="showNewProject">
+                    <div class="pm-modal-backdrop" (click)="closeNewProject()"></div>
+
+                    <div class="pm-modal" role="dialog" aria-modal="true" aria-label="Create Project" (click)="$event.stopPropagation()">
+                      <header class="pm-modal-header">
+                        <strong>Create Project</strong>
+                        <button class="pm-close" type="button" (click)="closeNewProject()" aria-label="Close">×</button>
+                      </header>
+
+                      <form #projectForm="ngForm" (ngSubmit)="saveNewProject(projectForm)">
+                        <label class="pm-label">Project name<span class="req">*</span></label>
+                        <input
+                          class="pm-input"
+                          type="text"
+                          name="name"
+                          required
+                          pattern="^[A-Za-z0-9 ]{3,50}$"
+                          #nameField="ngModel"
+                          [(ngModel)]="newProject.name"
+                          placeholder="e.g., Website Revamp"
+                        />
+                        <div *ngIf="nameField.invalid && (nameField.dirty || nameField.touched)" class="pm-error">
+                          <small *ngIf="nameField.errors?.['required']">Project name is required.</small>
+                          <small *ngIf="nameField.errors?.['pattern']">Only letters, numbers, and spaces (3–50 chars).</small>
+                        </div>
+
+                        <label class="pm-label">Description</label>
+                        <textarea
+                          class="pm-textarea"
+                          name="description"
+                          rows="3"
+                          [(ngModel)]="newProject.description"
+                          pattern="^$|^[A-Za-z0-9.,!?()\\s-]{1,200}$"
+                          #descField="ngModel"
+                          placeholder="(optional) brief summary"
+                        ></textarea>
+                        <div *ngIf="descField.invalid && (descField.dirty || descField.touched)" class="pm-error">
+                          <small *ngIf="descField.errors?.['pattern']">
+                            Only letters, numbers, spaces, and punctuation allowed (max 200 chars).
+                          </small>
+                        </div>
+
+                        <div class="pm-row-2">
+                          <div>
+                            <label class="pm-label">Status</label>
+                            <select class="pm-input" name="status" [(ngModel)]="newProject.status">
+                              <option value="Active">Active</option>
+                              <option value="In Review">In Review</option>
+                              <option value="Urgent">Urgent</option>
+                            </select>
+                          </div>
+                        </div>
+
+                        <div class="pm-actions">
+                          <button type="button" class="pm-btn" (click)="closeNewProject()">Cancel</button>
+                          <button type="submit" class="pm-btn pm-btn-primary" [disabled]="projectForm.invalid">Create</button>
+                        </div>
+                      </form>
+                    </div>
+                  </ng-container>
+
+                  <!-- Edit Project Modal -->
+                  <ng-container *ngIf="showEditProject">
+                    <div class="pm-modal-backdrop" (click)="closeEditProject()"></div>
+
+                    <div class="pm-modal" role="dialog" aria-modal="true" aria-label="Edit Project" (click)="$event.stopPropagation()">
+                      <header class="pm-modal-header">
+                        <strong>Edit Project</strong>
+                        <button class="pm-close" type="button" (click)="closeEditProject()" aria-label="Close">×</button>
+                      </header>
+
+                      <form #projectForm2="ngForm" (ngSubmit)="updateProject(projectForm2)">
+                        <label class="pm-label">Project name<span class="req">*</span></label>
+                        <input
+                          class="pm-input"
+                          type="text"
+                          name="name"
+                          required
+                          pattern="^[A-Za-z0-9 ]{3,50}$"
+                          #nameField="ngModel"
+                          [(ngModel)]="editProject.name"
+                          placeholder="e.g., Website Revamp"
+                        />
+                        <div *ngIf="nameField.invalid && (nameField.dirty || nameField.touched)" class="pm-error">
+                          <small *ngIf="nameField.errors?.['required']">Project name is required.</small>
+                          <small *ngIf="nameField.errors?.['pattern']">Only letters, numbers, and spaces (3–50 chars).</small>
+                        </div>
+
+                        <label class="pm-label">Description</label>
+                        <textarea
+                          class="pm-textarea"
+                          name="description"
+                          rows="3"
+                          [(ngModel)]="editProject.description"
+                          pattern="^$|^[A-Za-z0-9.,!?()\\s-]{1,200}$"
+                          #descField="ngModel"
+                          placeholder="(optional) brief summary"
+                        ></textarea>
+                        <div *ngIf="descField.invalid && (descField.dirty || descField.touched)" class="pm-error">
+                          <small *ngIf="descField.errors?.['pattern']">
+                            Only letters, numbers, spaces, and punctuation allowed (max 200 chars).
+                          </small>
+                        </div>
+
+                        <div class="pm-row-2">
+                          <div>
+                            <label class="pm-label">Status</label>
+                            <select class="pm-input" name="status" [(ngModel)]="editProject.status">
+                              <option value="Active">Active</option>
+                              <option value="In Review">In Review</option>
+                              <option value="Urgent">Urgent</option>
+                            </select>
+                          </div>
+                        </div>
+
+                        <div class="pm-actions">
+                          <button type="button" class="pm-btn" (click)="closeEditProject()">Cancel</button>
+                          <button type="submit" class="pm-btn pm-btn-primary">Update</button>
+                        </div>
+                      </form>
+                    </div>
+                  </ng-container>
                 </div>
-                <!-- ✅ End Project Cards -->
-
-                <!-- New Project Modal -->
-                <ng-container *ngIf="showNewProject">
-                  <div class="pm-modal-backdrop" (click)="closeNewProject()"></div>
-
-                  <div class="pm-modal" role="dialog" aria-modal="true" aria-label="Create Project"
-                    (click)="$event.stopPropagation()">
-                    <header class="pm-modal-header">
-                      <strong>Create Project</strong>
-                      <button class="pm-close" type="button" (click)="closeNewProject()" aria-label="Close">×</button>
-                    </header>
-
-                    <form #projectForm="ngForm" (ngSubmit)="saveNewProject(projectForm)">
-                      <!-- ✅ Project Name with Regex -->
-                      <label class="pm-label">Project name<span class="req">*</span></label>
-                      <input class="pm-input" type="text" name="name" required pattern="^[A-Za-z0-9 ]{3,50}$"
-                        #nameField="ngModel" [(ngModel)]="newProject.name" placeholder="e.g., Website Revamp">
-
-                      <!-- Error message -->
-                      <div *ngIf="nameField.invalid && (nameField.dirty || nameField.touched)" class="pm-error">
-                        <small *ngIf="nameField.errors?.['required']">Project name is required.</small>
-                        <small *ngIf="nameField.errors?.['pattern']">Only letters, numbers, and spaces (3–50
-                          chars).</small>
-                      </div>
-
-                      <!-- ✅ Description (optional but regex validated) -->
-                      <label class="pm-label">Description</label>
-                      <textarea class="pm-textarea" name="description" rows="3" [(ngModel)]="newProject.description"
-                        pattern="^$|^[A-Za-z0-9.,!?()\\s-]{1,200}$" #descField="ngModel"
-                        placeholder="(optional) brief summary"></textarea>
-
-                      <!-- Error message -->
-                      <div *ngIf="descField.invalid && (descField.dirty || descField.touched)" class="pm-error">
-                        <small *ngIf="descField.errors?.['pattern']">
-                          Only letters, numbers, spaces, and punctuation allowed (max 200 chars).
-                        </small>
-                      </div>
-
-
-
-                      <div class="pm-row-2">
-
-                        <div>
-                          <label class="pm-label">Status</label>
-                          <select class="pm-input" name="status" [(ngModel)]="newProject.status">
-                            <option value="Active">Active</option>
-                            <option value="In Review">In Review</option>
-                            <option value="Urgent">Urgent</option>
-                          </select>
-                        </div>
-                      </div>
-
-                      <div class="pm-actions">
-                        <button type="button" class="pm-btn" (click)="closeNewProject()">Cancel</button>
-                        <button type="submit" class="pm-btn pm-btn-primary"
-                          [disabled]="projectForm.invalid">Create</button>
-                      </div>
-                    </form>
-                  </div>
-                </ng-container>
-
-
-
-
-
-                
-
-                <!-- Edit Form -->
-                <ng-container *ngIf="showEditProject">
-                  <div class="pm-modal-backdrop" (click)="closeEditProject()"></div>
-
-                  <div class="pm-modal" role="dialog" aria-modal="true" aria-label="Create Project"
-                    (click)="$event.stopPropagation()">
-                    <header class="pm-modal-header">
-                      <strong>Edit Project</strong>
-                      <button class="pm-close" type="button" (click)="closeEditProject()" aria-label="Close">×</button>
-                    </header>
-
-                    <form #projectForm2="ngForm" (ngSubmit)="updateProject(projectForm2)">
-                      <!-- ✅ Project Name with Regex -->
-                      <label class="pm-label">Project name<span class="req">*</span></label>
-                      <input class="pm-input" type="text" name="name" required pattern="^[A-Za-z0-9 ]{3,50}$"
-                        #nameField="ngModel" [(ngModel)]="editProject.name" placeholder="e.g., Website Revamp">
-
-                      <!-- Error message -->
-                      <div *ngIf="nameField.invalid && (nameField.dirty || nameField.touched)" class="pm-error">
-                        <small *ngIf="nameField.errors?.['required']">Project name is required.</small>
-                        <small *ngIf="nameField.errors?.['pattern']">Only letters, numbers, and spaces (3–50
-                          chars).</small>
-                      </div>
-
-                      <!-- ✅ Description (optional but regex validated) -->
-                      <label class="pm-label">Description</label>
-                      <textarea class="pm-textarea" name="description" rows="3" [(ngModel)]="editProject.description"
-                        pattern="^$|^[A-Za-z0-9.,!?()\\s-]{1,200}$" #descField="ngModel"
-                        placeholder="(optional) brief summary"></textarea>
-
-                      <!-- Error message -->
-                      <div *ngIf="descField.invalid && (descField.dirty || descField.touched)" class="pm-error">
-                        <small *ngIf="descField.errors?.['pattern']">
-                          Only letters, numbers, spaces, and punctuation allowed (max 200 chars).
-                        </small>
-                      </div>
-
-
-
-                      <div class="pm-row-2">
-
-                        <div>
-                          <label class="pm-label">Status</label>
-                          <select class="pm-input" name="status" [(ngModel)]="editProject.status">
-                            <option value="Active">Active</option>
-                            <option value="In Review">In Review</option>
-                            <option value="Urgent">Urgent</option>
-                          </select>
-                        </div>
-                      </div>
-
-                      <div class="pm-actions">
-                        <button type="button" class="pm-btn" (click)="closeEditProject()">Cancel</button>
-                        <button type="submit" class="pm-btn pm-btn-primary">Update</button>
-                      </div>
-                    </form>
-                  </div>
-                </ng-container>
-
               </div>
             </div>
           </div>
@@ -261,5 +251,4 @@
       </div>
     </div>
   </div>
-
 </div>
