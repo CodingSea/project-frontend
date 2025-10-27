@@ -136,3 +136,33 @@
   border-radius: 0.3em;
   background-color: lightgray;
 }
+
+.btn
+{
+  width: 5em;
+  border-radius: 5px;
+  padding: 7px 14px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.edit-btn
+{
+  background: #dc2626;
+  color: white;
+  border: none;
+}
+
+.btn-save {
+  background: #16a34a;
+  color: white;
+  border: none;
+  margin: 0 0.5em;
+}
+
+.btn-secondary {
+  background: #f3f4f6;
+  color: #374151;
+  border: 1px solid #e5e7eb;
+}

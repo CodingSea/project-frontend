@@ -13,12 +13,13 @@ import { firstValueFrom } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ServiceInfo } from '@app/service-info';
 import { Service } from '@app/service';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-service-tasks',
   templateUrl: './service.tasks.component.html',
   styleUrls: [ './service.tasks.component.css' ],
-  imports: [ jqxKanbanModule, jqxSplitterModule, CommonModule, AddTaskPopup, TaskPopup, Sidebar ]
+  imports: [ jqxKanbanModule, jqxSplitterModule, CommonModule, AddTaskPopup, TaskPopup, Sidebar, FormsModule ]
 })
 
 export class ServiceTasksComponent implements OnInit, AfterViewInit
@@ -26,6 +27,8 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
   @ViewChild('kanbanReference') kanban!: jqxKanbanComponent;
 
   showKanban = true;
+
+  editMode: boolean = false;
 
   data: any[] = [];
   dataAdapter: any;
@@ -602,6 +605,22 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
   {
     this.isTaskboardSelected = isTaskboard;
     this.initializeKanbanDataSource();
+  }
+
+  saveChanges(): void
+  {
+    this.http.patch<TaskBoard>(`${environment.apiUrl}/service/${this.taskBoard?.service.serviceID}`, this.taskBoard?.service).subscribe();
+
+    this.toggleEdit();
+  }
+
+  toggleEdit()
+  {
+    this.editMode = !this.editMode;
+    if (!this.editMode)
+    {
+      this.getCurrentServiceInfo();
+    }
   }
 
 }
