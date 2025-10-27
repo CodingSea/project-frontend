@@ -78,7 +78,7 @@
                       <!-- Header -->
                       <header class="pm-card-header">
                         <h3>
-                          {{ p.name.length <= 25 ? p.name : (getLimitedString ? getLimitedString(p.name, 25) : (p.name | slice:0:25) + '...') }}
+                        {{ p.name.length <= 25 ? p.name : getLimitedString(p.name, 25) }}
                         </h3>
                         <span class="pm-pill" [attr.data-status]="p.status">{{ p.status }}</span>
 
