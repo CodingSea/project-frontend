@@ -28,6 +28,7 @@ export class ProjectManagement implements OnInit, AfterViewInit
   showEditProject = false;
   newProject: Partial<Project> = this.blankNewProject();
   editProject: Partial<Project> = this.blankNewProject();
+  lastEditProject: Partial<Project> = this.blankNewProject();
 
   openMenuId: number | null = null;
 
@@ -133,7 +134,7 @@ export class ProjectManagement implements OnInit, AfterViewInit
   closeNewProject() { this.showNewProject = false; }
 
   openEditProject() { this.showEditProject = true; this.editProject = this.blankNewProject(); }
-  closeEditProject() { this.showEditProject = false; }
+  closeEditProject() { this.showEditProject = false;}
 
   private blankNewProject(): Partial<Project>
   {
@@ -205,14 +206,11 @@ export class ProjectManagement implements OnInit, AfterViewInit
     this.openEditProject();
 
     this.editProject = s;
-    console.log(this.editProject);
   }
 
   async updateProject(form: any)
   {
     // if (form.invalid) return;
-
-    console.log(this.editProject)
 
     const updatedProject =
     {

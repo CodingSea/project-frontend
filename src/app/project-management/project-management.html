@@ -29,7 +29,6 @@
                       <option value="all">All Projects</option>
                       <option value="active">Active</option>
                       <option value="in-review">In Review</option>
-                      <!-- <option value="urgent">Urgent</option> -->
                     </select>
 
                     <!-- Button for filter panel -->
@@ -52,9 +51,6 @@
                         </div>
                         <div class="pm-row">
                           <label><input type="checkbox" [(ngModel)]="filterState.inReview"> In Review</label>
-                        </div>
-                        <div class="pm-row">
-                          <label><input type="checkbox" [(ngModel)]="filterState.urgent"> Urgent</label>
                         </div>
                       </div>
                     </aside>
@@ -156,7 +152,7 @@
                       <!-- ✅ Description (optional but regex validated) -->
                       <label class="pm-label">Description</label>
                       <textarea class="pm-textarea" name="description" rows="3" [(ngModel)]="newProject.description"
-                        pattern="^$|^[A-Za-z0-9.,!?()\\s-]{1,200}$" #descField="ngModel"
+                        #descField="ngModel"
                         placeholder="(optional) brief summary"></textarea>
 
                       <!-- Error message -->
@@ -175,7 +171,6 @@
                           <select class="pm-input" name="status" [(ngModel)]="newProject.status">
                             <option value="Active">Active</option>
                             <option value="In Review">In Review</option>
-                            <option value="Urgent">Urgent</option>
                           </select>
                         </div>
                       </div>
@@ -222,7 +217,7 @@
                       <!-- ✅ Description (optional but regex validated) -->
                       <label class="pm-label">Description</label>
                       <textarea class="pm-textarea" name="description" rows="3" [(ngModel)]="editProject.description"
-                        pattern="^$|^[A-Za-z0-9.,!?()\\s-]{1,200}$" #descField="ngModel"
+                        #descField="ngModel"
                         placeholder="(optional) brief summary"></textarea>
 
                       <!-- Error message -->
@@ -241,7 +236,6 @@
                           <select class="pm-input" name="status" [(ngModel)]="editProject.status">
                             <option value="Active">Active</option>
                             <option value="In Review">In Review</option>
-                            <option value="Urgent">Urgent</option>
                           </select>
                         </div>
                       </div>
