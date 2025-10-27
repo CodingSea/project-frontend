@@ -31,7 +31,6 @@
                 <div class="legend">
                     <span><span class="dot completed"></span>Completed</span>
                     <span><span class="dot inprogress"></span>In Progress</span>
-                    <!-- <span><span class="dot pending"></span>Pending</span> -->
                     <span><span class="dot atrisk"></span>At Risk</span>
                 </div>
                 <div class="percent">{{ formatDecimal(projectStatusRate.completed) }}%</div>
@@ -112,7 +111,7 @@
                 <hr>
 
                 <h3>Certifications</h3>
-                <div *ngFor="let c of certificates">
+                <div *ngFor="let c of certificates" class="certificates-container">
                     <div class="achievement">
                         <div class="icon completed"></div>
                         <div class="achievement-details">
