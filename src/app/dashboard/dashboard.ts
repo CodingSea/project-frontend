@@ -294,6 +294,8 @@ export class Dashboard
         this.certificates = response;
         let certificatesArray = this.certificates.slice(-4);
         this.certificates = certificatesArray;
+
+        console.log(this.certificates);
       },
       (error) =>
       {
