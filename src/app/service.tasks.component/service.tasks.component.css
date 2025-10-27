@@ -141,15 +141,14 @@
 {
   width: 5em;
   border-radius: 5px;
-  padding: 7px 14px;
-  font-size: 13px;
+  padding: 10px 15px;
   cursor: pointer;
   transition: 0.3s;
 }
 
 .edit-btn
 {
-  background: #dc2626;
+  background: #C21A25;
   color: white;
   border: none;
 }
