@@ -21,6 +21,7 @@ export class Dashboard
 
   projects: Project[] | null = null;
   closestServices: Service[] = []; // To hold the closest services
+  closestInReviewServices: Service[] = [];
 
   projectStatusRate =
     {
@@ -138,6 +139,7 @@ export class Dashboard
       {
         this.projects = response;
         this.getClosestServices();
+        this.getClosestInReviewServices();
       },
       (error) =>
       {
@@ -158,7 +160,7 @@ export class Dashboard
     {
       project.services?.forEach(service =>
       {
-        if(service.taskBoard?.cards === undefined) return;
+        if(service.taskBoard?.cards === undefined || project.status === "In Review") return;
 
         if (service.deadline && service.taskBoard?.cards.length > 0)
         {
@@ -215,12 +217,83 @@ export class Dashboard
       });
   }
 
+  getClosestInReviewServices()
+  {
+    const servicesArray: any[] = [];
+
+    // Get the current date for comparison
+    const currentDate = new Date();
+
+    // Loop through projects to gather services and their deadlines
+    this.projects?.forEach(project =>
+    {
+      project.services?.forEach(service =>
+      {
+        if(service.taskBoard?.cards === undefined || project.status !== "In Review") return;
+
+        if (service.deadline && service.taskBoard?.cards.length > 0)
+        {
+          // Calculate total cards and new cards
+          const totalCards = service.taskBoard?.cards?.length || 0;
+          const unfinishedCards = service.taskBoard?.cards?.filter(card => card.column === 'new' || card.column === "work").length || 0;
+
+          // Calculate completion rate (as a percentage)
+          const completionRate = totalCards > 0 ? ((totalCards - unfinishedCards) / totalCards) * 100 : 0;
+
+          // Determine the deadline date
+          const deadlineDate = new Date(service.deadline);
+          const timeDiff = deadlineDate.getTime() - currentDate.getTime();
+          const daysUntilDeadline = Math.ceil(timeDiff / (1000 * 3600 * 24)); // Convert to days
+
+          // Determine the status based on the logic provided
+          let status: 'Pending Approval' | 'In-Progress' | 'Completed' | 'At Risk' | 'Overdue';
+
+          if (completionRate === 100)
+          {
+            status = 'Completed';
+          } else if (daysUntilDeadline < 0)
+          {
+            status = 'Overdue';
+          } else if (daysUntilDeadline <= 10)
+          {
+            status = 'At Risk';
+          } else
+          {
+            status = 'In-Progress';
+          }
+
+          // Push service along with its project details
+          servicesArray.push({
+            ...service,
+            deadline: deadlineDate, // Store the deadline as a Date object
+            completionRate: completionRate, // Add the calculated completion rate
+            status: status, // Add the determined status
+            project: project // Include the project object
+          });
+        }
+      });
+    });
+
+    // Sort services by deadline
+    this.closestInReviewServices = servicesArray.sort((a, b) => a.deadline.getTime() - b.deadline.getTime())
+      .slice(0, 5) // Limit to 5 closest services
+      .map(item =>
+      {
+        return {
+          ...item,
+          projectName: item.project.name // Optionally include project name for easier access
+        };
+      });
+  }
+
   getUserCertificates()
   {
      this.http.get<Certificate[]>(`${environment.apiUrl}/certificate`).subscribe(
       (response) =>
       {
         this.certificates = response;
+        let certificatesArray = this.certificates.slice(-2);
+        this.certificates = certificatesArray;
       },
       (error) =>
       {
