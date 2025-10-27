@@ -111,12 +111,14 @@
                 <hr>
 
                 <h3>Certifications</h3>
-                <div *ngFor="let c of certificates" class="certificates-container">
-                    <div class="achievement">
-                        <div class="icon completed"></div>
-                        <div class="achievement-details">
-                            <h3>{{ c.name }}</h3>
-                            <p>By {{c.userId?.first_name}} {{c.userId?.last_name}} • {{ c.createdAt | date:"dd/MM/yyyy" }}</p>
+                <div  class="certificates-container">
+                    <div *ngFor="let c of certificates">
+                        <div class="achievement">
+                            <div class="icon completed"></div>
+                            <div class="achievement-details">
+                                <h3>{{ c.name }}</h3>
+                                <p>By {{c.userId?.first_name}} {{c.userId?.last_name}} • {{ c.createdAt | date:"dd/MM/yyyy" }}</p>
+                            </div>
                         </div>
                     </div>
                 </div>
