@@ -39,8 +39,79 @@
             </section>
 
             <div class="achievements-container">
-                <h2>Recent Certificates</h2>
+                <h2>Recent Notifications</h2>
 
+                <h3>In-Review Services</h3>
+                <table class="tasks-table">
+                    <thead>
+                        <tr>
+                            <th>Project Title</th>
+                            <th>Status</th>
+                            <th>Deadline</th>
+                            <th>Progress</th>
+                        </tr>
+                    </thead>
+                    <tbody class="closest-services">
+        
+                        <tr *ngFor="let service of closestInReviewServices; let i = index">
+                            <td>
+                                <strong (click)="goTo(`/services/${service.serviceID}/taskboard/${service.taskBoard?.id}`)">{{ service.name }}</strong><br />
+                                <small (click)="goTo(`/projects/${service.project.projectID}/services`)">{{ service.project.name }}</small>
+                                <!-- You can add a subtitle or description here if needed -->
+                            </td>
+                            <td class="status">
+                                <span class="status-badge" [ngClass]="{
+                                    'completed': service.status === 'Completed',
+                                    'at-risk': service.status === 'At Risk',
+                                    'overdue': service.status === 'Overdue',
+                                    'in-progress': service.status === 'In-Progress'
+                                }">{{ service.status }}</span>
+                            </td>
+                            <td>
+                                <strong>{{ service.deadline | date:'MMM d, y' }}</strong>
+                            </td>
+                            <td class="progress-tr">
+                                @if(service.taskBoard?.cards?.length === 0)
+                                {
+                                    <strong>No Tasks</strong>
+                                }
+                                @else 
+                                {
+                                    <div class="progress-container" style="width: 120px">
+                                        @if(service.status == "Completed")
+                                        {
+                                        <div class="progress-bar-filled" style=" background: #22c55e"
+                                            [style.width.%]="service.completionRate"></div>
+                                        }
+                                        @else if(service.status == "At Risk")
+                                        {
+                                        <div class="progress-bar-filled" style=" background: #ef4444"
+                                            [style.width.%]="service.completionRate"></div>
+                                        }
+                                        @else if(service.status == "In-Progress")
+                                        {
+                                        <div class="progress-bar-filled" style=" background: #6366f1"
+                                            [style.width.%]="service.completionRate"></div>
+                                        }
+                                        @else if(service.status == "Overdue")
+                                        {
+                                        <div class="progress-bar-filled" style=" background: #000000"
+                                            [style.width.%]="service.completionRate"></div>
+                                        }
+                                    </div>
+                                    {{ formatDecimal(service.completionRate!) }}%
+                                }
+        
+                                
+                            </td>
+                        </tr>
+        
+                    </tbody>
+                </table>
+
+                <hr>
+
+                <h3>Certifications</h3>
                 <div *ngFor="let c of certificates">
                     <div class="achievement">
                         <div class="icon completed"></div>
@@ -84,7 +155,7 @@
                     <td>
                         <strong>{{ service.deadline | date:'MMM d, y' }}</strong>
                     </td>
-                    <td>
+                    <td class="progress-tr">
                         @if(service.taskBoard?.cards?.length === 0)
                         {
                             <strong>No Tasks</strong>

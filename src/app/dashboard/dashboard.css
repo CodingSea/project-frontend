@@ -174,7 +174,7 @@ table td .subtitle {
 }
 
 table td.progress-bar {
-    width: 120px;
+    
 }
 
 .progress-container {
@@ -183,6 +183,7 @@ table td.progress-bar {
     overflow: hidden;
     height: 8px;
     margin-top: 4px;
+    margin: 0 1em;
 }
 
 .progress-bar-filled {
@@ -210,7 +211,7 @@ table td.progress-bar {
 }
 
 .tasks-table td.status {
-    width: 130px;
+    
 }
 
 .status-badge {
@@ -251,10 +252,10 @@ table td.progress-bar {
     box-shadow: 0 1px 3px rgb(0 0 0 / 0.1);
     padding: 20px;
     max-width: 600px;
-    margin: auto;
+    margin: 0 0;
 }
 
-h2 {
+h2, h3 {
     margin-bottom: 20px;
     color: #333;
 }
@@ -298,4 +299,9 @@ h2 {
 .closest-services strong :hover
 {
     color: #C21A25;
+}
+
+.progress-tr
+{
+    display: flex;
 }

@@ -12,15 +12,18 @@ import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-profile.component',
-  imports: [Sidebar, RouterLink, CommonModule, FormsModule],
+  imports: [ Sidebar, RouterLink, CommonModule, FormsModule ],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.css'
 })
-export class ProfileComponent implements OnInit {
+export class ProfileComponent implements OnInit
+{
   isCurrentUser = false;
   isEditing = false;
   currentUser: User | null = null;
-  certificates: Certificate[] | null = null;
+  certificates: Certificate[] = [];
+  displayedCertificates: Certificate[] = [];
+  editModeCertificates: Certificate[] = [];
   services: Service[] | null = null;
   isEmbedded = false;
   isImageLoading = true;
@@ -37,24 +40,29 @@ export class ProfileComponent implements OnInit {
 
   decodedToken: any | null = null;
 
-  constructor(private http: HttpClient, private activatedRoute: ActivatedRoute, private router: Router) {}
+  constructor(private http: HttpClient, private activatedRoute: ActivatedRoute, private router: Router) { }
 
-  ngOnInit() {
+  ngOnInit()
+  {
     this.isEmbedded = window !== window.parent;
     const token: string | null = localStorage.getItem("token");
     if (!token) return;
     this.decodedToken = jwtDecode(token);
 
-    this.activatedRoute.queryParamMap.subscribe(() => {
-      if (this.activatedRoute.snapshot.paramMap.has("userId")) {
+    this.activatedRoute.queryParamMap.subscribe(() =>
+    {
+      if (this.activatedRoute.snapshot.paramMap.has("userId"))
+      {
         this.loadOtherUserProfile();
-      } else {
+      } else
+      {
         this.loadCurrentUserProfile();
       }
     });
   }
 
-  loadOtherUserProfile() {
+  loadOtherUserProfile()
+  {
     const userId = this.activatedRoute.snapshot.paramMap.get('userId');
     if (!userId) return;
 
@@ -63,48 +71,89 @@ export class ProfileComponent implements OnInit {
     this.http.get<User>(`${environment.apiUrl}/user/${userId}`).subscribe((res) => this.setUserData(res));
     this.http.get<Certificate[]>(`${environment.apiUrl}/certificate/${userId}`).subscribe((res) => (this.certificates = res));
     this.http.get<Service[]>(`${environment.apiUrl}/service/user/${userId}`).subscribe((res) => (this.services = res));
+
+    if(this.certificates == null)
+    {
+      this.certificates = [];
+      this.displayedCertificates = [];
+    }
+    else
+    {
+      this.displayedCertificates = this.certificates;
+    }
   }
 
-  loadCurrentUserProfile() {
+  loadCurrentUserProfile()
+  {
     const userId = this.decodedToken.sub;
 
     this.isCurrentUser = true;
     this.http.get<User>(`${environment.apiUrl}/user/${userId}`).subscribe((res) => this.setUserData(res));
-    this.http.get<Certificate[]>(`${environment.apiUrl}/certificate/${userId}`).subscribe((res) => (this.certificates = res));
+    this.http.get<Certificate[]>(`${environment.apiUrl}/certificate/${userId}`).subscribe((res) => 
+    {
+      this.certificates = res;
+    });
     this.http.get<Service[]>(`${environment.apiUrl}/service/user/${userId}`).subscribe((res) => (this.services = res));
+
+    if(this.certificates == null)
+    {
+      this.certificates = [];
+      this.displayedCertificates = [];
+    }
+    else
+    {
+      this.displayedCertificates = this.certificates;
+    }
   }
 
-  setUserData(user: User) {
+  setUserData(user: User)
+  {
     this.currentUser = user;
     this.currentUserInfo.username = `${user.first_name} ${user.last_name}`;
     this.currentUserInfo.email = user.email;
     this.currentUserInfo.skills = user.skills || [];
     this.currentUserInfo.profileImage = user.profileImage || '';
-    console.log(user)
     this.currentUserInfo.role = user.role === "admin" ? "Admin" : "Developer";
     this.isImageLoading = false;
   }
 
   // === Edit Mode ===
-  toggleEdit() {
+  toggleEdit()
+  {
     this.isEditing = !this.isEditing;
-    if (!this.isEditing && this.currentUser) {
+    if (!this.isEditing && this.currentUser)
+    {
       this.loadCurrentUserProfile(); // revert if canceled
+      this.editModeCertificates.length = 0;
+    }
+    
+    if(this.certificates == null)
+    {
+      this.certificates = [];
+      this.displayedCertificates = [];
+    }
+    else
+    {
+      this.displayedCertificates = this.certificates;
     }
   }
 
-  addSkill() {
-    if (this.newSkill.trim()) {
+  addSkill()
+  {
+    if (this.newSkill.trim())
+    {
       this.currentUserInfo.skills.push(this.newSkill.trim());
       this.newSkill = '';
     }
   }
 
-  removeSkill(i: number) {
+  removeSkill(i: number)
+  {
     this.currentUserInfo.skills.splice(i, 1);
   }
 
-  saveProfile() {
+  async saveProfile()
+  {
     if (!this.currentUser) return;
 
     const updatePayload = {
@@ -113,8 +162,18 @@ export class ProfileComponent implements OnInit {
       skills: this.currentUserInfo.skills
     };
 
+    if (this.editModeCertificates !== null)
+    {
+      for (let c of this.editModeCertificates)
+      {
+        console.log(c);
+        await this.http.delete(`${environment.apiUrl}/certificate/${c.certificateID}`).toPromise();
+      }
+    }
+
     this.http.put(`${environment.apiUrl}/user/${this.decodedToken.sub}`, updatePayload).subscribe({
-      next: () => {
+      next: () =>
+      {
         alert('✅ Profile updated successfully!');
         this.isEditing = false;
         this.loadCurrentUserProfile();
@@ -127,8 +186,9 @@ export class ProfileComponent implements OnInit {
   onImageLoad() { this.isImageLoading = false; }
   onImageError() { this.isImageLoading = false; }
 
-  onProfileImageSelected(event: any) {
-    const file = event.target.files[0];
+  onProfileImageSelected(event: any)
+  {
+    const file = event.target.files[ 0 ];
     if (!file) return;
     const userId = this.decodedToken.sub;
 
@@ -136,7 +196,8 @@ export class ProfileComponent implements OnInit {
     formData.append('file', file);
 
     this.http.post(`${environment.apiUrl}/user/${userId}/profile-image`, formData).subscribe({
-      next: () => {
+      next: () =>
+      {
         alert('✅ Profile image updated!');
         this.loadCurrentUserProfile();
       },
@@ -144,8 +205,35 @@ export class ProfileComponent implements OnInit {
     });
   }
 
-  switchPage(serviceId: number, taskBoardId?: number) {
-    this.router.navigate([`/services/${serviceId}/taskboard/${taskBoardId}`]);
+  switchPage(serviceId: number, taskBoardId?: number)
+  {
+    this.router.navigate([ `/services/${serviceId}/taskboard/${taskBoardId}` ]);
     window.scrollTo(0, 0);
   }
+
+  async removeCertificate(i: number) 
+  {
+    try
+    {
+      // await this.http.delete(`${environment.apiUrl}/certificate/${i}`).toPromise();
+      // this.loadCurrentUserProfile();
+
+      const index: number | undefined = this.certificates?.findIndex(x => x.certificateID === Number(i));
+
+      if(index)
+      {
+        this.editModeCertificates?.push(this.certificates[index]);
+      }
+    }
+    catch (err)
+    {
+      console.log(err);
+    }
+  }
+
+  getFiltredCertificates(): Certificate[] | null
+  {
+    return this.certificates.filter((c) => !this.editModeCertificates.some((editCert) => editCert.certificateID === c.certificateID))
+  }
+
 }

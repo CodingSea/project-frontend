@@ -2,6 +2,7 @@ import { User } from "./user";
 
 export interface Certificate
 {
+    certificateID?: number;
     name: string;
     type: string;
     issuingOrganization: string;
