@@ -1,236 +1,194 @@
-body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 20px;
-    background-color: #f9f9f9;
+:host {
+  display: block;
+  font-family: "Poppins", sans-serif;
+  background: #f5f6f8;
+  min-height: 100vh;
 }
 
+/* ===== Container ===== */
 .container {
-    max-width: 1200px;
-    margin: 0 auto;
+  max-width: 1100px;
+  margin: 0 auto;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+  padding: 28px 36px 48px;
 }
 
+/* ===== Header ===== */
 .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px;
-    background-color: #fff;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  border-left: 4px solid #c21a25;
+  padding-left: 12px;
+  margin-bottom: 20px;
 }
 
-.add-button {
-    background-color: #C21A25;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    cursor: pointer;
-    border-radius: 5px;
+.header h1 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
 }
 
-.add-button-main {
-    background-color: #C21A25;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    cursor: pointer;
-    border-radius: 5px;
-}
-
+/* ===== Filter Section (Search Bar) ===== */
 .filter-section {
-    margin: 20px 0;
-    display: flex;
-    gap: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 8px;
+  position: relative;
 }
 
-.filter-section input
-{
-    width: 80%;
-    height: 3em;
-    margin: 0 auto;
-    border-radius: 5px;
-    border: 1px solid #D1D5DB;
+.filter-section input {
+  width: 100%;
+  max-width: 460px;
+  padding: 10px 40px 10px 40px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #374151;
+  background-color: #ffffff;
+  transition: all 0.2s ease;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2371717a' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M21 21l-4.35-4.35m0 0A7.5 7.5 0 1010.5 18a7.5 7.5 0 006.15-3.35z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: 12px center;
+  background-size: 18px;
 }
 
-.filter-section select,
-.clear-button {
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+.filter-section input:focus {
+  outline: none;
+  border-color: #c21a25;
+  box-shadow: 0 0 0 2px rgba(194, 26, 37, 0.15);
 }
 
+/* ===== Developer Count ===== */
 .developer-count {
-    margin: 20px 0;
-    font-weight: bold;
+  text-align: right;
+  font-size: 13px;
+  color: #9ca3af;
+  font-weight: 400;
+  margin: 4px 0 24px;
+  padding-right: 4px;
 }
 
+/* ===== Developer Cards Grid ===== */
 .developer-cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
 }
 
+/* ===== Developer Card ===== */
 .card {
-    background-color: white;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    padding: 20px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 20px 16px;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+  transition: all 0.2s ease-in-out;
 }
 
-.skill-list
-{
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.3em;
-    height: 3em;
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
 }
 
-.skill
-{
-    border: 1px solid black;
-    padding: 0.3em;
-    border-radius: 5px;
+/* ===== Developer Image ===== */
+.img-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
 }
 
-.card-btns
-{
-    text-align: center;
+.profile-img {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #f3f4f6;
 }
 
-.card img
-{
-    width: 50px;
-    text-align: start;
-}
-
+/* ===== Developer Name ===== */
 .card h3 {
-    margin: 10px 0;
+  margin: 8px 0 6px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #1f2937;
 }
 
-.status {
-    font-weight: bold;
+/* ===== Skills ===== */
+.skill-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  min-height: 30px;
+  margin-bottom: 14px;
 }
 
-.status.busy {
-    color: red;
+.skill {
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+  border-radius: 6px;
+  padding: 3px 8px;
+  font-size: 12px;
+  color: #374151;
 }
 
-.status.available {
-    color: green;
-}
-
-.status.offline {
-    color: gray;
-}
-
-.profile-button {
-    background-color: #C21A25;
-    color: white;
-    border: none;
-    padding: 10px;
-    cursor: pointer;
-    border-radius: 5px;
-    margin: auto 5px;
-    aspect-ratio: 2 / 1;
-}
-
-.add-button
-{
-    aspect-ratio: 1 / 1;
-    background-color: #ffffff;
-    color: black;
-    border: solid 1px #D1D5DB;
-}
-
-.pagination {
-    margin: 20px 0;
-    display: flex;
-    gap: 10px;
-    justify-content: center;
-}
-
-.page-button {
-    border: 1px solid #C21A25;
-    background-color: white;
-    color: #C21A25;
-    padding: 10px;
-    cursor: pointer;
-    border-radius: 5px;
-}
-
-.status-div
-{
-    height: 2em;
-}
-
+/* ===== Buttons ===== */
 .card-btns {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   gap: 8px;
 }
 
 .profile-button,
 .add-button {
   flex: 1;
-  height: 40px;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 500;
-  text-align: center;
-  border: none;
+  height: 36px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease-in-out;
+  transition: all 0.2s ease;
 }
 
-/* 🔴 Red "View Profile" */
+/* 🔴 View Profile */
 .profile-button {
-  background: #dc2626;
-  color: #fff;
+  background: #c21a25;
+  color: #ffffff;
+  border: none;
 }
 
 .profile-button:hover {
-  background: #b91c1c;
+  background: #a61821;
 }
 
-/* 🔘 Default "+" button */
+/* ➕ Add Developer */
 .add-button {
   background: #ffffff;
-  border: 1px solid #e5e7eb;
-  color: #000;
+  color: #111827;
+  border: 1px solid #d1d5db;
 }
 
 .add-button:hover {
   background: #f3f4f6;
 }
 
-/* ✅ Selected — outlined green */
+/*  Selected Developer */
 .add-button.selected {
-  background: transparent;
-  color: #16a34a;
+  background: #dcfce7;
   border: 2px solid #16a34a;
-  font-weight: 600;
+  color: #16a34a;
 }
 
-.add-button.selected:hover {
-  background: #dcfce7; /* light green hover */
-}
-
-
-
-/* Optional: make icons/text vertically centered */
-.add-button,
-.profile-button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+/* ===== Profile Modal ===== */
 .profile-modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 999;
+  background: rgba(17, 24, 39, 0.55);
+  backdrop-filter: blur(3px);
+  z-index: 998;
 }
 
 .profile-modal {
@@ -238,104 +196,66 @@ body {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background: white;
-  border-radius: 10px;
-  width: 90%;
-  max-width: 900px;
-  height: 85vh;
-  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.2);
-  z-index: 1000;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.25);
+  z-index: 999;
+  width: 80%;
+  max-width: 850px;
+  height: 70vh;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.25s ease-in-out;
 }
 
 .profile-iframe {
+  flex: 1;
   width: 100%;
-  height: 100%;
   border: none;
+  background: white;
   border-radius: 10px;
 }
 
 .close-profile {
   position: absolute;
   top: 10px;
-  right: 15px;
-  background: #dc2626;
+  right: 14px;
+  background: #c21a25;
   color: white;
   border: none;
-  font-size: 20px;
   border-radius: 50%;
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
+  font-size: 18px;
   cursor: pointer;
-  line-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   transition: all 0.2s ease-in-out;
 }
 
 .close-profile:hover {
-  background: #b91c1c;
-}
-
-
-.profile-modal-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 999;
-}
-
-.profile-modal {
-  position: fixed;
-  top: 52%; /* 🔹 moves it slightly lower so the close button isn’t cut off */
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: #fff;
-  border-radius: 14px;
-  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.25);
-  z-index: 1000;
-  width: 75%;         /* 🔹 smaller width */
-  max-width: 800px;   /* 🔹 slightly smaller max size */
-  height: 65vh;       /* 🔹 smaller height */
-  overflow: hidden;
-  display: flex;
-  align-items: center;    /* 🔹 centers the iframe vertically */
-  justify-content: center; /* 🔹 centers it horizontally */
-  padding: 12px;          /* 🔹 adds inner spacing so button isn’t clipped */
-  transition: all 0.25s ease-in-out;
-}
-
-
-
-.profile-iframe {
-  width: 100%;
-  height: 100%;
-  border: none;
-  border-radius: 10px;
-  object-fit: contain;
-  background: white;
-}
-
-.close-profile {
-  position: absolute;
-  top: 10px;
-  right: 15px;
-  background: #dc2626;
-  color: #fff;
-  border: none;
-  border-radius: 50%;
-  width: 32px;
-  height: 32px;
-  font-size: 18px;
-  cursor: pointer;
-  line-height: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-  transition: background 0.2s ease-in-out, transform 0.1s ease-in-out;
-}
-
-.close-profile:hover {
-  background: #b91c1c;
+  background: #a61821;
   transform: scale(1.05);
 }
 
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+  .container {
+    padding: 20px;
+  }
+
+  .developer-cards {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  }
+
+  .profile-img {
+    width: 70px;
+    height: 70px;
+  }
+
+  .header h1 {
+    font-size: 18px;
+  }
+}

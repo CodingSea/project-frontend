@@ -3,24 +3,22 @@
 
   <div class="card-frame">
     <div class="topbar">
-      <h1>Create New Certificate</h1>
+      <h1>{{ isEditMode ? 'Edit Certificate' : 'Create New Certificate' }}</h1>
     </div>
 
     <form [formGroup]="certificateForm" (ngSubmit)="onSubmit()" novalidate>
-      <!--  Basic Info -->
+      <!-- Basic Info -->
       <section class="section">
         <header class="section__header">
           <span class="bullet bullet-red"></span>
           <h2>Basic Information</h2>
         </header>
-
         <div class="section__body">
           <div class="grid-2">
             <div class="field">
               <label>Certificate Name<span class="req">*</span></label>
               <input type="text" formControlName="name" placeholder="Enter certificate name" />
             </div>
-
             <div class="field">
               <label>Certificate Type<span class="req">*</span></label>
               <select formControlName="type">
@@ -33,7 +31,6 @@
               </select>
             </div>
           </div>
-
           <div class="field mt-16">
             <label>Issuing Organization<span class="req">*</span></label>
             <input type="text" formControlName="issuingOrganization" placeholder="Enter issuing organization" />
@@ -47,20 +44,17 @@
           <span class="bullet bullet-pink"></span>
           <h2>Certificate Dates</h2>
         </header>
-
         <div class="section__body">
           <div class="grid-2">
             <div class="field">
               <label>Issue Date<span class="req">*</span></label>
               <input type="date" formControlName="issueDate" />
             </div>
-
             <div class="field">
               <label>Expiry Date</label>
               <input type="date" formControlName="expiryDate" />
             </div>
           </div>
-
           <div class="field mt-16">
             <label>Description</label>
             <textarea rows="3" formControlName="description" placeholder="Enter description of certificate"></textarea>
@@ -68,49 +62,57 @@
         </div>
       </section>
 
-      <!-- Upload Section -->
+      <!-- Attachments -->
       <section class="section">
         <header class="section__header">
           <span class="bullet bullet-pink"></span>
           <h2>Attachments</h2>
         </header>
-
         <div class="section__body">
           <div class="dropzone" [class.dragging]="isDragging">
             <div class="dz-inner">
               <div class="cloud">
                 <svg viewBox="0 0 24 24" width="28" height="28">
-                  <path d="M19 18H6a4 4 0 110-8 5 5 0 019.9-.9A3.5 3.5 0 1119 18z" fill="currentColor" />
+                  <path
+                    d="M19 18H6a4 4 0 110-8 5 5 0 019.9-.9A3.5 3.5 0 1119 18z"
+                    fill="currentColor"
+                  />
                 </svg>
               </div>
-              <p>Drag and drop certificate files here or</p>
-
+              <p>Drag and drop files here or</p>
               <label class="btn btn-red">
                 <input type="file" multiple (change)="onFilesSelected($event)" hidden />
                 Browse Files
               </label>
-
-              <small>Upload files like PDFs or images (Max 10MB each)</small>
+              <small>Upload PDF or image files (max 10MB each)</small>
             </div>
           </div>
 
+          <!-- Existing files -->
+          <ul class="file-list" *ngIf="existingFiles.length">
+            <li *ngFor="let f of existingFiles">
+              <a [href]="f.url" target="_blank">{{ f.name }}</a>
+              <button type="button" class="delete-btn" (click)="markFileForDeletion(f)">×</button>
+            </li>
+          </ul>
+
+          <!-- Newly added files -->
           <ul class="file-list" *ngIf="files.length">
-            <li *ngFor="let file of files; let i = index">
-              {{ file.name }}
-              <button type="button" (click)="removeFile(i)">×</button>
+            <li *ngFor="let f of files">
+              <span>{{ f.name }} <small>(new)</small></span>
+              <button type="button" class="delete-btn" (click)="removeNewFile(f)">×</button>
             </li>
           </ul>
         </div>
       </section>
 
-      <!--  Footer Buttons -->
+      <!-- Footer -->
       <div class="footer-actions">
         <button type="button" class="btn btn-ghost" routerLink="/profile">Cancel</button>
         <button type="submit" class="btn btn-red" [disabled]="isSubmitting">
-          {{ isSubmitting ? 'Uploading...' : 'Create Certificate' }}
+          {{ isSubmitting ? 'Saving...' : (isEditMode ? 'Update Certificate' : 'Create Certificate') }}
         </button>
       </div>
     </form>
   </div>
-
 </div>
