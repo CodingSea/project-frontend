@@ -28,12 +28,13 @@ export class ProjectManagement implements OnInit, AfterViewInit
   showEditProject = false;
   newProject: Partial<Project> = this.blankNewProject();
   editProject: Partial<Project> = this.blankNewProject();
+  lastEditProject: Partial<Project> = this.blankNewProject();
 
   openMenuId: number | null = null;
 
   // Filters
   showFilter = false;
-  selectedFilter: 'all' | 'active' | 'in-review' | 'urgent' = 'all';
+  selectedFilter: 'all' | 'active' | 'in-review' = 'all';
   filterState = { active: true, inReview: true, urgent: true };
 
   projectsInfo =
@@ -133,7 +134,7 @@ export class ProjectManagement implements OnInit, AfterViewInit
   closeNewProject() { this.showNewProject = false; }
 
   openEditProject() { this.showEditProject = true; this.editProject = this.blankNewProject(); }
-  closeEditProject() { this.showEditProject = false; }
+  closeEditProject() { this.showEditProject = false;}
 
   private blankNewProject(): Partial<Project>
   {
@@ -164,12 +165,10 @@ export class ProjectManagement implements OnInit, AfterViewInit
     if (this.selectedFilter !== 'all')
     {
       return (this.selectedFilter === 'active' && s === 'active')
-        || (this.selectedFilter === 'in-review' && s === 'in review')
-        || (this.selectedFilter === 'urgent' && s === 'urgent');
+        || (this.selectedFilter === 'in-review' && s === 'in review');
     }
     return (s === 'active' && this.filterState.active)
-      || (s === 'in review' && this.filterState.inReview)
-      || (s === 'urgent' && this.filterState.urgent);
+      || (s === 'in review' && this.filterState.inReview);
   }
 
   formatDecimal(num: number): string
@@ -207,14 +206,11 @@ export class ProjectManagement implements OnInit, AfterViewInit
     this.openEditProject();
 
     this.editProject = s;
-    console.log(this.editProject);
   }
 
   async updateProject(form: any)
   {
     // if (form.invalid) return;
-
-    console.log(this.editProject)
 
     const updatedProject =
     {

@@ -31,7 +31,6 @@
                 <div class="legend">
                     <span><span class="dot completed"></span>Completed</span>
                     <span><span class="dot inprogress"></span>In Progress</span>
-                    <!-- <span><span class="dot pending"></span>Pending</span> -->
                     <span><span class="dot atrisk"></span>At Risk</span>
                 </div>
                 <div class="percent">{{ formatDecimal(projectStatusRate.completed) }}%</div>
@@ -109,15 +108,17 @@
                     </tbody>
                 </table>
 
-                <hr>
+                <hr *ngIf="closestInReviewServices.length > 0">
 
                 <h3>Certifications</h3>
-                <div *ngFor="let c of certificates">
-                    <div class="achievement">
-                        <div class="icon completed"></div>
-                        <div class="achievement-details">
-                            <h3>{{ c.name }}</h3>
-                            <p>By {{c.userId?.first_name}} {{c.userId?.last_name}} • {{ c.createdAt | date:"dd/MM/yyyy" }}</p>
+                <div  class="certificates-container">
+                    <div *ngFor="let c of certificates">
+                        <div class="achievement">
+                            <div class="icon completed"></div>
+                            <div class="achievement-details">
+                                <h3>{{ c.name }}</h3>
+                                <p>By {{c.user?.first_name}} {{c.user?.last_name}} • {{ c.createdAt | date:"dd/MM/yyyy" }}</p>
+                            </div>
                         </div>
                     </div>
                 </div>

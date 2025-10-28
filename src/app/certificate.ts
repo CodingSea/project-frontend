@@ -9,7 +9,7 @@ export interface Certificate
     issueDate: string;
     expiryDate: string;
     description?: string;
-    userId?: User;
+    user?: User;
     createdAt?: Date;
     // certificateFile: File | null;
 }

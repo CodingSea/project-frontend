@@ -276,7 +276,7 @@ export class Dashboard
 
     // Sort services by deadline
     this.closestInReviewServices = servicesArray.sort((a, b) => a.deadline.getTime() - b.deadline.getTime())
-      .slice(0, 5) // Limit to 5 closest services
+      .slice(0, 3) // Limit to 5 closest services
       .map(item =>
       {
         return {
@@ -292,8 +292,10 @@ export class Dashboard
       (response) =>
       {
         this.certificates = response;
-        let certificatesArray = this.certificates.slice(-2);
+        let certificatesArray = this.certificates.slice(-4);
         this.certificates = certificatesArray;
+
+        console.log(this.certificates);
       },
       (error) =>
       {

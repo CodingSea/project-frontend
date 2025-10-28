@@ -7,12 +7,12 @@
       @if(isTaskboardSelected)
       {
       <div class="nav-section active left" (click)="selectSection(true)">Task Board</div>
-      <div class="nav-section right" (click)="selectSection(false)">Attachments</div>
+      <div class="nav-section right" (click)="selectSection(false)">Discussion</div>
       }
       @else
       {
       <div class="nav-section left" (click)="selectSection(true)">Task Board</div>
-      <div class="nav-section active right" (click)="selectSection(false)">Attachments</div>
+      <div class="nav-section active right" (click)="selectSection(false)">Discussion</div>
       }
     </div>
 
@@ -81,9 +81,16 @@
         </div>
 
         <h3>Description:</h3>
-        <p class="description-conatiner">{{ taskBoard?.service?.description }}</p>
+        <input type="text" name="description" class="description-conatiner"
+        [disabled]="!editMode" [(ngModel)]="taskBoard!.service!.description"
+        placeholder="Add a Description...">
 
         <div class="header-actions">
+          <button *ngIf="!editMode" (click)="toggleEdit()" class="btn edit-btn">Edit</button>
+          <div *ngIf="editMode" class="edit-buttons">
+            <button class="btn btn-secondary" (click)="toggleEdit()">Cancel</button>
+            <button class="btn btn-save" (click)="saveChanges()">Save</button>
+          </div>
           <button class="back-btn" (click)="goBack()">Back</button>
         </div>
       </header>
