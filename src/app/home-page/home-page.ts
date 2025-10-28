@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { Sidebar } from "@app/sidebar/sidebar";
-import { HeaderComponent } from '@app/header/header';
+import { Categories } from '@app/categories';
 
 @Component({
   selector: 'app-home-page',
@@ -9,6 +9,7 @@ import { HeaderComponent } from '@app/header/header';
   styleUrl: './home-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class HomePage {
-
+export class HomePage 
+{
+  categories: string[] = Object.values(Categories);
 }
