@@ -2,11 +2,13 @@ import { Component, OnInit } from '@angular/core';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '@app/auth';
 import { RouterModule } from '@angular/router';
+import { jwtDecode } from 'jwt-decode';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [ RouterLink ,RouterModule],
+  imports: [RouterLink, RouterModule, CommonModule],
   templateUrl: './sidebar.html',
   styleUrl: './sidebar.css'
 })
@@ -14,12 +16,25 @@ export class Sidebar implements OnInit
 {
   activeLink: string = '';
 
+  isAdmin: boolean = false;
+  decodedToken: any;
+
   constructor(private auth: AuthService, private router: Router) { }
 
   ngOnInit()
   {
     this.setActiveLink(this.router.url);
 
+    const token: string | null = localStorage.getItem("token");
+    if (token)
+    {
+      this.decodedToken = jwtDecode(token);
+
+      if(this.decodedToken.role == "admin")
+      {
+        this.isAdmin = true;
+      }
+    }
     this.router.events.subscribe(event =>
     {
       if (event instanceof NavigationEnd)
