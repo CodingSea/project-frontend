@@ -236,13 +236,6 @@ export class HomePage implements OnInit
 
   filteredIssues(): Issue[]
   {
-    // return this.issues.filter(issue =>
-    //   (this.selectedCategory === Categories.AllCategories || issue.category === this.selectedCategory) &&
-    //   (this.selectedStatus === Status.All || issue.status === this.selectedStatus) &&
-    //   (issue.title.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
-    //     issue.description.toLowerCase().includes(this.searchQuery.toLowerCase()))
-    // );
-
     return this.issues;
   }
 
