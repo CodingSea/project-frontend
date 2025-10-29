@@ -13,6 +13,7 @@ import { ServiceFormComponent } from './service-form/service-form.component';
 import { DevelopersSearchComponent } from './developers.search.component/developers.search.component';
 import { ServiceTasksComponent } from './service.tasks.component/service.tasks.component';
 import { ServicesComponent } from './services.component/services.component';
+import { IssuePage } from './issue-page/issue-page';
 
 export const routes: Routes = [
   { path: "", redirectTo: 'auth/signup', pathMatch: "full" },
@@ -29,7 +30,9 @@ export const routes: Routes = [
   { path: 'certificate/edit/:id', component: CertificateCreateComponent, canActivate: [AuthGuard] },
   { path: 'developers', component: DevelopersSearchComponent, canActivate: [AuthGuard], data: { onlyAdmin: true } },
   { path: 'services/:serviceId/taskboard/:taskBoardId', component: ServiceTasksComponent, canActivate: [AuthGuard] },
+{ path: 'issues', component: IssuePage },
   { path: '**', component: UserComponent }
+
 ];
 
 @NgModule({
