@@ -9,50 +9,41 @@
           <input type="text" placeholder="Search issues..." />
           <span class="search-icon">🔍</span>
         </div>
-        <select>
-          @for (category of categories; track $index)
-          {
-          <option>{{ category }}</option>
-          }
+        <select [(ngModel)]="selectedCategory">
+          <option *ngFor="let category of categories" [value]="category">{{ category }}</option>
         </select>
-        <select>
-          @for (s of status; track $index)
-          {
-          <option>{{ s }}</option>
-          }
+        <select [(ngModel)]="selectedStatus">
+          <option *ngFor="let s of status" [value]="s">{{ s }}</option>
         </select>
         <button class="new-issue">+ New Issue</button>
       </div>
     </header>
 
     <section class="card-grid">
-
-      <div *ngFor="let issue of issues">
+      <div *ngFor="let issue of filteredIssues()">
         <div class="card">
-            <div class="card-tags">
-                <span [ngClass]="getCategoryClass(issue.category)">
-                    {{ issue.category }}
-                </span>
-                <span [ngClass]="getStatusClass(issue.status)">
-                    {{ issue.status }}
-                </span>
-            </div>
-            <h3>{{ issue.title }}</h3>
-            <p>{{ issue.description }}</p>
-            <div class="card-footer">
-                <span>{{ getTimeAgo(issue) }}</span>
-                <button class="details-btn">View Details</button>
-            </div>
+          <div class="card-tags">
+            <span [ngClass]="getCategoryClass(issue.category)">
+              {{ issue.category }}
+            </span>
+            <span [ngClass]="getStatusClass(issue.status)">
+              {{ issue.status }}
+            </span>
+          </div>
+          <h3>{{ issue.title }}</h3>
+          <p>{{ issue.description }}</p>
+          <div class="card-footer">
+            <span>{{ getTimeAgo(issue) }}</span>
+            <button class="details-btn">View Details</button>
+          </div>
         </div>
-    </div>
-
+      </div>
     </section>
 
     <div class="pagination">
       <button (click)="changePage(currentPage - 1)" [disabled]="currentPage === 1">&lt;</button>
-      <button *ngFor="let page of [].constructor(getTotalPages()); let i = index" (click)="changePage(i + 1)"
-        [class.active]="currentPage === i + 1">
-        {{ i + 1 }}
+      <button *ngFor="let page of pageNumbers" (click)="changePage(page)" [class.active]="currentPage === page">
+        {{ page }}
       </button>
       <button (click)="changePage(currentPage + 1)" [disabled]="currentPage >= getTotalPages()">&gt;</button>
     </div>

@@ -7,10 +7,11 @@ import { environment } from '@environments/environment';
 import { CommonModule } from '@angular/common';
 import { Issue } from '@app/issue';
 import { Status, StatusClasses } from '@app/status';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-home-page',
-  imports: [ Sidebar, CommonModule ],
+  imports: [ Sidebar, CommonModule, FormsModule ],
   templateUrl: './home-page.html',
   styleUrl: './home-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -27,6 +28,9 @@ export class HomePage implements OnInit
   pageSize: number = 6;
   totalIssues: number = 0;
   pageNumbers: number[] = [];
+
+  selectedCategory: Categories = Categories.AllCategories;
+  selectedStatus: Status = Status.All;
 
   ngOnInit()
   {
@@ -129,6 +133,14 @@ export class HomePage implements OnInit
   getStatusClass(status: Status): string
   {
     return StatusClasses[ status ];
+  }
+
+  filteredIssues(): Issue[]
+  {
+    return this.issues.filter(issue =>
+      (this.selectedCategory === Categories.AllCategories || issue.category === this.selectedCategory) &&
+      (this.selectedStatus === Status.All || issue.status === this.selectedStatus)
+    );
   }
 
 }
