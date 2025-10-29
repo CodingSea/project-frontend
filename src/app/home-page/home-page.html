@@ -7,7 +7,6 @@
       <div class="controls">
         <div class="search-box">
           <input type="text" [(ngModel)]="searchQuery" placeholder="Search issues..." />
-          <span class="search-icon">🔍</span>
         </div>
         <select [(ngModel)]="selectedCategory">
           <option *ngFor="let category of categories" [value]="category">{{ category }}</option>
