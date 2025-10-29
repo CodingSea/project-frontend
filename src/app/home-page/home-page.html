@@ -40,11 +40,13 @@
     </section>
 
     <div class="pagination">
+      <button (click)="jumpToPage(true)" [disabled]="currentPage === 1">&lt;&lt;</button>
       <button (click)="changePage(currentPage - 1)" [disabled]="currentPage === 1">&lt;</button>
       <button *ngFor="let page of pageNumbers" (click)="changePage(page)" [class.active]="currentPage === page">
         {{ page }}
       </button>
       <button (click)="changePage(currentPage + 1)" [disabled]="currentPage >= getTotalPages()">&gt;</button>
+      <button (click)="jumpToPage(false)" [disabled]="currentPage >= getTotalPages()">&gt;&gt;</button>
     </div>
 
     <footer class="footer">

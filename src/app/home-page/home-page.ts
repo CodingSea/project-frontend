@@ -25,7 +25,7 @@ export class HomePage implements OnInit
 
   issues: Issue[] = [];
   currentPage: number = 1;
-  pageSize: number = 6;
+  pageSize: number = 2;
   totalIssues: number = 0;
   pageNumbers: number[] = [];
   searchQuery: string = '';
@@ -74,6 +74,26 @@ export class HomePage implements OnInit
   {
     if (page < 1 || page > this.getTotalPages()) return;
     this.currentPage = page;
+    this.updatePageNumbers();
+    this.loadIssues();
+  }
+
+  jumpToPage(firstPage: boolean): void
+  {
+    const totalPages = this.getTotalPages();  // Get total number of pages
+
+    // Set the current page to either the first or last page
+    if (firstPage)
+    {
+      this.currentPage = 1;  // Navigate to the first page
+    } 
+    else
+    {
+      this.currentPage = totalPages;  // Navigate to the last page
+    }
+
+    // Update the page numbers and load the issues based on the new current page
+    this.updatePageNumbers();
     this.loadIssues();
   }
 
@@ -86,7 +106,34 @@ export class HomePage implements OnInit
   updatePageNumbers(): void
   {
     const totalPages = this.getTotalPages();
-    this.pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1); // Create an array of page numbers
+    const currentPage = this.currentPage;
+
+    this.pageNumbers = [];
+
+    // Calculate the start and end page indexes
+    let startPage = Math.max(1, currentPage - 2); // Start from 2 pages before the current page
+    let endPage = Math.min(totalPages, currentPage + 2); // End at 2 pages after the current page
+
+    // Ensure we always show exactly 5 pages
+    if (endPage - startPage < 4)
+    {
+      if (currentPage <= 3)
+      {
+        endPage = Math.min(5, totalPages); // If near the start
+      } else
+      {
+        startPage = Math.max(1, endPage - 4); // Adjust start page if near the end
+      }
+    }
+
+    // Add pages to the pageNumbers array
+    for (let i = startPage; i <= endPage; i++)
+    {
+      this.pageNumbers.push(i);
+    }
+
+    // Remove duplicates and sort the page numbers
+    this.pageNumbers = Array.from(new Set(this.pageNumbers)).sort((a, b) => a - b);
   }
 
   getTimeAgo(issue: Issue): string
