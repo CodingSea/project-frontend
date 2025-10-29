@@ -6,12 +6,12 @@
       <h1>Recent Issues</h1>
       <div class="controls">
         <div class="search-box">
-          <input type="text" [(ngModel)]="searchQuery" placeholder="Search issues..." />
+          <input type="text" [(ngModel)]="searchQuery" (keydown.enter)="onFilterChange()" (input)="checkText()"  placeholder="Search issues..." />
         </div>
-        <select [(ngModel)]="selectedCategory">
+        <select [(ngModel)]="selectedCategory" (change)="onFilterChange()">
           <option *ngFor="let category of categories" [value]="category">{{ category }}</option>
         </select>
-        <select [(ngModel)]="selectedStatus">
+        <select [(ngModel)]="selectedStatus" (change)="onFilterChange()">
           <option *ngFor="let s of status" [value]="s">{{ s }}</option>
         </select>
         <button class="new-issue">+ New Issue</button>
