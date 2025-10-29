@@ -16,10 +16,10 @@
           }
         </select>
         <select>
-          <option>All Status</option>
-          <option>Open</option>
-          <option>In Progress</option>
-          <option>Resolved</option>
+          @for (s of status; track $index)
+          {
+          <option>{{ s }}</option>
+          }
         </select>
         <button class="new-issue">+ New Issue</button>
       </div>
@@ -29,28 +29,32 @@
 
       <div *ngFor="let issue of issues">
         <div class="card">
-          <div class="card-tags">
-            <span class="tag blue">{{ issue.categories }}</span>
-            <span class="tag green">{{ issue.status }}</span>
-          </div>
-          <h3>{{ issue.title }}</h3>
-          <p>{{ issue.description }}</p>
-          <div class="card-footer">
-            <span>2 hours ago</span>
-            <button class="details-btn">View Details</button>
-          </div>
+            <div class="card-tags">
+                <span [ngClass]="getCategoryClass(issue.category)">
+                    {{ issue.category }}
+                </span>
+                <span [ngClass]="getStatusClass(issue.status)">
+                    {{ issue.status }}
+                </span>
+            </div>
+            <h3>{{ issue.title }}</h3>
+            <p>{{ issue.description }}</p>
+            <div class="card-footer">
+                <span>{{ getTimeAgo(issue) }}</span>
+                <button class="details-btn">View Details</button>
+            </div>
         </div>
-      </div>
+    </div>
 
     </section>
 
     <div class="pagination">
-      <button>&lt;</button>
-      <button class="active">1</button>
-      <button>2</button>
-      <span>...</span>
-      <button>10</button>
-      <button>&gt;</button>
+      <button (click)="changePage(currentPage - 1)" [disabled]="currentPage === 1">&lt;</button>
+      <button *ngFor="let page of [].constructor(getTotalPages()); let i = index" (click)="changePage(i + 1)"
+        [class.active]="currentPage === i + 1">
+        {{ i + 1 }}
+      </button>
+      <button (click)="changePage(currentPage + 1)" [disabled]="currentPage >= getTotalPages()">&gt;</button>
     </div>
 
     <footer class="footer">
