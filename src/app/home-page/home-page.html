@@ -10,9 +10,9 @@
           <span class="search-icon">🔍</span>
         </div>
         <select>
-          @for (category of categories; track $index) 
+          @for (category of categories; track $index)
           {
-            <option>{{ category }}</option>
+          <option>{{ category }}</option>
           }
         </select>
         <select>
@@ -26,35 +26,22 @@
     </header>
 
     <section class="card-grid">
-      <!-- Card 1 -->
-      <div class="card">
-        <div class="card-tags">
-          <span class="tag red">Bug Reports</span>
-          <span class="tag green">Open</span>
-        </div>
-        <h3>Login Authentication Error</h3>
-        <p>Users unable to authenticate with OAuth provider, getting 401 errors consistently...</p>
-        <div class="card-footer">
-          <span>2 hours ago</span>
-          <button class="details-btn">View Details</button>
+
+      <div *ngFor="let issue of issues">
+        <div class="card">
+          <div class="card-tags">
+            <span class="tag blue">{{ issue.categories }}</span>
+            <span class="tag green">{{ issue.status }}</span>
+          </div>
+          <h3>{{ issue.title }}</h3>
+          <p>{{ issue.description }}</p>
+          <div class="card-footer">
+            <span>2 hours ago</span>
+            <button class="details-btn">View Details</button>
+          </div>
         </div>
       </div>
 
-      <!-- Card 2 -->
-      <div class="card">
-        <div class="card-tags">
-          <span class="tag blue">Feature Requests</span>
-          <span class="tag yellow">In Progress</span>
-        </div>
-        <h3>Dark Mode Implementation</h3>
-        <p>Request for dark mode theme across the application to improve user experience...</p>
-        <div class="card-footer">
-          <span>5 hours ago</span>
-          <button class="details-btn">View Details</button>
-        </div>
-      </div>
-
-      <!-- Add more cards... -->
     </section>
 
     <div class="pagination">
