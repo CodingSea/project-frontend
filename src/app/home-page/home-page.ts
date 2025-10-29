@@ -28,6 +28,7 @@ export class HomePage implements OnInit
   pageSize: number = 6;
   totalIssues: number = 0;
   pageNumbers: number[] = [];
+  searchQuery: string = '';
 
   selectedCategory: Categories = Categories.AllCategories;
   selectedStatus: Status = Status.All;
@@ -139,7 +140,9 @@ export class HomePage implements OnInit
   {
     return this.issues.filter(issue =>
       (this.selectedCategory === Categories.AllCategories || issue.category === this.selectedCategory) &&
-      (this.selectedStatus === Status.All || issue.status === this.selectedStatus)
+      (this.selectedStatus === Status.All || issue.status === this.selectedStatus) &&
+      (issue.title.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
+        issue.description.toLowerCase().includes(this.searchQuery.toLowerCase()))
     );
   }
 

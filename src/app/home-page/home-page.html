@@ -6,7 +6,7 @@
       <h1>Recent Issues</h1>
       <div class="controls">
         <div class="search-box">
-          <input type="text" placeholder="Search issues..." />
+          <input type="text" [(ngModel)]="searchQuery" placeholder="Search issues..." />
           <span class="search-icon">🔍</span>
         </div>
         <select [(ngModel)]="selectedCategory">
