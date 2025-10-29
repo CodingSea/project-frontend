@@ -25,7 +25,7 @@ export class HomePage implements OnInit
 
   issues: Issue[] = [];
   currentPage: number = 1;
-  pageSize: number = 2;
+  pageSize: number = 6;
   totalIssues: number = 0;
   pageNumbers: number[] = [];
   searchQuery: string = '';
@@ -41,11 +41,30 @@ export class HomePage implements OnInit
 
   loadIssues(): void
   {
-    this.http.get<Issue[]>(`${environment.apiUrl}/issue?page=${this.currentPage}&limit=${this.pageSize}`).subscribe(
+    // Construct the query string manually
+    const queryParams = new URLSearchParams();
+    queryParams.append('page', this.currentPage.toString());
+    queryParams.append('limit', this.pageSize.toString());
+
+    if (this.selectedStatus !== Status.All)
+    {
+      queryParams.append('status', this.selectedStatus);
+    }
+
+    if (this.selectedCategory !== Categories.AllCategories)
+    {
+      queryParams.append('category', this.selectedCategory);
+    }
+
+    if (this.searchQuery)
+    {
+      queryParams.append('search', this.searchQuery);
+    }
+
+    this.http.get<Issue[]>(`${environment.apiUrl}/issue?${queryParams.toString()}`).subscribe(
       (res) =>
       {
         this.issues = res;
-
         this.cdr.markForCheck();
       },
       (err) =>
@@ -86,7 +105,7 @@ export class HomePage implements OnInit
     if (firstPage)
     {
       this.currentPage = 1;  // Navigate to the first page
-    } 
+    }
     else
     {
       this.currentPage = totalPages;  // Navigate to the last page
@@ -101,6 +120,38 @@ export class HomePage implements OnInit
   {
     const totalPages = Math.ceil(this.totalIssues / this.pageSize);
     return totalPages || 1; // Ensure at least one page is returned
+  }
+
+  getTotalIssuesCount(): void
+  {
+    const queryParams = new URLSearchParams();
+    if (this.selectedStatus !== Status.All)
+    {
+      queryParams.append('status', this.selectedStatus);
+    }
+
+    if (this.selectedCategory !== Categories.AllCategories)
+    {
+      queryParams.append('category', this.selectedCategory);
+    }
+
+    if (this.searchQuery)
+    {
+      queryParams.append('search', this.searchQuery);
+    }
+
+    this.http.get<number>(`${environment.apiUrl}/issue/count?${queryParams.toString()}`).subscribe(
+      (count) =>
+      {
+        this.totalIssues = count; // Update the total issues count
+        this.updatePageNumbers(); // Recalculate the page numbers
+        this.loadIssues(); // Load issues based on updated filters
+      },
+      (err) =>
+      {
+        console.error('Error fetching total issues count:', err);
+      }
+    );
   }
 
   updatePageNumbers(): void
@@ -185,12 +236,32 @@ export class HomePage implements OnInit
 
   filteredIssues(): Issue[]
   {
-    return this.issues.filter(issue =>
-      (this.selectedCategory === Categories.AllCategories || issue.category === this.selectedCategory) &&
-      (this.selectedStatus === Status.All || issue.status === this.selectedStatus) &&
-      (issue.title.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
-        issue.description.toLowerCase().includes(this.searchQuery.toLowerCase()))
-    );
+    // return this.issues.filter(issue =>
+    //   (this.selectedCategory === Categories.AllCategories || issue.category === this.selectedCategory) &&
+    //   (this.selectedStatus === Status.All || issue.status === this.selectedStatus) &&
+    //   (issue.title.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
+    //     issue.description.toLowerCase().includes(this.searchQuery.toLowerCase()))
+    // );
+
+    return this.issues;
+  }
+
+  onFilterChange(): void
+  {
+    console.log("pressed")
+    this.currentPage = 1; // Reset to the first page when changing filters
+    this.getTotalIssuesCount(); // Reload issues based on the new filters
+
+  }
+
+  checkText(): void
+  {
+    if (this.searchQuery == "")
+    {
+      console.log("none")
+      this.currentPage = 1;
+      this.getTotalIssuesCount();
+    }
   }
 
 }
