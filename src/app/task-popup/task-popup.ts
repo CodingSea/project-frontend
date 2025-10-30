@@ -51,8 +51,6 @@ export class TaskPopup
     }
 
     this.tags = this.taskService.textToArray(this.task?.tags);
-
-    console.log(this.task);
   }
 
   onInputChange()
@@ -103,8 +101,6 @@ export class TaskPopup
         tags: this.tagsString,
         color: selectedColor
       };
-
-      // console.log("popup", updatedTask)
 
       await this.taskService.updateTask(updatedTask); // Call the updateTask method
 

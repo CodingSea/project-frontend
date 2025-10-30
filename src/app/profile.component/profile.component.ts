@@ -12,11 +12,12 @@ import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-profile.component',
-  imports: [Sidebar, RouterLink, CommonModule, FormsModule],
+  imports: [ Sidebar, RouterLink, CommonModule, FormsModule ],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.css'
 })
-export class ProfileComponent implements OnInit {
+export class ProfileComponent implements OnInit
+{
   @ViewChild('fileInput') fileInputRef!: any;
 
   isCurrentUser = false;
@@ -49,25 +50,30 @@ export class ProfileComponent implements OnInit {
 
   decodedToken: any | null = null;
 
-  constructor(private http: HttpClient, private activatedRoute: ActivatedRoute, private router: Router) {}
+  constructor(private http: HttpClient, private activatedRoute: ActivatedRoute, private router: Router) { }
 
-  ngOnInit() {
+  ngOnInit()
+  {
     this.isEmbedded = window !== window.parent;
     const token: string | null = localStorage.getItem("token");
     if (!token) return;
     this.decodedToken = jwtDecode(token);
 
-    this.activatedRoute.queryParamMap.subscribe(() => {
-      if (this.activatedRoute.snapshot.paramMap.has("userId")) {
+    this.activatedRoute.queryParamMap.subscribe(() =>
+    {
+      if (this.activatedRoute.snapshot.paramMap.has("userId"))
+      {
         this.loadOtherUserProfile();
-      } else {
+      } else
+      {
         this.loadCurrentUserProfile();
       }
     });
   }
 
   // ===== LOAD USER DATA =====
-  loadOtherUserProfile() {
+  loadOtherUserProfile()
+  {
     const userId = this.activatedRoute.snapshot.paramMap.get('userId');
     if (!userId) return;
     this.isCurrentUser = this.decodedToken.sub == userId;
@@ -77,7 +83,8 @@ export class ProfileComponent implements OnInit {
     this.http.get<Service[]>(`${environment.apiUrl}/service/user/${userId}`).subscribe((res) => (this.services = res));
   }
 
-  loadCurrentUserProfile() {
+  loadCurrentUserProfile()
+  {
     const userId = this.decodedToken.sub;
     this.isCurrentUser = true;
 
@@ -86,7 +93,8 @@ export class ProfileComponent implements OnInit {
     this.http.get<Service[]>(`${environment.apiUrl}/service/user/${userId}`).subscribe((res) => (this.services = res));
   }
 
-  setUserData(user: User) {
+  setUserData(user: User)
+  {
     this.currentUser = user;
     this.currentUserInfo.username = `${user.first_name} ${user.last_name}`;
     this.currentUserInfo.email = user.email;
@@ -97,13 +105,16 @@ export class ProfileComponent implements OnInit {
   }
 
   // ===== EDIT MODE =====
-  toggleEdit() {
+  toggleEdit()
+  {
     this.isEditing = !this.isEditing;
 
-    if (this.isEditing) {
+    if (this.isEditing)
+    {
       this.originalImage = this.currentUserInfo.profileImage;
       this.previewImage = this.currentUserInfo.profileImage;
-    } else {
+    } else
+    {
       // Cancel pressed
       this.previewImage = this.originalImage;
       this.currentUserInfo.profileImage = this.originalImage || '';
@@ -116,59 +127,70 @@ export class ProfileComponent implements OnInit {
   }
 
   // ===== SKILLS =====
-  addSkill() {
-    if (this.newSkill.trim()) {
+  addSkill()
+  {
+    if (this.newSkill.trim())
+    {
       this.currentUserInfo.skills.push(this.newSkill.trim());
       this.newSkill = '';
     }
   }
 
-  removeSkill(i: number) {
+  removeSkill(i: number)
+  {
     this.currentUserInfo.skills.splice(i, 1);
   }
 
   // ===== CERTIFICATES =====
-  removeCertificateTemp(index: number) {
-    const cert = this.certificates?.[index];
+  removeCertificateTemp(index: number)
+  {
+    const cert = this.certificates?.[ index ];
     if (cert && cert.certificateID) this.deletedCertificates.push(cert.certificateID);
     this.certificates?.splice(index, 1);
   }
 
-  editCertificate(certId: any) {
+  editCertificate(certId: any)
+  {
     if (!certId) return;
-    this.router.navigate([`/certificate/edit/${certId}`]);
+    this.router.navigate([ `/certificate/edit/${certId}` ]);
   }
 
   // ===== PROFILE IMAGE =====
   onImageLoad() { this.isImageLoading = false; }
   onImageError() { this.isImageLoading = false; }
 
-  onProfileImageClick() {
-    if (this.isEditing && (this.previewImage || this.currentUserInfo.profileImage)) {
+  onProfileImageClick()
+  {
+    if (this.isEditing && (this.previewImage || this.currentUserInfo.profileImage))
+    {
       this.showImageOptions = !this.showImageOptions;
     }
   }
 
-  triggerChangeImage() {
+  triggerChangeImage()
+  {
     const input = this.fileInputRef?.nativeElement;
     if (input) input.click();
     this.showImageOptions = false;
   }
 
-  onProfileImageSelected(event: any) {
-    const file = event.target.files[0];
+  onProfileImageSelected(event: any)
+  {
+    const file = event.target.files[ 0 ];
     if (!file) return;
 
     //  Allow only image files
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
-    if (!allowedTypes.includes(file.type)) {
+    const allowedTypes = [ 'image/jpeg', 'image/png', 'image/webp', 'image/gif' ];
+    if (!allowedTypes.includes(file.type))
+    {
       alert('❌ Only image files (JPG, PNG, GIF, WebP) are allowed.');
       return;
     }
 
     // Preview image locally before saving
     const reader = new FileReader();
-    reader.onload = () => {
+    reader.onload = () =>
+    {
       this.previewImage = reader.result as string;
       this.currentUserInfo.profileImage = this.previewImage!;
       this.imageRemoved = false;
@@ -179,7 +201,8 @@ export class ProfileComponent implements OnInit {
     this.showImageOptions = false;
   }
 
-  removeTempImage() {
+  removeTempImage()
+  {
     this.previewImage = null;
     this.currentUserInfo.profileImage = '';
     this.pendingImageFile = null;
@@ -187,15 +210,18 @@ export class ProfileComponent implements OnInit {
     this.showImageOptions = false;
   }
 
-  closeImageOptions(event: MouseEvent) {
+  closeImageOptions(event: MouseEvent)
+  {
     const target = event.target as HTMLElement;
-    if (target.classList.contains('image-options-overlay')) {
+    if (target.classList.contains('image-options-overlay'))
+    {
       this.showImageOptions = false;
     }
   }
 
   // ===== SAVE PROFILE =====
-  async saveProfile() {
+  async saveProfile()
+  {
     if (!this.currentUser) return;
     const userId = this.decodedToken.sub;
 
@@ -205,15 +231,18 @@ export class ProfileComponent implements OnInit {
       skills: this.currentUserInfo.skills
     };
 
-    try {
+    try
+    {
       // Remove profile image if marked
-      if (this.imageRemoved) {
+      if (this.imageRemoved)
+      {
         await this.http.delete(`${environment.apiUrl}/user/${userId}/profile-image`).toPromise();
         this.imageRemoved = false;
       }
 
       // Upload new image if selected
-      if (this.pendingImageFile) {
+      if (this.pendingImageFile)
+      {
         const formData = new FormData();
         formData.append('file', this.pendingImageFile);
         await this.http.post(`${environment.apiUrl}/user/${userId}/profile-image`, formData).toPromise();
@@ -221,11 +250,15 @@ export class ProfileComponent implements OnInit {
       }
 
       // Delete marked certificates
-      if (this.deletedCertificates.length > 0) {
-        for (const certId of this.deletedCertificates) {
-          try {
+      if (this.deletedCertificates.length > 0)
+      {
+        for (const certId of this.deletedCertificates)
+        {
+          try
+          {
             await this.http.delete(`${environment.apiUrl}/certificate/${certId}`).toPromise();
-          } catch (err) {
+          } catch (err)
+          {
             console.warn(`⚠️ Failed to delete certificate ${certId}:`, err);
           }
         }
@@ -241,14 +274,16 @@ export class ProfileComponent implements OnInit {
       this.originalImage = this.currentUserInfo.profileImage;
       this.showImageOptions = false;
       this.loadCurrentUserProfile();
-    } catch (err) {
+    } catch (err)
+    {
       console.error('❌ Error saving profile:', err);
     }
   }
 
   // ===== SERVICES =====
-  switchPage(serviceId: number, taskBoardId?: number) {
-    this.router.navigate([`/services/${serviceId}/taskboard/${taskBoardId}`]);
+  switchPage(serviceId: number, taskBoardId?: number)
+  {
+    this.router.navigate([ `/services/${serviceId}/taskboard/${taskBoardId}` ]);
     window.scrollTo(0, 0);
   }
 }
