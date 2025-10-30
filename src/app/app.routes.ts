@@ -13,14 +13,16 @@ import { ServiceFormComponent } from './service-form/service-form.component';
 import { DevelopersSearchComponent } from './developers.search.component/developers.search.component';
 import { ServiceTasksComponent } from './service.tasks.component/service.tasks.component';
 import { ServicesComponent } from './services.component/services.component';
+import { IssuePage } from './issue-page/issue-page';
+import { IssueCreateComponent } from './issue-create/issue-create';
 
 export const routes: Routes = [
-  { path: "", redirectTo: 'auth/signup', pathMatch: "full" },
+  { path: '', redirectTo: 'auth/signup', pathMatch: 'full' },
   { path: 'projects', component: ProjectManagement, canActivate: [AuthGuard], data: { onlyAdmin: true } },
   { path: 'projects/:projectId/services', component: ServicesComponent, canActivate: [AuthGuard], data: { onlyAdmin: true } },
   { path: 'projects/:projectId/services/new', component: ServiceFormComponent, canActivate: [AuthGuard], data: { onlyAdmin: true } },
   { path: 'projects/:projectId/services/:serviceId/edit', component: ServiceFormComponent, canActivate: [AuthGuard], data: { onlyAdmin: true } },
-  { path: "auth/:mode", component: UserComponent },
+  { path: 'auth/:mode', component: UserComponent },
   { path: 'dashboard', component: Dashboard, canActivate: [AuthGuard], data: { onlyAdmin: true } },
   { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard] },
   { path: 'profile/user/:userId', component: ProfileComponent, canActivate: [AuthGuard] },
@@ -29,15 +31,14 @@ export const routes: Routes = [
   { path: 'certificate/edit/:id', component: CertificateCreateComponent, canActivate: [AuthGuard] },
   { path: 'developers', component: DevelopersSearchComponent, canActivate: [AuthGuard], data: { onlyAdmin: true } },
   { path: 'services/:serviceId/taskboard/:taskBoardId', component: ServiceTasksComponent, canActivate: [AuthGuard] },
-
-
+  { path: 'issues', component: IssuePage },
+  { path: 'issues/create', component: IssueCreateComponent },
   { path: 'home', component: HomePage, canActivate: [AuthGuard] },
-
-  { path: '**', component: UserComponent }
+  { path: '**', component: UserComponent },
 ];
 
 @NgModule({
   imports: [BrowserModule, RouterModule.forRoot(routes)],
   exports: [RouterModule],
 })
-export class RoutingModule { }
+export class RoutingModule {}
