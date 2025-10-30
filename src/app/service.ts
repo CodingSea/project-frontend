@@ -9,7 +9,7 @@ export interface Service
     description: string;
     project: Project;
     deadline: Date;
-    status?: 'Pending Approval' | 'In-Progress' | 'Completed' | 'At Risk' | 'Overdue' | "on Hold" | "Not Started Yet" | "Default";
+    status?: 'Pending Approval' | 'In-Progress' | 'Completed' | 'At Risk' | 'Overdue' | "On Hold" | "Not Started Yet" | "Default";
     chief: User;
     projectManager?: User;
     assignedResources: User[];

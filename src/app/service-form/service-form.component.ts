@@ -283,6 +283,12 @@ export class ServiceFormComponent implements OnInit, OnDestroy
       this.files.forEach((file) => formData.append('newFiles', file));
       formData.append('filesToDelete', JSON.stringify(this.filesToDelete));
 
+
+      if (this.form.get("status")?.value != DefaultStatus.Default.valueOf())
+      {
+        formData.append('status', this.form.get("status")?.value);
+      }
+
       this.serviceService.updateServiceWithFiles(this.serviceId, formData).subscribe({
         next: () =>
         {
