@@ -12,7 +12,7 @@ import { Sidebar } from "@app/sidebar/sidebar";
 import { firstValueFrom } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ServiceInfo } from '@app/service-info';
-import { Service } from '@app/service';
+import { Service, ServiceStatus } from '@app/service';
 import { FormsModule } from '@angular/forms';
 
 @Component({
@@ -76,7 +76,7 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
     this.getCurrentServiceInfo();
   }
 
-  getCurrentServiceInfo(): void
+  async getCurrentServiceInfo(): Promise<void>
   {
     this.servicesInfo =
     {
@@ -153,7 +153,6 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
         this.servicesInfo.completionRate = totalTasksCount > 0
           ? (this.servicesInfo.completedTasks / totalTasksCount) * 100
           : 0;
-
       },
       (error) =>
       {
@@ -162,7 +161,7 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
     );
   }
 
-  getCurrentServiceInfoFromData(): void
+  async getCurrentServiceInfoFromData(): Promise<void>
   {
     this.servicesInfo =
     {
@@ -216,6 +215,44 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
     this.servicesInfo.completionRate = totalTasksCount > 0
       ? (this.servicesInfo.completedTasks / totalTasksCount) * 100
       : 0;
+  }
+
+  async checkServiceStatus()
+  {
+    try
+    {
+      console.log(this.dataAdapter);
+
+      if (this.dataAdapter.localData == undefined)
+      {
+        console.log("New");
+        await this.http.patch<Service>(`${environment.apiUrl}/service/${this.serviceId}/status`, { status: ServiceStatus.New }).toPromise();
+        return;
+      }
+
+      if (this.dataAdapter.localData.length > 0)
+      {
+        if (this.servicesInfo.completionRate == 100)
+        {
+          console.log("Completed");
+          await this.http.patch<Service>(`${environment.apiUrl}/service/${this.serviceId}/status`, { status: ServiceStatus.Completed }).toPromise();
+        }
+        else
+        {
+          console.log("In progress");
+          await this.http.patch<Service>(`${environment.apiUrl}/service/${this.serviceId}/status`, { status: ServiceStatus.InProgress }).toPromise();
+        }
+      }
+      else
+      {
+        console.log("New");
+        await this.http.patch<Service>(`${environment.apiUrl}/service/${this.serviceId}/status`, { status: ServiceStatus.New }).toPromise();
+      }
+    }
+    catch (err)
+    {
+      console.log(err);
+    }
   }
 
   async getBoardCards(): Promise<void>
@@ -303,6 +340,7 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
       await this.updateTask(taskToUpdate); // Save task with new status and order
 
       this.getCurrentServiceInfoFromData();
+      await this.checkServiceStatus();
     }
     else 
     {
@@ -410,8 +448,10 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
       ]
     });
 
-    this.dataAdapter.localdata = this.data;
+    this.dataAdapter.localData = this.data;
     this.rebuildKanban();
+
+    this.checkServiceStatus();
   }
 
   addTask(column: string, taskText: string, tagsText: string)
@@ -428,13 +468,15 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
 
     this.data.push(newTask);
 
-    this.dataAdapter.localdata = this.data;
+    this.dataAdapter.localData = this.data;
     this.rebuildKanban();
 
     this.closePopup();
+
+    this.checkServiceStatus();
   }
 
-  rebuildKanban()
+  async rebuildKanban()
   {
     if (this.kanban)
     {
@@ -443,9 +485,11 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
 
     this.showKanban = false;
 
+    await this.getBoardCards();
+
     setTimeout(() =>
     {
-      this.dataAdapter = new jqx.dataAdapter(this.dataAdapter);
+      this.dataAdapter = new jqx.dataAdapter(this.data);
       this.showKanban = true;
     }, 0);
   }
@@ -497,12 +541,13 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
         color: color,
       };
 
-      console.log(newTask02);
-
       this.data.push(newTask02);
-      this.dataAdapter.localdata = this.data;
+      this.dataAdapter.localData = this.data;
       this.rebuildKanban();
       this.closePopup();
+      
+      await this.getCurrentServiceInfo();
+      await this.initializeKanbanDataSource();
     } catch (error)
     {
       console.error('Error creating task:', error);
@@ -526,8 +571,6 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
       color: task.color === null ? "#008000" : task.color
     };
 
-    // console.log(payload)
-
     try
     {
       const response = await this.http.patch<TaskCard>(
@@ -547,6 +590,8 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
           color: payload.color
         };
       }
+
+      this.dataAdapter.localData = this.data;
     } catch (error)
     {
       console.error('Error updating task:', error);
@@ -560,11 +605,11 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
       const url = `${environment.apiUrl}/service/${this.taskBoardId}/tasks/${taskId}`;
       await this.http.delete(url).toPromise(); // Call the delete API
       this.data = this.data.filter(task => task.id !== taskId); // Remove from local data
-      this.dataAdapter.localdata = this.data;
+      this.dataAdapter.localData = this.data;
       this.rebuildKanban();
       this.closeTaskDetailPopup();
-      // this.getCurrentServiceInfo();
-      this.getCurrentServiceInfoFromData();
+      await this.getCurrentServiceInfoFromData();
+      this.checkServiceStatus();
     } catch (error)
     {
       console.error('Error deleting task:', error);
