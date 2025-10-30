@@ -487,8 +487,6 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
 
     await this.getBoardCards();
 
-    
-
     setTimeout(() =>
     {
       this.dataAdapter = new jqx.dataAdapter(this.data);
