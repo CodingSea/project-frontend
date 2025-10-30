@@ -16,12 +16,12 @@ import { ServicesComponent } from './services.component/services.component';
 import { IssuePage } from './issue-page/issue-page';
 
 export const routes: Routes = [
-  { path: "", redirectTo: 'auth/signup', pathMatch: "full" },
+  { path: '', redirectTo: 'auth/signup', pathMatch: 'full' },
   { path: 'projects', component: ProjectManagement, canActivate: [AuthGuard], data: { onlyAdmin: true } },
   { path: 'projects/:projectId/services', component: ServicesComponent, canActivate: [AuthGuard], data: { onlyAdmin: true } },
   { path: 'projects/:projectId/services/new', component: ServiceFormComponent, canActivate: [AuthGuard], data: { onlyAdmin: true } },
   { path: 'projects/:projectId/services/:serviceId/edit', component: ServiceFormComponent, canActivate: [AuthGuard], data: { onlyAdmin: true } },
-  { path: "auth/:mode", component: UserComponent },
+  { path: 'auth/:mode', component: UserComponent },
   { path: 'dashboard', component: Dashboard, canActivate: [AuthGuard], data: { onlyAdmin: true } },
   { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard] },
   { path: 'profile/user/:userId', component: ProfileComponent, canActivate: [AuthGuard] },
@@ -30,13 +30,13 @@ export const routes: Routes = [
   { path: 'certificate/edit/:id', component: CertificateCreateComponent, canActivate: [AuthGuard] },
   { path: 'developers', component: DevelopersSearchComponent, canActivate: [AuthGuard], data: { onlyAdmin: true } },
   { path: 'services/:serviceId/taskboard/:taskBoardId', component: ServiceTasksComponent, canActivate: [AuthGuard] },
-{ path: 'issues', component: IssuePage },
-  { path: '**', component: UserComponent }
-
+  { path: 'issues', component: IssuePage },
+  { path: 'home', component: HomePage, canActivate: [AuthGuard] },
+  { path: '**', component: UserComponent },
 ];
 
 @NgModule({
   imports: [BrowserModule, RouterModule.forRoot(routes)],
   exports: [RouterModule],
 })
-export class RoutingModule { }
+export class RoutingModule {}

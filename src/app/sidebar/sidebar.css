@@ -32,6 +32,12 @@
   align-items: center;
 }
 
+.icon
+{
+  margin-right: 8px;
+  fill: currentColor;
+}
+
 .sidebar nav a {
   display: flex;
   align-items: center;
