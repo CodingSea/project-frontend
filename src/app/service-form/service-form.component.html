@@ -39,11 +39,8 @@
 
           <div class="field mt-16">
             <label>Service Description</label>
-            <textarea
-              rows="4"
-              formControlName="description"
-              placeholder="(optional) Briefly describe the service scope and objectives"
-            ></textarea>
+            <textarea rows="4" formControlName="description"
+              placeholder="(optional) Briefly describe the service scope and objectives"></textarea>
             <div class="error" *ngIf="form.get('description')?.touched && form.get('description')?.invalid">
               <small *ngIf="form.get('description')?.hasError('pattern')">
                 Only letters, numbers, punctuation, and spaces allowed (max 300 characters).
@@ -51,6 +48,31 @@
               <small *ngIf="form.get('description')?.hasError('maxlength')">
                 Maximum 300 characters allowed.
               </small>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Statsu -->
+      <section class="section" *ngIf="isEditMode">
+        <header class="section__header">
+          <span class="icon">
+            <svg viewBox="0 0 24 24" width="18" height="18">
+              <path d="M12 12a5 5 0 100-10 5 5 0 000 10zm-7 9a7 7 0 0114 0v1H5v-1z" fill="currentColor" />
+            </svg>
+          </span>
+          <h2>Service Status</h2>
+        </header>
+
+        <div class="section__body">
+          <div class="grid">
+            <!-- Chief -->
+            <div class="field">
+              <label>Status<span class="req">*</span></label>
+
+              <select formControlName="status">
+                <option *ngFor="let s of status" [value]="s">{{ s }}</option>
+              </select>
             </div>
           </div>
         </div>
@@ -117,7 +139,8 @@
           <div class="grid-resource">
             <div class="field">
               <label>Assign Resources</label>
-              <button type="button" class="btn btn-red" (click)="openDevelopersModal($event)">+ Select Developers</button>
+              <button type="button" class="btn btn-red" (click)="openDevelopersModal($event)">+ Select
+                Developers</button>
             </div>
           </div>
 
@@ -180,9 +203,9 @@
         <button type="submit" class="btn btn-red" [disabled]="isSubmitting">
           <span class="plus" *ngIf="!isEditMode">+</span>
           {{
-            isEditMode
-              ? (isSubmitting ? 'Saving...' : 'Save Update')
-              : (isSubmitting ? 'Creating...' : 'Create Service')
+          isEditMode
+          ? (isSubmitting ? 'Saving...' : 'Save Update')
+          : (isSubmitting ? 'Creating...' : 'Create Service')
           }}
         </button>
       </div>
@@ -199,10 +222,8 @@
         <button type="button" class="pm-close done-btn" (click)="closeDevelopersModal($event)">Done</button>
       </header>
       <div>
-        <app-developers-search
-          (developerSelected)="onDeveloperSelected($event)"
-          [selectedIds]="selectedResourceIds"
-        ></app-developers-search>
+        <app-developers-search (developerSelected)="onDeveloperSelected($event)"
+          [selectedIds]="selectedResourceIds"></app-developers-search>
       </div>
     </div>
   </div>
@@ -215,10 +236,8 @@
         <button type="button" class="pm-close done-btn" (click)="closeChiefModal()">Done</button>
       </header>
       <div>
-        <app-developers-search
-          (developerSelected)="onChiefSelected($event)"
-          [selectedIds]="selectedChief ? [selectedChief.id] : []"
-        ></app-developers-search>
+        <app-developers-search (developerSelected)="onChiefSelected($event)"
+          [selectedIds]="selectedChief ? [selectedChief.id] : []"></app-developers-search>
       </div>
     </div>
   </div>
@@ -231,10 +250,8 @@
         <button type="button" class="pm-close done-btn" (click)="closeManagerModal()">Done</button>
       </header>
       <div>
-        <app-developers-search
-          (developerSelected)="onManagerSelected($event)"
-          [selectedIds]="selectedManager ? [selectedManager.id] : []"
-        ></app-developers-search>
+        <app-developers-search (developerSelected)="onManagerSelected($event)"
+          [selectedIds]="selectedManager ? [selectedManager.id] : []"></app-developers-search>
       </div>
     </div>
   </div>

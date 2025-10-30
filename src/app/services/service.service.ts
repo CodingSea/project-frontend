@@ -2,18 +2,19 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '@environments/environment';
+import { Service } from '@app/service';
 
 // ✅ Full Service interface to match backend entity
-export interface Service {
-  serviceID: number;
-  name: string;
-  description?: string;
-  deadline?: string;
-  files?: { name: string; url: string }[]; // ✅ match backend: list of { name, url }
-  chief?: any;
-  projectManager?: any;
-  assignedResources?: any[];
-}
+// export interface Service {
+//   serviceID: number;
+//   name: string;
+//   description?: string;
+//   deadline?: string;
+//   files?: { name: string; url: string }[]; // ✅ match backend: list of { name, url }
+//   chief?: any;
+//   projectManager?: any;
+//   assignedResources?: any[];
+// }
 
 // ✅ DTO interface (create/update)
 export interface CreateServiceDto {
