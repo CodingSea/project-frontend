@@ -1,7 +1,13 @@
+.container {
+  display: flex;
+  width: 100%;
+  overflow-y: hidden;
+}
+
 
 .issue-create-container {
   max-width: 880px;
-  margin: 60px auto;
+  margin: 1em auto;
   background: #ffffff;
   border: 1px solid #e5e7eb;
   border-radius: 14px;
