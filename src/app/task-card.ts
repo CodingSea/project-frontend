@@ -10,3 +10,16 @@ export interface TaskCard
     order: number;
     color?: string;
 }
+
+export interface TaskCardDisplayed
+{
+    id?: number;
+    column: string;
+    title: string;
+    description?: string;
+    taskBoardId?: number;
+    comments?: Comment[];
+    tags?: string;
+    order: number;
+    color?: string;
+}

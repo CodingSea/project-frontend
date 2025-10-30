@@ -18,3 +18,12 @@ export interface Service
     memberCount?: number;
     completionRate?: number;
 }
+
+export enum ServiceStatus
+{
+  New = 'Not Started Yet',
+  Pending = 'Pending Approval',
+  InProgress = 'In-Progress',
+  Completed = 'Completed',
+  OnHold = "On Hold"
+}
