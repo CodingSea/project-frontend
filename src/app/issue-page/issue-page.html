@@ -1,134 +1,73 @@
 <app-sidebar></app-sidebar>
 
 <div class="issue-container">
-  <!-- Problem Section -->
-  <section class="issue-problem">
+  <div *ngIf="loading">⏳ Loading issues...</div>
+  <div *ngIf="error" class="error-alert">{{ error }}</div>
+
+  <section *ngFor="let issue of issues" class="issue-problem">
     <header class="issue-header">
       <div class="issue-meta">
-        <span class="issue-status open">Open</span>
-        <span class="issue-number">#1247</span>
-        <span class="issue-date">Created 2 days ago • Updated 4 hours ago</span>
+        <span class="issue-status" [ngClass]="{ open: issue.status === 'open' }">
+          {{ issue.status | titlecase }}
+        </span>
+        <span class="issue-number">#{{ issue.id }}</span>
+        <span class="issue-date">
+          Created {{ issue.createdAt | date: 'medium' }}
+        </span>
       </div>
 
-      <h1 class="issue-title">How to fix AWS S3 403 Access Denied error?</h1>
+      <h1 class="issue-title">{{ issue.title }}</h1>
 
-      <div class="issue-author">
-        <img src="images/user.png" alt="Author" class="avatar" />
+      <div class="issue-author" *ngIf="issue.createdBy">
+        <img
+          [src]="issue.createdBy.profileImage || 'images/user.png'"
+          alt="Author"
+          class="avatar"
+        />
         <div>
-          <strong>Alex Thompson</strong>
+          <strong>
+            {{ issue.createdBy.first_name }} {{ issue.createdBy.last_name }}
+          </strong>
           <span class="author-note">opened this issue</span>
         </div>
       </div>
     </header>
 
-    <!-- Code Snippet -->
-    <div class="code-container">
-      <button class="copy-btn" (click)="copyCode($event)">Copy code</button>
-      <pre><code class="language-javascript">
-const AWS = require('aws-sdk');
-const s3 = new AWS.S3();
-
-s3.getObject({{ '{' }}
-  Bucket: 'my-bucket',
-  Key: 'my-file.txt'
-{{ '}' }}, (err, data) => {{ '{' }}
-  if (err) console.log(err); // 403 Access Denied
-{{ '}' }});
-      </code></pre>
-    </div>
-
     <div class="error-alert">
-      <strong>⚠️ Error:</strong> <span>AccessDenied: Access Denied</span>
+      <strong>📝 Description:</strong> {{ issue.description }}
     </div>
-  </section>
 
-  <!-- Solutions Section -->
-  <section class="solutions-section">
-    <h2 class="solutions-title">💡 Top Solutions</h2>
+    <!-- Feedbacks -->
+    <section class="solutions-section" *ngIf="issue.feedbacks?.length">
+      <h2 class="solutions-title">💡 Feedbacks</h2>
 
-    <!-- Solution 1 -->
-    <article class="solution-card">
-      <header class="solution-header">
-        <div class="solution-author">
-          <img src="images/user.png" alt="Fatima" class="avatar" />
-          <div>
-            <strong>Fatima Al-Zahra</strong>
-            <span class="expert-badge">Expert</span>
-            <span class="time-ago">answered 3 hours ago</span>
+      <article *ngFor="let feedback of issue.feedbacks" class="solution-card">
+        <header class="solution-header">
+          <div class="solution-author">
+            <img
+              [src]="feedback.user?.profileImage || 'images/user.png'"
+              alt="User"
+              class="avatar"
+            />
+            <div>
+              <strong>
+                {{ feedback.user?.first_name }} {{ feedback.user?.last_name }}
+              </strong>
+              <span class="time-ago">
+                {{ feedback.createdAt | date: 'short' }}
+              </span>
+            </div>
           </div>
+        </header>
+
+        <p class="solution-text">{{ feedback.content || 'No content yet' }}</p>
+
+        <div class="comments" *ngIf="feedback.comments?.length">
+          <p *ngFor="let comment of feedback.comments">
+            💬 <strong>{{ comment.user.first_name }}:</strong> {{ comment.content }}
+          </p>
         </div>
-        <button class="accept-btn">Accept Solution</button>
-      </header>
-
-      <p class="solution-text">
-        You need to set the correct region and credentials. The issue is that you're not specifying the AWS region in your S3 configuration.
-      </p>
-
-      <div class="code-container">
-        <button class="copy-btn" (click)="copyCode($event)">Copy code</button>
-        <pre><code class="language-javascript">
-// ❌ Wrong
-const s3 = new AWS.S3();
-
-// ✅ Correct
-const s3 = new AWS.S3({{ '{' }} region: 'us-east-1' {{ '}' }});
-        </code></pre>
-      </div>
-
-      <div class="attachments">
-        <a href="#">aws-demo.zip</a>
-        <a href="#">policy-example.json</a>
-      </div>
-
-      <div class="comments">
-        <p><strong>Ali Hassan:</strong> This worked for me!</p>
-        <p><strong>Noor Ahmed:</strong> I had to also add credentials to make it work.</p>
-      </div>
-    </article>
-
-    <!-- Solution 2 -->
-    <article class="solution-card">
-      <header class="solution-header">
-        <div class="solution-author">
-          <img src="images/user.png" alt="Ahmed" class="avatar" />
-          <div>
-            <strong>Ahmed Khalil</strong>
-            <span class="contributor-badge">Contributor</span>
-            <span class="time-ago">answered 1 hour ago</span>
-          </div>
-        </div>
-      </header>
-
-      <p class="solution-text">
-        You can also fix it by setting IAM roles properly. Make sure your IAM user or role has the necessary S3 permissions.
-      </p>
-
-      <div class="code-container">
-        <button class="copy-btn" (click)="copyCode($event)">Copy code</button>
-        <pre><code class="language-json">
-{{ '{' }}
-  "Version": "2012-10-17",
-  "Statement": [
-    {{ '{' }}
-      "Effect": "Allow",
-      "Action": "s3:GetObject",
-      "Resource": "arn:aws:s3:::my-bucket/*"
-    {{ '}' }}
-  ]
-{{ '}' }}
-        </code></pre>
-      </div>
-    </article>
-
-    <!-- Add Solution -->
-    <div class="add-solution">
-      <h3>Add your solution</h3>
-      <textarea placeholder="Share your solution or comment..."></textarea>
-      <div class="add-solution-actions">
-        <button class="attach-btn">Attach files</button>
-        <button class="code-btn">Insert code</button>
-        <button class="post-btn">Post Solution</button>
-      </div>
-    </div>
+      </article>
+    </section>
   </section>
 </div>

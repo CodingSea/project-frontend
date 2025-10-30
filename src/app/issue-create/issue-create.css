@@ -1,0 +1,371 @@
+
+.issue-create-container {
+  max-width: 880px;
+  margin: 60px auto;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 48px 56px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.04);
+  font-family: "Inter", system-ui, sans-serif;
+}
+
+.issue-create-header h1 {
+  font-size: 26px;
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
+}
+
+.issue-create-header p {
+  color: #6b7280;
+  font-size: 15px;
+  margin: 8px 0 32px;
+}
+
+.issue-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+label {
+  font-weight: 500;
+  color: #1f2937;
+  margin-bottom: 6px;
+  font-size: 15px;
+}
+
+label span {
+  color: #dc2626;
+}
+
+/* Inputs */
+input[type="text"],
+textarea,
+select {
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 11px 13px;
+  font-size: 15px;
+  background-color: #f9fafb;
+  color: #111827;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+
+input[type="text"]:focus,
+textarea:focus,
+select:focus {
+  border-color: #dc2626;
+  background: #fff;
+  outline: none;
+}
+
+.other-category {
+  margin-top: 8px;
+}
+
+/* Attachments */
+.attachment-dropzone {
+  border: 2px dashed #e5e7eb;
+  background: #fafafa;
+  border-radius: 10px;
+  padding: 26px;
+  text-align: center;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.attachment-dropzone:hover {
+  background: #fff6f6;
+  border-color: #fca5a5;
+}
+
+.upload-icon {
+  font-size: 32px;
+  color: #ef4444;
+  margin-bottom: 8px;
+}
+
+.upload-text {
+  color: #374151;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.upload-text strong {
+  color: #dc2626;
+}
+
+.upload-subtext {
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.uploaded-files {
+  margin-top: 14px;
+}
+
+.file-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f3f4f6;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  margin-bottom: 6px;
+}
+
+.file-icon {
+  color: #9ca3af;
+  margin-right: 8px;
+}
+
+.file-name {
+  flex: 1;
+  color: #374151;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.remove-file {
+  background: transparent;
+  border: none;
+  color: #dc2626;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+
+.remove-file:hover {
+  background: #fee2e2;
+}
+
+/* Code Snippet */
+.code-block.light-theme {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.code-header {
+  background: #f1f5f9;
+  color: #374151;
+  padding: 8px 16px;
+  font-size: 13px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.copy-btn {
+  background: transparent;
+  border: 1px solid #d1d5db;
+  color: #374151;
+  border-radius: 6px;
+  padding: 3px 10px;
+  font-size: 12.5px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.copy-btn:hover {
+  background: #e5e7eb;
+}
+
+.code-content {
+  font-family: "JetBrains Mono", monospace;
+  background: #f8fafc;
+  color: #1e293b;
+  padding: 16px;
+  font-size: 14px;
+  white-space: pre-wrap;
+  display: block;
+  min-height: 140px;
+  outline: none;
+  line-height: 1.5;
+  overflow-x: auto;
+  border-radius: 0 0 10px 10px;
+}
+
+/* Footer */
+.form-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 14px;
+  margin-top: 28px;
+}
+
+.btn-cancel {
+  background-color: #f3f4f6;
+  color: #374151;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 10px 22px;
+  font-weight: 500;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.btn-cancel:hover {
+  background-color: #e5e7eb;
+}
+
+.btn-submit {
+  background-color: #dc2626;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 24px;
+  font-weight: 500;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.btn-submit:hover {
+  background-color: #b91c1c;
+}
+
+.form-message {
+  font-size: 14px;
+  color: #16a34a;
+  font-weight: 500;
+  margin-top: 16px;
+  text-align: right;
+}
+
+.error-message {
+  color: #dc2626;
+  font-size: 14px;
+  font-weight: 500;
+  margin-top: 6px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .issue-create-container {
+    padding: 24px;
+  }
+}
+.issue-create-container {
+  max-width: 880px;
+  margin: 60px auto;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 48px 56px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.04);
+  font-family: "Inter", system-ui, sans-serif;
+}
+
+.issue-create-header h1 {
+  font-size: 26px;
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
+}
+
+.issue-create-header p {
+  color: #6b7280;
+  font-size: 15px;
+  margin: 8px 0 32px;
+}
+
+.issue-form { display: flex; flex-direction: column; gap: 24px; }
+.form-group { display: flex; flex-direction: column; }
+
+label { font-weight: 500; color: #1f2937; margin-bottom: 6px; font-size: 15px; }
+label span { color: #dc2626; }
+
+/* Inputs */
+input[type="text"], textarea, select {
+  border: 1px solid #d1d5db; border-radius: 8px; padding: 11px 13px;
+  font-size: 15px; background-color: #f9fafb; color: #111827;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+input[type="text"]:focus, textarea:focus, select:focus {
+  border-color: #dc2626; background: #fff; outline: none;
+}
+.other-category { margin-top: 8px; }
+
+/* Attachments */
+.attachment-dropzone {
+  border: 2px dashed #e5e7eb; background: #fafafa; border-radius: 10px;
+  padding: 26px; text-align: center; cursor: pointer; transition: 0.3s ease;
+}
+.attachment-dropzone:hover { background: #fff6f6; border-color: #fca5a5; }
+.upload-icon { font-size: 32px; color: #ef4444; margin-bottom: 8px; }
+.upload-text { color: #374151; font-weight: 500; margin-bottom: 4px; }
+.upload-text strong { color: #dc2626; }
+.upload-subtext { color: #6b7280; font-size: 13px; }
+.uploaded-files { margin-top: 14px; }
+
+.file-item {
+  display: flex; align-items: center; justify-content: space-between;
+  background: #f3f4f6; padding: 8px 12px; border-radius: 6px; font-size: 14px;
+  margin-bottom: 6px;
+}
+.file-icon { color: #9ca3af; margin-right: 8px; }
+.file-name { flex: 1; color: #374151; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.remove-file { background: transparent; border: none; color: #dc2626; font-size: 16px; cursor: pointer; padding: 4px; border-radius: 6px; transition: background 0.2s; }
+.remove-file:hover { background: #fee2e2; }
+
+/* Code Snippet */
+.code-block.light-theme { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden; }
+.code-header {
+  background: #f1f5f9; color: #374151; padding: 8px 16px; font-size: 13px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.copy-btn {
+  background: transparent; border: 1px solid #d1d5db; color: #374151;
+  border-radius: 6px; padding: 3px 10px; font-size: 12.5px; cursor: pointer; transition: all 0.2s ease;
+}
+.copy-btn:hover { background: #e5e7eb; }
+.code-content {
+  font-family: "JetBrains Mono", monospace; background: #f8fafc; color: #1e293b;
+  padding: 16px; font-size: 14px; white-space: pre-wrap; display: block; min-height: 140px;
+  outline: none; line-height: 1.5; overflow-x: auto; border-radius: 0 0 10px 10px;
+}
+
+/* Validation messages */
+.error-message { color: #dc2626; font-size: 14px; font-weight: 500; margin-top: 6px; }
+.ok-message { color: #16a34a; font-size: 14px; font-weight: 500; margin-top: 6px; }
+
+/* Footer */
+.form-footer { display: flex; justify-content: flex-end; gap: 14px; margin-top: 28px; }
+.btn-cancel {
+  background-color: #f3f4f6; color: #374151; border: 1px solid #d1d5db;
+  border-radius: 8px; padding: 10px 22px; font-weight: 500; font-size: 15px;
+  cursor: pointer; transition: background-color 0.2s, color 0.2s;
+}
+.btn-cancel:hover { background-color: #e5e7eb; }
+.btn-submit {
+  background-color: #dc2626; color: #fff; border: none; border-radius: 8px;
+  padding: 10px 24px; font-weight: 500; font-size: 15px; cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+.btn-submit:hover { background-color: #b91c1c; }
+.form-message { font-size: 14px; color: #16a34a; font-weight: 500; margin-top: 16px; text-align: right; }
+
+@media (max-width: 768px) { .issue-create-container { padding: 24px; } }
+.success-message {
+  color: #16a34a;
+  font-weight: 500;
+}
+
+.error-message {
+  color: #dc2626;
+  font-weight: 500;
+}

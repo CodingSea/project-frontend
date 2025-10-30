@@ -14,6 +14,7 @@ import { DevelopersSearchComponent } from './developers.search.component/develop
 import { ServiceTasksComponent } from './service.tasks.component/service.tasks.component';
 import { ServicesComponent } from './services.component/services.component';
 import { IssuePage } from './issue-page/issue-page';
+import { IssueCreateComponent } from './issue-create/issue-create';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'auth/signup', pathMatch: 'full' },
@@ -31,6 +32,7 @@ export const routes: Routes = [
   { path: 'developers', component: DevelopersSearchComponent, canActivate: [AuthGuard], data: { onlyAdmin: true } },
   { path: 'services/:serviceId/taskboard/:taskBoardId', component: ServiceTasksComponent, canActivate: [AuthGuard] },
   { path: 'issues', component: IssuePage },
+  { path: 'issues/create', component: IssueCreateComponent },
   { path: 'home', component: HomePage, canActivate: [AuthGuard] },
   { path: '**', component: UserComponent },
 ];

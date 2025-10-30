@@ -30,6 +30,7 @@
     "@angular/router": "^20.3.0",
     "@auth0/angular-jwt": "^5.2.0",
     "@fortawesome/fontawesome-free": "^7.1.0",
+    "highlight.js": "^11.11.1",
     "jqwidgets-ng": "^24.0.0",
     "jqwidgets-scripts": "^24.0.0",
     "jwt-decode": "^4.0.0",
