@@ -14,7 +14,7 @@
         <select [(ngModel)]="selectedStatus" (change)="onFilterChange()">
           <option *ngFor="let s of status" [value]="s">{{ s }}</option>
         </select>
-        <button class="new-issue">+ New Issue</button>
+        <button class="new-issue" routerLink="/issues/create">+ New Issue</button>
       </div>
     </header>
 
