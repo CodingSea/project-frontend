@@ -134,7 +134,12 @@ export class ProjectManagement implements OnInit, AfterViewInit
   closeNewProject() { this.showNewProject = false; }
 
   openEditProject() { this.showEditProject = true; this.editProject = this.blankNewProject(); }
-  closeEditProject() { this.showEditProject = false;}
+  closeEditProject()
+  {
+    this.editProject = { ...this.lastEditProject };
+    this.showEditProject = false;
+    this.loadProjects();
+  }
 
   private blankNewProject(): Partial<Project>
   {
@@ -150,6 +155,8 @@ export class ProjectManagement implements OnInit, AfterViewInit
       this.projects = [ created, ...this.projects ];
       this.closeNewProject();
     });
+
+    this.loadProjects();
   }
 
 
@@ -201,11 +208,11 @@ export class ProjectManagement implements OnInit, AfterViewInit
 
   async goToEdit(s: Project, event: Event)
   {
+    this.lastEditProject = { ...s }; // Store the current project state
     event.stopPropagation();
 
     this.openEditProject();
-
-    this.editProject = s;
+    this.editProject = { ...s }; // Set the project to edit
   }
 
   async updateProject(form: any)
@@ -219,10 +226,12 @@ export class ProjectManagement implements OnInit, AfterViewInit
       status: this.editProject.status
     }
 
+    this.lastEditProject = { ...updatedProject };
+
     await this.http.patch(`${environment.apiUrl}/project/${this.editProject.projectID}`, updatedProject).subscribe(
       (res) =>
       {
-        
+
       },
       (err) =>
       {
@@ -238,7 +247,7 @@ export class ProjectManagement implements OnInit, AfterViewInit
     try
     {
       await this.http.delete(`${environment.apiUrl}/project/${s.projectID}`).toPromise();
-      
+
       this.loadProjects();
     }
     catch (error)
