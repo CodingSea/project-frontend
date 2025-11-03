@@ -14,7 +14,7 @@
         <select [(ngModel)]="selectedStatus" (change)="onFilterChange()">
           <option *ngFor="let s of status" [value]="s">{{ s }}</option>
         </select>
-        <button class="new-issue">+ New Issue</button>
+<button class="new-issue" (click)="goToCreateIssue()">+ New Issue</button>
       </div>
     </header>
 
@@ -33,7 +33,7 @@
           <p>{{ issue.description }}</p>
           <div class="card-footer">
             <span>{{ getTimeAgo(issue) }}</span>
-            <button class="details-btn">View Details</button>
+              <button class="details-btn" (click)="openIssue(issue.id)">View Details</button>
           </div>
         </div>
       </div>

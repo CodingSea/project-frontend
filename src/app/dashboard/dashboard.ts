@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { Project } from '@app/project';
-import { Service } from '@app/service';
+import { Service, ServiceStatus } from '@app/service';
 import { Sidebar } from "@app/sidebar/sidebar";
 import { environment } from '@environments/environment';
 import { CommonModule } from '@angular/common';
@@ -161,6 +161,7 @@ export class Dashboard
       project.services?.forEach(service =>
       {
         if(service.taskBoard?.cards === undefined || project.status === "In Review") return;
+        if(service.status === ServiceStatus.OnHold.valueOf()) return;
 
         if (service.deadline && service.taskBoard?.cards.length > 0)
         {

@@ -9,7 +9,7 @@ export interface Service
     description: string;
     project: Project;
     deadline: Date;
-    status?: 'Pending Approval' | 'In-Progress' | 'Completed' | 'At Risk' | 'Overdue' | "on Hold" | "Not Started Yet";
+    status?: 'Pending Approval' | 'In-Progress' | 'Completed' | 'At Risk' | 'Overdue' | "On Hold" | "Not Started Yet" | "Default";
     chief: User;
     projectManager?: User;
     assignedResources: User[];
@@ -17,6 +17,7 @@ export interface Service
     taskBoard?: TaskBoard;
     memberCount?: number;
     completionRate?: number;
+    files?: { name: string; url: string }[];
 }
 
 export enum ServiceStatus
@@ -25,5 +26,12 @@ export enum ServiceStatus
   Pending = 'Pending Approval',
   InProgress = 'In-Progress',
   Completed = 'Completed',
+  OnHold = "On Hold"
+}
+
+export enum ServiceStatusForEdit
+{
+  Completed = 'Completed',
+  Pending = 'Pending Approval',
   OnHold = "On Hold"
 }

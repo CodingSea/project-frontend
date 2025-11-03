@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@
 import { Sidebar } from "@app/sidebar/sidebar";
 import { Categories, CategoryClasses } from '@app/categories';
 import { HttpClient } from '@angular/common/http';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { environment } from '@environments/environment';
 import { CommonModule } from '@angular/common';
 import { Issue } from '@app/issue';
@@ -76,9 +76,11 @@ export class HomePage implements OnInit
 
   updateTotalIssues(): void
   {
+    console.log(`${environment.apiUrl}`)
     this.http.get<number>(`${environment.apiUrl}/issue/count`).subscribe(
       (count) =>
       {
+        
         this.totalIssues = count;
         this.updatePageNumbers();
       },
@@ -256,5 +258,17 @@ export class HomePage implements OnInit
       this.getTotalIssuesCount();
     }
   }
+
+  openIssue(id: number): void
+  {
+    this.router.navigate([ '/issues', id ]);
+  }
+
+  goToCreateIssue(): void
+  {
+    this.router.navigate([ '/issues/create' ]);
+  }
+
+
 
 }
