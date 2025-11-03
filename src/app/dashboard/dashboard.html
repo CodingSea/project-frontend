@@ -40,8 +40,8 @@
             <div class="achievements-container">
                 <h2>Recent Notifications</h2>
 
-                <h3>In-Review Services</h3>
-                <table class="tasks-table">
+                <h3>Urgent Services</h3>
+                <table class="tasks-table" *ngIf="closestInReviewServices.length > 0">
                     <thead>
                         <tr>
                             <th>Project Title</th>
@@ -63,7 +63,9 @@
                                     'completed': service.status === 'Completed',
                                     'at-risk': service.status === 'At Risk',
                                     'overdue': service.status === 'Overdue',
-                                    'in-progress': service.status === 'In-Progress'
+                                    'in-progress': service.status === 'In-Progress',
+                                    'on-hold': service.status === 'On Hold',
+                                    'pending-approval': service.status === 'Pending Approval'
                                 }">{{ service.status }}</span>
                             </td>
                             <td>
@@ -82,7 +84,7 @@
                                         <div class="progress-bar-filled" style=" background: #22c55e"
                                             [style.width.%]="service.completionRate"></div>
                                         }
-                                        @else if(service.status == "At Risk")
+                                        @else if(service.status == "At Risk" || service.status == "Pending Approval")
                                         {
                                         <div class="progress-bar-filled" style=" background: #ef4444"
                                             [style.width.%]="service.completionRate"></div>
@@ -92,7 +94,7 @@
                                         <div class="progress-bar-filled" style=" background: #6366f1"
                                             [style.width.%]="service.completionRate"></div>
                                         }
-                                        @else if(service.status == "Overdue")
+                                        @else if(service.status == "Overdue" || service.status == "On Hold")
                                         {
                                         <div class="progress-bar-filled" style=" background: #000000"
                                             [style.width.%]="service.completionRate"></div>
