@@ -28,7 +28,7 @@
                     <select class="select_33-142" [(ngModel)]="selectedFilter" (change)="applyFilters()">
                       <option value="all">All Projects</option>
                       <option value="active">Active</option>
-                      <option value="in-review">In Review</option>
+                      <option value="on hold">On Hold</option>
                     </select>
 
                     <!-- Button for filter panel -->
@@ -50,7 +50,7 @@
                           <label><input type="checkbox" [(ngModel)]="filterState.active"> Active</label>
                         </div>
                         <div class="pm-row">
-                          <label><input type="checkbox" [(ngModel)]="filterState.inReview"> In Review</label>
+                          <label><input type="checkbox" [(ngModel)]="filterState.onHold"> On Hold</label>
                         </div>
                       </div>
                     </aside>
@@ -170,7 +170,7 @@
                           <label class="pm-label">Status</label>
                           <select class="pm-input" name="status" [(ngModel)]="newProject.status">
                             <option value="Active">Active</option>
-                            <option value="In Review">In Review</option>
+                            <option value="On Hold">On Hold</option>
                           </select>
                         </div>
                       </div>
@@ -235,7 +235,7 @@
                           <label class="pm-label">Status</label>
                           <select class="pm-input" name="status" [(ngModel)]="editProject.status">
                             <option value="Active">Active</option>
-                            <option value="In Review">In Review</option>
+                            <option value="On Hold">On Hold</option>
                           </select>
                         </div>
                       </div>

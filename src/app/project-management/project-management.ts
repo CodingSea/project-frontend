@@ -34,8 +34,8 @@ export class ProjectManagement implements OnInit, AfterViewInit
 
   // Filters
   showFilter = false;
-  selectedFilter: 'all' | 'active' | 'in-review' = 'all';
-  filterState = { active: true, inReview: true, urgent: true };
+  selectedFilter: 'all' | 'active' | 'on hold' = 'all';
+  filterState = { active: true, onHold: true, urgent: true };
 
   projectsInfo =
     {
@@ -165,10 +165,10 @@ export class ProjectManagement implements OnInit, AfterViewInit
     if (this.selectedFilter !== 'all')
     {
       return (this.selectedFilter === 'active' && s === 'active')
-        || (this.selectedFilter === 'in-review' && s === 'in review');
+        || (this.selectedFilter === 'on hold' && s === 'on hold');
     }
     return (s === 'active' && this.filterState.active)
-      || (s === 'in review' && this.filterState.inReview);
+      || (s === 'on hold' && this.filterState.onHold);
   }
 
   formatDecimal(num: number): string
