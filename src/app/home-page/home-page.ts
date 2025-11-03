@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@
 import { Sidebar } from "@app/sidebar/sidebar";
 import { Categories, CategoryClasses } from '@app/categories';
 import { HttpClient } from '@angular/common/http';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { environment } from '@environments/environment';
 import { CommonModule } from '@angular/common';
 import { Issue } from '@app/issue';
@@ -11,7 +11,7 @@ import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-home-page',
-  imports: [ Sidebar, CommonModule, FormsModule ],
+  imports: [ Sidebar, CommonModule, FormsModule, RouterLink ],
   templateUrl: './home-page.html',
   styleUrl: './home-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
