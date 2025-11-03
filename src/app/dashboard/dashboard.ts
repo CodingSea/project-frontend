@@ -65,8 +65,9 @@ export class Dashboard
           const timeDiff = deadlineDate.getTime() - currentDate.getTime();
           const daysUntilDeadline = Math.ceil(timeDiff / (1000 * 3600 * 24)); // Convert to days
 
-          if (service.taskBoard?.cards)
+          if (service.taskBoard?.cards && project.status != "On Hold")
           {
+            if(service.status == "On Hold") return;
             // Iterate through each card in the service
             service.taskBoard.cards.forEach((card) =>
             {
@@ -160,7 +161,7 @@ export class Dashboard
     {
       project.services?.forEach(service =>
       {
-        if (service.taskBoard?.cards === undefined || project.status === "In Review" || service.status === "Pending Approval") return;
+        if (service.taskBoard?.cards === undefined || project.status === "On Hold" || service.status === "Pending Approval") return;
         if (service.status === ServiceStatus.OnHold.valueOf()) return;
 
         if (service.deadline && service.taskBoard?.cards.length > 0)
@@ -178,20 +179,32 @@ export class Dashboard
           const daysUntilDeadline = Math.ceil(timeDiff / (1000 * 3600 * 24)); // Convert to days
 
           // Determine the status based on the logic provided
-          let status: 'Pending Approval' | 'In-Progress' | 'Completed' | 'At Risk' | 'Overdue';
+          let status: 'Pending Approval' | 'In-Progress' | 'Completed' | 'At Risk' | 'Overdue' | 'On Hold' | 'Not Started Yet' | 'Default';
 
-          if (completionRate === 100)
+          if (service.status)
           {
-            status = 'Completed';
-          } else if (daysUntilDeadline < 0)
+            status = service.status;
+          }
+          else
+          {
+            if (completionRate === 100)
+            {
+              status = 'Completed';
+            } else if (daysUntilDeadline < 0)
+            {
+              status = 'Overdue';
+            } else if (daysUntilDeadline <= 10)
+            {
+              status = 'At Risk';
+            } else
+            {
+              status = 'In-Progress';
+            }
+          }
+
+          if (daysUntilDeadline < 0)
           {
             status = 'Overdue';
-          } else if (daysUntilDeadline <= 10)
-          {
-            status = 'At Risk';
-          } else
-          {
-            status = 'In-Progress';
           }
 
           // Push service along with its project details
