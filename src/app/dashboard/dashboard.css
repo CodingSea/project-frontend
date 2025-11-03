@@ -225,7 +225,7 @@ table td.progress-bar {}
     background-color: #22c55e;
 }
 
-.at-risk {
+.at-risk, .pending-approval {
     background-color: #ef4444;
 }
 
@@ -235,6 +235,11 @@ table td.progress-bar {}
 }
 
 .overdue {
+    background-color: #202020;
+}
+
+.on-hold
+{
     background-color: #202020;
 }
 

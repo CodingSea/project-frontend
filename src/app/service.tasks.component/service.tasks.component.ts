@@ -221,11 +221,8 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
   {
     try
     {
-      console.log(this.dataAdapter);
-
       if (this.dataAdapter.localData == undefined)
       {
-        console.log("New");
         await this.http.patch<Service>(`${environment.apiUrl}/service/${this.serviceId}/status`, { status: ServiceStatus.New }).toPromise();
         return;
       }
@@ -234,18 +231,16 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
       {
         if (this.servicesInfo.completionRate == 100)
         {
-          console.log("Completed");
+          if(this.taskBoard?.service.status == "Pending Approval" || this.taskBoard?.service.status == "On Hold") return;
           await this.http.patch<Service>(`${environment.apiUrl}/service/${this.serviceId}/status`, { status: ServiceStatus.Completed }).toPromise();
         }
         else
         {
-          console.log("In progress");
           await this.http.patch<Service>(`${environment.apiUrl}/service/${this.serviceId}/status`, { status: ServiceStatus.InProgress }).toPromise();
         }
       }
       else
       {
-        console.log("New");
         await this.http.patch<Service>(`${environment.apiUrl}/service/${this.serviceId}/status`, { status: ServiceStatus.New }).toPromise();
       }
     }
@@ -545,7 +540,7 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
       this.dataAdapter.localData = this.data;
       this.rebuildKanban();
       this.closePopup();
-      
+
       await this.getCurrentServiceInfo();
       await this.initializeKanbanDataSource();
     } catch (error)
