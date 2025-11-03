@@ -3,7 +3,6 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '@environments/environment';
 
-/** User model */
 export interface User {
   id: number;
   first_name: string;
@@ -12,7 +11,6 @@ export interface User {
   profileImage?: string;
 }
 
-/** Comment model */
 export interface Comment {
   id?: number;
   content: string;
@@ -20,23 +18,23 @@ export interface Comment {
   user: User;
 }
 
-/** Feedback model */
 export interface Feedback {
   id?: number;
   content: string;
   createdAt?: string;
   user?: User;
+  isAccepted?: boolean;
   comments?: Comment[];
+  attachments?: { name: string; url: string }[];
 }
 
-/** Issue model (expanded to match backend) */
 export interface Issue {
   id?: number;
   title: string;
   description: string;
+  descriptionHtml?: string;
   status?: string;
   category?: string;
-  codeSnippet?: string;
   attachments?: { name: string; url: string }[];
   createdById?: number;
   createdAt?: string;
@@ -53,28 +51,43 @@ export class IssueService {
 
   constructor(private http: HttpClient) {}
 
-  /** ✅ Create issue with file upload */
-  createIssue(data: any, files: File[]): Observable<Issue> {
-    const formData = new FormData();
-    formData.append('title', data.title);
-    formData.append('description', data.description);
-    if (data.category) formData.append('category', data.category);
-    if (data.codeSnippet) formData.append('codeSnippet', data.codeSnippet);
-    if (data.createdById) formData.append('createdById', String(data.createdById));
-
-    files.forEach((file) => formData.append('attachments', file));
-
-    console.log('🚀 Uploading issue with files:', files.map((f) => f.name));
-    return this.http.post<Issue>(this.apiUrl, formData);
+  createIssue(data: any, files: File[]) {
+    const form = new FormData();
+    form.append('title', data.title);
+    form.append('description', data.description);
+    if (data.category) form.append('category', data.category);
+    form.append('createdById', data.createdById);
+    files.forEach(f => form.append('attachments', f));
+    return this.http.post<Issue>(this.apiUrl, form);
   }
 
-  /** ✅ Get all issues */
-  getAllIssues(): Observable<Issue[]> {
-    return this.http.get<Issue[]>(this.apiUrl);
-  }
-
-  /** ✅ Get single issue with signed S3 URLs */
   getIssueById(id: number): Observable<Issue> {
     return this.http.get<Issue>(`${this.apiUrl}/${id}`);
+  }
+
+  addFeedback(issueId: number, formData: FormData) {
+    return this.http.post(`${this.apiUrl}/${issueId}/feedback`, formData);
+  }
+
+  addComment(feedbackId: number, content: string) {
+    const token = localStorage.getItem('token');
+    const decoded: any = token ? JSON.parse(atob(token.split('.')[1])) : null;
+    const userId = decoded?.sub;
+
+    return this.http.post(`${environment.apiUrl}/comment`, {
+      feedbackId,
+      content,
+      userId,
+    });
+  }
+
+  toggleFeedbackAccepted(feedbackId: number, issueOwnerId: number) {
+    return this.http.post(`${this.apiUrl}/feedback/${feedbackId}/toggle`, { issueOwnerId });
+  }
+
+  downloadFile(key: string) {
+    return this.http.get(`${this.apiUrl}/file/download?key=${encodeURIComponent(key)}`, {
+      responseType: 'blob'
+    });
   }
 }

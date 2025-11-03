@@ -1,156 +1,81 @@
 <div class="container">
   <app-sidebar></app-sidebar>
 
-<div class="issue-create-container">
-  <div class="issue-create-header">
-    <h1>Create New Issue</h1>
-    <p>
-      Provide clear and structured details to help others understand and resolve your issue efficiently.
-    </p>
+  <div class="page-content">
+    <div class="issue-create-container">
+
+      <div class="issue-create-header">
+        <h1>Create New Issue</h1>
+        <p>Provide clear and structured details to help others understand your issue.</p>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="issue-form">
+
+        <div class="form-group">
+          <label>Title <span>*</span></label>
+          <input type="text" formControlName="title" placeholder="Enter issue title">
+          <small class="error" *ngIf="form.get('title')?.invalid && form.get('title')?.touched">
+            Title must be 3+ chars and only letters/numbers/symbols -,()#.
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label>Description <span>*</span></label>
+          <textarea formControlName="description" rows="6" placeholder="Describe the issue"></textarea>
+          <small class="error" *ngIf="form.get('description')?.invalid && form.get('description')?.touched">
+            Description must be at least 10 characters.
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label>Category</label>
+          <select formControlName="category">
+            <option value="">Select category</option>
+            <option *ngFor="let c of categories" [value]="c">{{ c }}</option>
+            <option value="Other">Other</option>
+          </select>
+
+          <input *ngIf="form.get('category')?.value === 'Other'"
+                type="text"
+                formControlName="otherCategory"
+                placeholder="Type custom category"
+                class="other-category">
+
+          <small class="error"
+                *ngIf="form.get('category')?.value === 'Other' && !form.get('otherCategory')?.value && form.get('otherCategory')?.touched">
+            Please enter your custom category.
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label>Attachments</label>
+
+          <div class="attachment-dropzone"
+                (dragover)="onDragOver($event)"
+                (drop)="onFileDropped($event)"
+                (click)="fileInput.click()">
+            <input #fileInput type="file" multiple hidden (change)="onFileSelected($event)">
+            <i class="fa-solid fa-upload upload-icon"></i>
+            <p><strong>Click to upload</strong> or drag & drop</p>
+            <p>Max 5 files, 30MB total</p>
+          </div>
+
+          <div class="uploaded-files" *ngIf="attachments.length">
+            <div class="file-item" *ngFor="let file of attachments; let i=index">
+              <span class="file-name">{{ file.name }}</span>
+              <button type="button" class="remove-file" (click)="removeFile(i)">×</button>
+            </div>
+          </div>
+
+          <small class="error" *ngIf="fileError">{{ fileError }}</small>
+        </div>
+
+        <div class="form-footer">
+          <button type="button" class="btn-cancel" (click)="onCancel()">Cancel</button>
+          <button type="submit" class="btn-submit" [disabled]="loading">Create Issue</button>
+        </div>
+
+      </form>
+    </div>
   </div>
-
-  <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate class="issue-form">
-    <!-- Title -->
-    <div class="form-group">
-      <label for="title">Title <span>*</span></label>
-      <input
-        id="title"
-        type="text"
-        formControlName="title"
-        placeholder="Short summary of the issue"
-      />
-      <div class="error-message" *ngIf="form.get('title')?.touched && form.get('title')?.invalid">
-        <small *ngIf="form.get('title')?.hasError('required')">Title is required.</small>
-        <small *ngIf="form.get('title')?.hasError('pattern')">
-          Only letters, numbers, and spaces allowed (3–100 characters).
-        </small>
-      </div>
-    </div>
-
-    <!-- Description -->
-    <div class="form-group">
-      <label for="description">Description <span>*</span></label>
-      <textarea
-        id="description"
-        rows="6"
-        formControlName="description"
-        placeholder="Describe the issue, what you expected, and what happened..."
-      ></textarea>
-      <div class="error-message" *ngIf="form.get('description')?.touched && form.get('description')?.invalid">
-        <small *ngIf="form.get('description')?.hasError('required')">Description is required.</small>
-        <small *ngIf="form.get('description')?.hasError('pattern')">
-          Only letters, numbers, punctuation, and spaces allowed (max 500 characters).
-        </small>
-        <small *ngIf="form.get('description')?.hasError('minlength')">
-          Please provide at least 10 characters.
-        </small>
-        <small *ngIf="form.get('description')?.hasError('maxlength')">
-          Maximum 500 characters allowed.
-        </small>
-      </div>
-    </div>
-
-    <!-- Category -->
-    <div class="form-group">
-      <label for="category">Category</label>
-      <select id="category" formControlName="category">
-        <option value="">Select category</option>
-        <option value="Frontend">Frontend</option>
-        <option value="Backend">Backend</option>
-        <option value="AWS">AWS</option>
-        <option value="Database">Database</option>
-        <option value="UI/UX">UI / UX</option>
-        <option value="Other">Other</option>
-      </select>
-
-      <input
-        *ngIf="form.get('category')?.value === 'Other'"
-        type="text"
-        formControlName="otherCategory"
-        placeholder="Specify category"
-        class="other-category"
-      />
-    </div>
-
-    <!-- Attachments -->
-    <div class="form-group">
-      <label>Attachments</label>
-      <div
-        class="attachment-dropzone"
-        (dragover)="onDragOver($event)"
-        (drop)="onFileDropped($event)"
-        (click)="fileInput.click()"
-      >
-        <input
-          #fileInput
-          type="file"
-          (change)="onFileSelected($event)"
-          multiple
-          hidden
-          accept=".pdf,.png,.jpg,.jpeg,.zip,.rar,.7z,.txt,.md,.json,.js,.ts,.jsx,.tsx,.py,.java,.cs,.cpp,.c,.sh,.rb,.go,.php,.sql,.yml,.yaml,.doc,.docx,.ppt,.pptx"
-        />
-        <i class="fa-solid fa-upload upload-icon"></i>
-        <p class="upload-text">
-          <strong>Click to upload</strong> or drag and drop files here
-        </p>
-        <p class="upload-subtext">
-          Allowed: docs/images/zips/code files — up to 10MB each (max {{MAX_FILES}} files, {{MAX_TOTAL_MB}}MB total)
-        </p>
-      </div>
-
-      <p *ngIf="fileError" class="error-message">{{ fileError }}</p>
-
-      <div class="uploaded-files" *ngIf="attachments.length">
-        <div class="file-item" *ngFor="let file of attachments; let i = index">
-          <i class="fa-solid fa-paperclip file-icon"></i>
-          <span class="file-name">{{ file.name }}</span>
-          <button type="button" class="remove-file" (click)="removeFile(i)">
-            <i class="fa-solid fa-xmark"></i>
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Code Snippet -->
-    <div class="form-group">
-      <label for="codeSnippet">Code Snippet</label>
-      <div class="code-block light-theme">
-        <div class="code-header">
-          <span>Code</span>
-          <button type="button" class="copy-btn" (click)="copyCode()">Copy</button>
-        </div>
-        <pre><code
-          #codeSnippetEl
-          id="codeSnippet"
-          contenteditable="true"
-          class="code-content"
-          (input)="onCodeInput()"
-        ></code></pre>
-      </div>
-
-      <p *ngIf="codeError" class="error-message">{{ codeError }}</p>
-    </div>
-
-    <!-- Footer -->
-    <div class="form-footer">
-      <button type="button" class="btn-cancel" (click)="onCancel()">Cancel</button>
-      <button type="submit" class="btn-submit" [disabled]="loading || form.invalid">
-        <ng-container *ngIf="!loading">Create Issue</ng-container>
-        <ng-container *ngIf="loading">Submitting...</ng-container>
-      </button>
-    </div>
-
-    <p
-      *ngIf="message"
-      class="form-message"
-      [ngClass]="{
-        'error-message': message.includes('Please fix validation errors') || message.includes('Failed'),
-        'success-message': message.includes(' ')
-      }"
-    >
-      {{ message }}
-    </p>
-  </form>
-</div>
-
 </div>
