@@ -257,4 +257,14 @@ export class HomePage implements OnInit
     }
   }
 
+  openIssue(id: number): void {
+  this.router.navigate(['/issues', id]);
+}
+
+goToCreateIssue(): void {
+  this.router.navigate(['/issues/create']);
+}
+
+
+
 }
