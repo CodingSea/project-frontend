@@ -11,7 +11,7 @@ import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-home-page',
-  imports: [ Sidebar, CommonModule, FormsModule, RouterLink ],
+  imports: [ Sidebar, CommonModule, FormsModule ],
   templateUrl: './home-page.html',
   styleUrl: './home-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -76,9 +76,11 @@ export class HomePage implements OnInit
 
   updateTotalIssues(): void
   {
+    console.log(`${environment.apiUrl}`)
     this.http.get<number>(`${environment.apiUrl}/issue/count`).subscribe(
       (count) =>
       {
+        
         this.totalIssues = count;
         this.updatePageNumbers();
       },
@@ -257,13 +259,15 @@ export class HomePage implements OnInit
     }
   }
 
-  openIssue(id: number): void {
-  this.router.navigate(['/issues', id]);
-}
+  openIssue(id: number): void
+  {
+    this.router.navigate([ '/issues', id ]);
+  }
 
-goToCreateIssue(): void {
-  this.router.navigate(['/issues/create']);
-}
+  goToCreateIssue(): void
+  {
+    this.router.navigate([ '/issues/create' ]);
+  }
 
 
 
