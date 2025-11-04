@@ -31,7 +31,16 @@
   }
   
   .scrollable-text {
-    max-height: 50vh; /* Set max height for scrolling */
+    max-height: 60vh; /* Set max height for scrolling */
     overflow-y: auto; /* Enable vertical scrolling */
     padding: 16px;
+  }
+
+  #close-btn
+  {
+    border: none;
+    width: 2em;
+    height: 2em;
+    margin: auto 0;
+    border-radius: 5px;
   }
