@@ -1,6 +1,6 @@
 // categories.ts
 export enum Categories {
-  All = "all",
+  All = "All",
   BugReport = "Bug Report",
   FeatureRequest = "Feature Request",
   SecurityIssue = "Security Issue",

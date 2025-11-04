@@ -1,7 +1,7 @@
 export enum Status {
-  All = "all",
-  Open = "open",
-  Resolved = "resolved",
+  All = "All",
+  Open = "Open",
+  Resolved = "Resolved",
 }
 
 export const StatusClasses = {

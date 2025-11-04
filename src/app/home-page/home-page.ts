@@ -16,9 +16,10 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './home-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class HomePage implements OnInit {
+export class HomePage implements OnInit
+{
 
-  constructor(private http: HttpClient, private router: Router, private cdr: ChangeDetectorRef) {}
+  constructor(private http: HttpClient, private router: Router, private cdr: ChangeDetectorRef) { }
 
   categories = Object.values(Categories);
   status = Object.values(Status);
@@ -33,44 +34,63 @@ export class HomePage implements OnInit {
   selectedCategory: Categories = Categories.All;
   selectedStatus: Status = Status.All;
 
-  ngOnInit() {
+  ngOnInit()
+  {
     this.loadData();
   }
 
-  buildQueryParams(): string {
+  buildQueryParams(): string
+  {
     const params = new URLSearchParams();
     params.append('page', this.currentPage.toString());
     params.append('limit', this.pageSize.toString());
     params.append('status', this.selectedStatus);
     params.append('category', this.selectedCategory);
 
-    if (this.searchQuery.trim() !== '') {
+    if (this.searchQuery.trim() !== '')
+    {
       params.append('search', this.searchQuery.trim());
     }
 
     return params.toString();
   }
 
-  loadData(): void {
-    const params = this.buildQueryParams();
+  loadData(): void
+  {
+    const queryParams = new URLSearchParams();
+    queryParams.append('page', this.currentPage.toString());
+    queryParams.append('limit', this.pageSize.toString());
 
-    this.http.get<number>(`${environment.apiUrl}/issue/count?${params}`).subscribe(count => {
-      this.totalIssues = count;
-      this.updatePageNumbers();
+    if (this.selectedStatus !== Status.All)
+    {
+      queryParams.append('status', this.selectedStatus);
+    }
 
-      this.http.get<Issue[]>(`${environment.apiUrl}/issue?${params}`).subscribe(res => {
-        // remove markdown formatting for preview
-        this.issues = res.map(issue => ({
-          ...issue,
-          previewDescription: this.stripMarkdown(issue.description)
-        }));
+    if (this.selectedCategory !== Categories.All)
+    {
+      queryParams.append('category', this.selectedCategory);
+    }
 
-        this.cdr.detectChanges();
-      });
-    });
+    if (this.searchQuery)
+    {
+      queryParams.append('search', this.searchQuery);
+    }
+
+    this.http.get<Issue[]>(`${environment.apiUrl}/issue?${queryParams.toString()}`).subscribe(
+      (res) =>
+      {
+        this.issues = res;
+        this.cdr.markForCheck();
+      },
+      (err) =>
+      {
+        console.error('Error loading issues:', err);
+      }
+    );
   }
 
-  stripMarkdown(text: string): string {
+  stripMarkdown(text: string): string
+  {
     if (!text) return '';
 
     return text
@@ -81,27 +101,32 @@ export class HomePage implements OnInit {
       .trim();
   }
 
-  onFilterChange(): void {
+  onFilterChange(): void
+  {
     this.currentPage = 1;
     this.loadData();
   }
 
-  changePage(page: number): void {
+  changePage(page: number): void
+  {
     if (page < 1 || page > this.getTotalPages()) return;
     this.currentPage = page;
     this.loadData();
   }
 
-  jumpToPage(firstPage: boolean): void {
+  jumpToPage(firstPage: boolean): void
+  {
     this.currentPage = firstPage ? 1 : this.getTotalPages();
     this.loadData();
   }
 
-  getTotalPages(): number {
+  getTotalPages(): number
+  {
     return Math.ceil(this.totalIssues / this.pageSize) || 1;
   }
 
-  updatePageNumbers(): void {
+  updatePageNumbers(): void
+  {
     const total = this.getTotalPages();
     const curr = this.currentPage;
     this.pageNumbers = [];
@@ -109,7 +134,8 @@ export class HomePage implements OnInit {
     let start = Math.max(1, curr - 2);
     let end = Math.min(total, curr + 2);
 
-    if (end - start < 4) {
+    if (end - start < 4)
+    {
       if (curr <= 3) end = Math.min(5, total);
       else start = Math.max(1, end - 4);
     }
@@ -117,20 +143,24 @@ export class HomePage implements OnInit {
     for (let i = start; i <= end; i++) this.pageNumbers.push(i);
   }
 
-  getCategoryClass(category: Categories): string {
+  getCategoryClass(category: Categories): string
+  {
     return CategoryClasses[ category ];
   }
 
-  getStatusClass(status: Status): string {
+  getStatusClass(status: Status): string
+  {
     return StatusClasses[ status ];
   }
 
-  getTimeAgo(issue: Issue): string {
+  getTimeAgo(issue: Issue): string
+  {
     const createdAt: any = typeof issue.createdAt === 'string' ? new Date(issue.createdAt) : issue.createdAt;
     const now = new Date();
     const seconds = Math.floor((now.getTime() - createdAt.getTime()) / 1000);
 
-    if (seconds >= 7 * 24 * 60 * 60) {
+    if (seconds >= 7 * 24 * 60 * 60)
+    {
       return createdAt.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
     }
 
@@ -142,7 +172,8 @@ export class HomePage implements OnInit {
       { t: 60, l: 'minute' }
     ];
 
-    for (const u of units) {
+    for (const u of units)
+    {
       const v = Math.floor(seconds / u.t);
       if (v >= 1) return `${v} ${u.l}${v > 1 ? 's' : ''} ago`;
     }
@@ -150,11 +181,13 @@ export class HomePage implements OnInit {
     return `${seconds} seconds ago`;
   }
 
-  openIssue(id: number): void {
-    this.router.navigate(['/issues', id]);
+  openIssue(id: number): void
+  {
+    this.router.navigate([ '/issues', id ]);
   }
 
-  goToCreateIssue(): void {
-    this.router.navigate(['/issues/create']);
+  goToCreateIssue(): void
+  {
+    this.router.navigate([ '/issues/create' ]);
   }
 }

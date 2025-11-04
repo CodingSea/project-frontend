@@ -14,7 +14,7 @@ import { environment } from '@environments/environment';
 @Component({
   selector: 'app-issue-page',
   standalone: true,
-  imports: [CommonModule, Sidebar, HttpClientModule, FormsModule],
+  imports: [CommonModule, Sidebar, FormsModule],
   templateUrl: './issue-page.html',
   styleUrls: ['./issue-page.css'],
 })
