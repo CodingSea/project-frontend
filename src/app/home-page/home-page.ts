@@ -8,10 +8,11 @@ import { CommonModule } from '@angular/common';
 import { Issue } from '@app/issue';
 import { Status, StatusClasses } from '@app/status';
 import { FormsModule } from '@angular/forms';
+import { HeaderComponent } from '@app/header/header';
 
 @Component({
   selector: 'app-home-page',
-  imports: [ Sidebar, CommonModule, FormsModule ],
+  imports: [ Sidebar, CommonModule, FormsModule,HeaderComponent ],
   templateUrl: './home-page.html',
   styleUrl: './home-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -80,7 +81,7 @@ export class HomePage implements OnInit
     this.http.get<number>(`${environment.apiUrl}/issue/count`).subscribe(
       (count) =>
       {
-        
+
         this.totalIssues = count;
         this.updatePageNumbers();
       },

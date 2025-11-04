@@ -1,8 +1,7 @@
 <div class="header-wrap">
   <header class="header-card">
-    <!-- left: brand -->
     <div class="brand">
-      <span class="brand-badge" aria-hidden="true">
+      <span class="brand-badge">
         <svg viewBox="0 0 24 24">
           <rect x="4" y="4" width="16" height="16" rx="6" />
         </svg>
@@ -10,15 +9,7 @@
       <span class="brand-name">{{ title }}</span>
     </div>
 
-    <!-- right: actions -->
     <div class="actions">
-      <button class="icon-btn bell" aria-label="Notifications">
-        <svg class="icon" viewBox="0 0 24 24">
-          <path d="M12 22a2 2 0 0 0 2-2h-4a2 2 0 0 0 2 2Zm6-6V11a6 6 0 1 0-12 0v5l-2 2v1h16v-1l-2-2Z"/>
-        </svg>
-        <span *ngIf="hasUnread" class="dot"></span>
-      </button>
-
       <div class="avatar">
         <img [src]="avatarUrl" alt="User" />
       </div>
