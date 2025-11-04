@@ -138,4 +138,22 @@ export class IssueCreateComponent {
       }
     });
   }
+
+  autoResize(event: Event) {
+  const textarea = event.target as HTMLTextAreaElement;
+  textarea.style.height = 'auto';
+  const maxHeight = 300;
+
+  if (textarea.scrollHeight < maxHeight) {
+    textarea.style.height = textarea.scrollHeight + 'px';
+  } else {
+    textarea.style.height = maxHeight + 'px';
+  }
+}
+
+openMarkdownCheat() {
+  window.open("https://www.markdownguide.org/cheat-sheet/", "_blank");
+}
+
+
 }

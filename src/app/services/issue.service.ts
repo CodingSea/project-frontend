@@ -41,6 +41,7 @@ export interface Issue {
   updatedAt?: string;
   createdBy?: User;
   feedbacks?: Feedback[];
+previewDescription?: string;
 }
 
 @Injectable({

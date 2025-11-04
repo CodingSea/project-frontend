@@ -21,7 +21,21 @@
 
         <div class="form-group">
           <label>Description <span>*</span></label>
-          <textarea formControlName="description" rows="6" placeholder="Describe the issue"></textarea>
+          <div class="md-helper">
+  <span>Need help with Markdown?</span>
+  <button type="button" class="md-cheat-btn"
+    (click)="openMarkdownCheat()">
+    Markdown Cheatsheet
+  </button>
+</div>
+
+<textarea
+  formControlName="description"
+  class="auto-textarea"
+  placeholder="Describe the issue (Markdown supported)"
+  rows="1"
+  (input)="autoResize($event)">
+</textarea>
           <small class="error" *ngIf="form.get('description')?.invalid && form.get('description')?.touched">
             Description must be at least 10 characters.
           </small>

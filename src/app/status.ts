@@ -1,14 +1,12 @@
-// categories.ts
-export enum Status
-{
-    All = "All Status",
-    Open = "Open",
-    Resolved = "Resolved",
+export enum Status {
+  All = "all",
+  Open = "open",
+  Resolved = "resolved",
 }
 
-export const StatusClasses: { [ key in Status ]: string } =
-{
-    [ Status.All ]: "tag red",
-    [ Status.Open ]: "tag red",
-    [ Status.Resolved ]: "tag blue",
+export const StatusClasses = {
+  [Status.All]: "tag status-all",
+  [Status.Open]: "tag status-open",
+  [Status.Resolved]: "tag status-resolved"
 };
+

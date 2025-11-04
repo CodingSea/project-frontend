@@ -64,46 +64,107 @@ export class IssuePage implements AfterViewInit, OnInit {
     return marked.parse(text ?? '') as string;
   }
 
-  loadIssue(id: number) {
-    this.loading = true;
+  /** ✅ Time Ago function (same as Home page) */
+  getTimeAgo(date: any): string {
+    const createdAt: Date = typeof date === 'string' ? new Date(date) : date;
+    const now = new Date();
+    const seconds = Math.floor((now.getTime() - createdAt.getTime()) / 1000);
 
-    this.issueService.getIssueById(id).subscribe({
-      next: (data) => {
-        this.issue = {
-          ...data,
-          createdBy: data.createdBy
-            ? { ...data.createdBy, profileImage: data.createdBy.profileImage || '' }
-            : undefined,
-          descriptionHtml: this.renderMarkdown(data.description || '')
-        };
+    const weeks = Math.floor(seconds / (7 * 24 * 60 * 60));
+    if (weeks >= 1) return weeks + ' week' + (weeks === 1 ? '' : 's') + ' ago';
 
-        if (this.issue.feedbacks) {
-          this.issue.feedbacks = this.issue.feedbacks.map(fb => ({
-            ...fb,
-            user: fb.user
-              ? { ...fb.user, profileImage: fb.user.profileImage || '' }
-              : undefined,
-            comments: (fb.comments ?? []).map(c => ({
-              ...c,
-              user: c.user
-                ? { ...c.user, profileImage: c.user.profileImage || '' }
-                : { first_name: 'Unknown', last_name: '', profileImage: '' }
-            }))
-          })) as any;
-        }
+    if (seconds >= 7 * 24 * 60 * 60) {
+      return createdAt.toLocaleDateString(undefined, { year:'numeric', month:'long', day:'numeric' });
+    }
 
-        this.loading = false;
-        setTimeout(() => {
-          Prism.highlightAll();
-          this.addCopyButtons();
-        }, 300);
-      },
-      error: () => {
-        this.error = 'Issue not found';
-        this.loading = false;
-      }
-    });
+    let interval = Math.floor(seconds / 31536000);
+    if (interval >= 1) return interval + ' year' + (interval === 1 ? '' : 's') + ' ago';
+
+    interval = Math.floor(seconds / 2592000);
+    if (interval >= 1) return interval + ' month' + (interval === 1 ? '' : 's') + ' ago';
+
+    interval = Math.floor(seconds / 86400);
+    if (interval >= 1) return interval + ' day' + (interval === 1 ? '' : 's') + ' ago';
+
+    interval = Math.floor(seconds / 3600);
+    if (interval >= 1) return interval + ' hour' + (interval === 1 ? '' : 's') + ' ago';
+
+    interval = Math.floor(seconds / 60);
+    if (interval >= 1) return interval + ' minute' + (interval === 1 ? '' : 's') + ' ago';
+
+    return 'Just now';
   }
+
+  /** ✅ Load issue + parse feedback JSON content */
+loadIssue(id: number) {
+  this.loading = true;
+
+  this.issueService.getIssueById(id).subscribe({
+    next: (data) => {
+      this.issue = {
+        ...data,
+        createdBy: data.createdBy
+          ? { ...data.createdBy, profileImage: data.createdBy.profileImage || '' }
+          : undefined,
+        descriptionHtml: this.renderMarkdown(data.description || '')
+      };
+
+      if (this.issue.feedbacks) {
+        this.issue.feedbacks = this.issue.feedbacks.map(fb => {
+          let cleanContent = fb.content;
+          try {
+            const parsed = JSON.parse(fb.content);
+            cleanContent = parsed.content || fb.content;
+          } catch {}
+
+          return {
+            ...fb,
+            content: cleanContent,
+            user: fb.user ? { ...fb.user, profileImage: fb.user.profileImage || '' } : undefined,
+            comments: (fb.comments ?? []).map(c => {
+              let commentText = c.content;
+              try {
+                const parsedC = JSON.parse(c.content);
+                commentText = parsedC.content || c.content;
+              } catch {}
+
+              return {
+                ...c,
+                content: commentText,
+                user: c.user
+                  ? { ...c.user, profileImage: c.user.profileImage || '' }
+                  : { first_name: 'Unknown', last_name: '', profileImage: '' }
+              };
+            })
+          };
+        }) as any;
+
+        /** ✅ Sort feedbacks: accepted first, then oldest → newest */
+        if (this.issue.feedbacks && this.issue.feedbacks.length > 0) {
+          this.issue.feedbacks = [...this.issue.feedbacks].sort((a: any, b: any) => {
+            // Accepted answers first
+            if (a.isAccepted && !b.isAccepted) return -1;
+            if (!a.isAccepted && b.isAccepted) return 1;
+
+            // Then sort by creation date oldest → newest
+            return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+          });
+        }
+      }
+
+      this.loading = false;
+      setTimeout(() => {
+        Prism.highlightAll();
+        this.addCopyButtons();
+      }, 300);
+    },
+    error: () => {
+      this.error = 'Issue not found';
+      this.loading = false;
+    }
+  });
+}
+
 
   onImgLoad(id: string | number) { this.isImageLoading[String(id)] = false; }
   onImgError(event: any, id: string | number) {
@@ -165,30 +226,33 @@ export class IssuePage implements AfterViewInit, OnInit {
     const text = this.replyContent[feedbackId]?.trim();
     if (!text || !this.currentUserId) return;
 
-    this.issueService.addComment(feedbackId, text).subscribe((newComment: any) => {
-      const fb = this.issue?.feedbacks?.find(f => f.id === feedbackId);
-      if (fb) {
-        fb.comments = fb.comments || [];
-        fb.comments.push({
-          ...newComment,
-          user: {
-            ...newComment.user,
-            profileImage: newComment.user.profileImage || ''
-          }
-        });
-      }
+this.issueService.addComment(feedbackId, text).subscribe((newComment: any) => {
+  const fb = this.issue?.feedbacks?.find(f => f.id === feedbackId);
+  if (fb) {
+    // ✅ Ensure new comment has a profile image immediately
+    const loggedInUserImg = this.fixImage(this.issue?.createdBy?.profileImage);
+    newComment.user.profileImage = loggedInUserImg;
 
-      this.replyContent[feedbackId] = '';
-      this.showReplyBox[feedbackId] = false;
+    fb.comments = fb.comments || [];
+    fb.comments.push({
+      ...newComment,
+      content: newComment.content,
+      user: {
+        ...newComment.user,
+        profileImage: newComment.user.profileImage
+      }
     });
   }
 
-  toggleReplyBox(id: number) { this.showReplyBox[id] = !this.showReplyBox[id]; }
-  autoResize(event: Event) {
-    const textarea = event.target as HTMLTextAreaElement;
-    textarea.style.height = 'auto';
-    textarea.style.height = textarea.scrollHeight + 'px';
+  this.replyContent[feedbackId] = '';
+  this.showReplyBox[feedbackId] = false;
+});
+
   }
+
+  toggleReplyBox(id: number) { this.showReplyBox[id] = !this.showReplyBox[id]; }
+
+
   removeFile(i: number) { this.selectedFiles.splice(i, 1); }
 
   acceptFeedback(feedbackId: number) {
@@ -216,4 +280,17 @@ export class IssuePage implements AfterViewInit, OnInit {
       window.URL.revokeObjectURL(url);
     });
   }
+
+  autoResize(event: Event) {
+  const textarea = event.target as HTMLTextAreaElement;
+  textarea.style.height = 'auto';
+  const maxHeight = 240;
+
+  if (textarea.scrollHeight < maxHeight) {
+    textarea.style.height = textarea.scrollHeight + 'px';
+  } else {
+    textarea.style.height = maxHeight + 'px';
+  }
+}
+
 }
