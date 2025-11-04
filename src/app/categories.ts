@@ -5,7 +5,8 @@ export enum Categories
     BugReport = "Bug Report",
     FeatureRequest = "Feature Request",
     SecurityIssue = "Security Issue",
-    Database = "Database"
+    Database = "Database",
+    Service = "Service",
 }
 
 export const CategoryClasses: { [ key in Categories ]: string } = {
@@ -13,5 +14,6 @@ export const CategoryClasses: { [ key in Categories ]: string } = {
     [ Categories.BugReport ]: "tag red",
     [ Categories.FeatureRequest ]: "tag green",
     [ Categories.SecurityIssue ]: "tag blue",
-    [ Categories.Database ]: "tag yellow"
+    [ Categories.Database ]: "tag yellow",
+    [ Categories.Service ]: "tag green",
 };
