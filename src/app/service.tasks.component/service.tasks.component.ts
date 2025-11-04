@@ -14,12 +14,13 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ServiceInfo } from '@app/service-info';
 import { Service, ServiceStatus } from '@app/service';
 import { FormsModule } from '@angular/forms';
+import { IssuePageTemplate } from '@app/issue-page/issue-page-template';
 
 @Component({
   selector: 'app-service-tasks',
   templateUrl: './service.tasks.component.html',
   styleUrls: [ './service.tasks.component.css' ],
-  imports: [ jqxKanbanModule, jqxSplitterModule, CommonModule, AddTaskPopup, TaskPopup, Sidebar, FormsModule ]
+  imports: [ jqxKanbanModule, jqxSplitterModule, CommonModule, AddTaskPopup, TaskPopup, Sidebar, FormsModule, IssuePageTemplate ]
 })
 
 export class ServiceTasksComponent implements OnInit, AfterViewInit
@@ -221,17 +222,19 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
   {
     try
     {
-      if (this.dataAdapter.localData == undefined)
+      if (this.dataAdapter.localData == undefined || this.dataAdapter.localData[ 0 ].status == "s" || this.dataAdapter.localData.length == 0)
       {
         await this.http.patch<Service>(`${environment.apiUrl}/service/${this.serviceId}/status`, { status: ServiceStatus.New }).toPromise();
         return;
       }
 
+      console.log(this.dataAdapter.localData)
+
       if (this.dataAdapter.localData.length > 0)
       {
         if (this.servicesInfo.completionRate == 100)
         {
-          if(this.taskBoard?.service.status == "Pending Approval" || this.taskBoard?.service.status == "On Hold") return;
+          if (this.taskBoard?.service.status == "Pending Approval" || this.taskBoard?.service.status == "On Hold") return;
           await this.http.patch<Service>(`${environment.apiUrl}/service/${this.serviceId}/status`, { status: ServiceStatus.Completed }).toPromise();
         }
         else
@@ -603,8 +606,7 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
       this.dataAdapter.localData = this.data;
       this.rebuildKanban();
       this.closeTaskDetailPopup();
-      await this.getCurrentServiceInfoFromData();
-      this.checkServiceStatus();
+      this.initializeKanbanDataSource();
     } catch (error)
     {
       console.error('Error deleting task:', error);
