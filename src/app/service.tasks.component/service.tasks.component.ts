@@ -14,12 +14,13 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ServiceInfo } from '@app/service-info';
 import { Service, ServiceStatus } from '@app/service';
 import { FormsModule } from '@angular/forms';
+import { IssuePageTemplate } from '@app/issue-page/issue-page-template';
 
 @Component({
   selector: 'app-service-tasks',
   templateUrl: './service.tasks.component.html',
   styleUrls: [ './service.tasks.component.css' ],
-  imports: [ jqxKanbanModule, jqxSplitterModule, CommonModule, AddTaskPopup, TaskPopup, Sidebar, FormsModule ]
+  imports: [ jqxKanbanModule, jqxSplitterModule, CommonModule, AddTaskPopup, TaskPopup, Sidebar, FormsModule, IssuePageTemplate ]
 })
 
 export class ServiceTasksComponent implements OnInit, AfterViewInit
