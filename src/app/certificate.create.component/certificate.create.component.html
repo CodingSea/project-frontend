@@ -1,118 +1,122 @@
-<div class="app">
-  <app-sidebar />
+<div class="layout-wrapper">
+  <app-header></app-header>
+  <app-sidebar></app-sidebar>
 
-  <div class="card-frame">
-    <div class="topbar">
-      <h1>{{ isEditMode ? 'Edit Certificate' : 'Create New Certificate' }}</h1>
-    </div>
-
-    <form [formGroup]="certificateForm" (ngSubmit)="onSubmit()" novalidate>
-      <!-- Basic Info -->
-      <section class="section">
-        <header class="section__header">
-          <span class="bullet bullet-red"></span>
-          <h2>Basic Information</h2>
-        </header>
-        <div class="section__body">
-          <div class="grid-2">
-            <div class="field">
-              <label>Certificate Name<span class="req">*</span></label>
-              <input type="text" formControlName="name" placeholder="Enter certificate name" />
-            </div>
-            <div class="field">
-              <label>Certificate Type<span class="req">*</span></label>
-              <select formControlName="type">
-                <option value="" disabled>Select certificate type</option>
-                <option value="diploma">Diploma</option>
-                <option value="degree">Degree</option>
-                <option value="certification">Certification</option>
-                <option value="award">Award</option>
-                <option value="other">Other</option>
-              </select>
-            </div>
-          </div>
-          <div class="field mt-16">
-            <label>Issuing Organization<span class="req">*</span></label>
-            <input type="text" formControlName="issuingOrganization" placeholder="Enter issuing organization" />
-          </div>
-        </div>
-      </section>
-
-      <!-- Dates -->
-      <section class="section">
-        <header class="section__header">
-          <span class="bullet bullet-pink"></span>
-          <h2>Certificate Dates</h2>
-        </header>
-        <div class="section__body">
-          <div class="grid-2">
-            <div class="field">
-              <label>Issue Date<span class="req">*</span></label>
-              <input type="date" formControlName="issueDate" />
-            </div>
-            <div class="field">
-              <label>Expiry Date</label>
-              <input type="date" formControlName="expiryDate" />
-            </div>
-          </div>
-          <div class="field mt-16">
-            <label>Description</label>
-            <textarea rows="3" formControlName="description" placeholder="Enter description of certificate"></textarea>
-          </div>
-        </div>
-      </section>
-
-      <!-- Attachments -->
-      <section class="section">
-        <header class="section__header">
-          <span class="bullet bullet-pink"></span>
-          <h2>Attachments</h2>
-        </header>
-        <div class="section__body">
-          <div class="dropzone" [class.dragging]="isDragging">
-            <div class="dz-inner">
-              <div class="cloud">
-                <svg viewBox="0 0 24 24" width="28" height="28">
-                  <path
-                    d="M19 18H6a4 4 0 110-8 5 5 0 019.9-.9A3.5 3.5 0 1119 18z"
-                    fill="currentColor"
-                  />
-                </svg>
-              </div>
-              <p>Drag and drop files here or</p>
-              <label class="btn btn-red">
-                <input type="file" multiple (change)="onFilesSelected($event)" hidden />
-                Browse Files
-              </label>
-              <small>Upload PDF or image files (max 10MB each)</small>
-            </div>
-          </div>
-
-          <!-- Existing files -->
-          <ul class="file-list" *ngIf="existingFiles.length">
-            <li *ngFor="let f of existingFiles">
-              <a [href]="f.url" target="_blank">{{ f.name }}</a>
-              <button type="button" class="delete-btn" (click)="markFileForDeletion(f)">×</button>
-            </li>
-          </ul>
-
-          <!-- Newly added files -->
-          <ul class="file-list" *ngIf="files.length">
-            <li *ngFor="let f of files">
-              <span>{{ f.name }} <small>(new)</small></span>
-              <button type="button" class="delete-btn" (click)="removeNewFile(f)">×</button>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <!-- Footer -->
-      <div class="footer-actions">
-        <button type="button" class="btn btn-ghost" routerLink="/profile">Cancel</button>
-        <button type="submit" class="btn btn-red" [disabled]="isSubmitting">
-          {{ isSubmitting ? 'Saving...' : (isEditMode ? 'Update Certificate' : 'Create Certificate') }}
-        </button>
+  <div class="page-content">
+    <div class="card-frame">
+      <div class="topbar">
+        <h1>{{ isEditMode ? 'Edit Certificate' : 'Create New Certificate' }}</h1>
       </div>
-    </form>
+
+      <form [formGroup]="certificateForm" (ngSubmit)="onSubmit()" novalidate>
+
+        <!-- Basic Info -->
+        <section class="section">
+          <header class="section__header">
+            <span class="bullet bullet-red"></span>
+            <h2>Basic Information</h2>
+          </header>
+          <div class="section__body">
+            <div class="grid-2">
+              <div class="field">
+                <label>Certificate Name<span class="req">*</span></label>
+                <input type="text" formControlName="name" placeholder="Enter certificate name" />
+              </div>
+              <div class="field">
+                <label>Certificate Type<span class="req">*</span></label>
+                <select formControlName="type">
+                  <option value="" disabled>Select certificate type</option>
+                  <option value="diploma">Diploma</option>
+                  <option value="degree">Degree</option>
+                  <option value="certification">Certification</option>
+                  <option value="award">Award</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="field mt-16">
+              <label>Issuing Organization<span class="req">*</span></label>
+              <input type="text" formControlName="issuingOrganization" placeholder="Enter issuing organization" />
+            </div>
+          </div>
+        </section>
+
+        <!-- Dates -->
+        <section class="section">
+          <header class="section__header">
+            <span class="bullet bullet-pink"></span>
+            <h2>Certificate Dates</h2>
+          </header>
+          <div class="section__body">
+            <div class="grid-2">
+              <div class="field">
+                <label>Issue Date<span class="req">*</span></label>
+                <input type="date" formControlName="issueDate" />
+              </div>
+              <div class="field">
+                <label>Expiry Date</label>
+                <input type="date" formControlName="expiryDate" />
+              </div>
+            </div>
+
+            <div class="field mt-16">
+              <label>Description</label>
+              <textarea rows="3" formControlName="description" placeholder="Enter description of certificate"></textarea>
+            </div>
+          </div>
+        </section>
+
+        <!-- Attachments -->
+        <section class="section">
+          <header class="section__header">
+            <span class="bullet bullet-pink"></span>
+            <h2>Attachments</h2>
+          </header>
+          <div class="section__body">
+            <div class="dropzone" [class.dragging]="isDragging">
+              <div class="dz-inner">
+                <div class="cloud">
+                  <svg viewBox="0 0 24 24" width="28" height="28">
+                    <path d="M19 18H6a4 4 0 110-8 5 5 0 019.9-.9A3.5 3.5 0 1119 18z" fill="currentColor"/>
+                  </svg>
+                </div>
+                <p>Drag and drop files here or</p>
+                <label class="btn btn-red">
+                  <input type="file" multiple (change)="onFilesSelected($event)" hidden />
+                  Browse Files
+                </label>
+                <small>Upload PDF or image files (max 10MB each)</small>
+              </div>
+            </div>
+
+            <!-- Existing files -->
+            <ul class="file-list" *ngIf="existingFiles.length">
+              <li *ngFor="let f of existingFiles">
+                <a [href]="f.url" target="_blank">{{ f.name }}</a>
+                <button type="button" class="delete-btn" (click)="markFileForDeletion(f)">×</button>
+              </li>
+            </ul>
+
+            <!-- New files -->
+            <ul class="file-list" *ngIf="files.length">
+              <li *ngFor="let f of files">
+                <span>{{ f.name }} <small>(new)</small></span>
+                <button type="button" class="delete-btn" (click)="removeNewFile(f)">×</button>
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- Footer -->
+        <div class="footer-actions">
+          <button type="button" class="btn btn-ghost" routerLink="/profile">Cancel</button>
+          <button type="submit" class="btn btn-red" [disabled]="isSubmitting">
+            {{ isSubmitting ? 'Saving...' : (isEditMode ? 'Update Certificate' : 'Create Certificate') }}
+          </button>
+        </div>
+
+      </form>
+    </div>
   </div>
 </div>

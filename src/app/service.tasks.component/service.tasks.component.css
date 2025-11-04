@@ -1,8 +1,52 @@
+/* ===== SIDEBAR + CONTENT LAYOUT FIX ===== */
 .container {
   display: flex;
   width: 100%;
-  overflow-y: hidden;
 }
+
+/* Sidebar fixed */
+app-sidebar {
+  width: 240px;
+  position: fixed;
+  left: 0;
+  top: 70px; /* header height */
+  height: calc(100vh - 70px);
+  background: #ffffff;
+  border-right: 1px solid #eee;
+  z-index: 100;
+}
+
+/* ✅ Kanban content offset */
+.kanban-container {
+  flex: 1;
+  margin-left: 240px; /* push content right */
+  margin-top: 70px; /* push under header */
+  padding: 20px;
+  background-color: #f7f9fc;
+  width: calc(100% - 240px);
+  min-height: calc(100vh - 70px);
+  box-sizing: border-box;
+}
+
+/* Mobile responsive */
+@media (max-width: 1100px) {
+  app-sidebar {
+    position: relative;
+    width: 100%;
+    top: 0;
+    height: auto;
+    border-right: none;
+    border-bottom: 1px solid #eee;
+  }
+
+  .kanban-container {
+    margin-left: 0;
+    margin-top: 120px;
+    padding: 1rem;
+    width: 100%;
+  }
+}
+
 
 .kanban-container {
   padding: 20px;

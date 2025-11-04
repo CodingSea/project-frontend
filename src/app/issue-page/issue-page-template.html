@@ -92,7 +92,8 @@
             </button>
           </div>
 
-          <div class="markdown-body solution-body" [innerHTML]="renderMarkdown(fb.content)"></div>
+<div class="markdown-body solution-body"
+     [innerHTML]="renderMarkdown(getFeedbackContent(fb))"></div>
 
           <!-- Attachments -->
           <div class="attachments-section" *ngIf="fb.attachments?.length">

@@ -9,10 +9,11 @@ import { Certificate } from '@app/services/certificate.service';
 import { Service } from '@app/service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { HeaderComponent } from '@app/header/header';
 
 @Component({
   selector: 'app-profile.component',
-  imports: [ Sidebar, RouterLink, CommonModule, FormsModule ],
+  imports: [ Sidebar, RouterLink, CommonModule, FormsModule,HeaderComponent ],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.css'
 })

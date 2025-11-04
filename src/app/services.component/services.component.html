@@ -1,4 +1,6 @@
 <div class="container">
+    <app-header></app-header>
+
   <app-sidebar />
 
   <div class="pm-container">
@@ -100,11 +102,11 @@
                     (click)="onCardClick(p)"
                   >
                     <header class="pm-card-header">
-                      @if (p.name.length <= 15) 
+                      @if (p.name.length <= 15)
                       {
                         <h3>{{ p.name }}</h3>
                       }
-                      @else 
+                      @else
                       {
                         <h3>{{ getLimitedString(p.name, 15) }}</h3>
                       }
@@ -138,7 +140,7 @@
                       {
                         <span class="pm-progress-label">No Tasks</span>
                       }
-                      @else 
+                      @else
                       {
                         <div class="pm-progress">
                           <div

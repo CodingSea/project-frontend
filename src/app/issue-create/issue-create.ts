@@ -7,11 +7,12 @@ import { Sidebar } from '@app/sidebar/sidebar';
 import { Categories } from '../categories';
 import { jwtDecode } from 'jwt-decode';
 import { ExternalSitePopupComponent } from '@app/external-site-popup-component/external-site-popup-component';
+import { HeaderComponent } from '@app/header/header';
 
 @Component({
   selector: 'app-issue-create',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, Sidebar, ExternalSitePopupComponent],
+  imports: [CommonModule, ReactiveFormsModule, Sidebar, ExternalSitePopupComponent,HeaderComponent],
   templateUrl: './issue-create.html',
   styleUrls: [ './issue-create.css' ],
 })

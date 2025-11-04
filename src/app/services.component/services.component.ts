@@ -10,11 +10,12 @@ import { CreateServiceDto, ServiceService } from '@app/services/service.service'
 import { Sidebar } from '@app/sidebar/sidebar';
 import { environment } from '@environments/environment';
 import { ServiceFormComponent } from '@app/service-form/service-form.component';
+import { HeaderComponent } from '@app/header/header';
 
 @Component({
   selector: 'app-services',
   standalone: true,
-  imports: [ CommonModule, FormsModule, Sidebar, ServiceFormComponent ],
+  imports: [ CommonModule, FormsModule, Sidebar, ServiceFormComponent,HeaderComponent ],
   templateUrl: './services.component.html',
   styleUrls: [ './services.component.css' ],
 })
@@ -91,7 +92,7 @@ export class ServicesComponent implements AfterViewInit
             uniqueMembers.add(service.projectManager.id);
             serviceUniqueMembers.add(service.projectManager.id);
           }
-          if (service.assignedResources) 
+          if (service.assignedResources)
           {
             service.assignedResources.forEach((r) => uniqueMembers.add(r.id));
             service.assignedResources.forEach((r) => serviceUniqueMembers.add(r.id));

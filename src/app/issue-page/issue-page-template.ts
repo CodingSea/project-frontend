@@ -276,4 +276,17 @@ export class IssuePageTemplate implements AfterViewInit, OnInit
             window.URL.revokeObjectURL(url);
         });
     }
+    getFeedbackContent(fb: any) {
+  try {
+    // Backend sends feedback like: { content: "{\"content\":\"cc\",\"userId\":\"15\"}" }
+    const parsed = JSON.parse(fb.content);
+
+    // If content is nested again
+    return parsed.content ?? fb.content;
+  } catch {
+    // If already plain text
+    return fb.content;
+  }
+}
+
 }
