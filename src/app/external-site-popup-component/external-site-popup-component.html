@@ -1,0 +1,13 @@
+<div *ngIf="showModal" class="modal-backdrop">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Scrollable Text</h2>
+        <button (click)="close()">X</button>
+      </div>
+      <div class="modal-content">
+        <div class="scrollable-text">
+          {{ textContent }}
+        </div>
+      </div>
+    </div>
+  </div>

@@ -1,0 +1,37 @@
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .modal {
+    background: white;
+    border-radius: 8px;
+    width: 80%;
+    max-width: 800px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+  }
+  
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    padding: 16px;
+    background: #f1f1f1;
+  }
+  
+  .modal-content {
+    height: 60vh; /* Adjust as needed */
+  }
+  
+  .scrollable-text {
+    max-height: 50vh; /* Set max height for scrolling */
+    overflow-y: auto; /* Enable vertical scrolling */
+    padding: 16px;
+  }
