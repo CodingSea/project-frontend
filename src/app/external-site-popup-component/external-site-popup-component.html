@@ -1,0 +1,17 @@
+<div *ngIf="showModal" class="modal-backdrop">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Markdown Reference Sheet</h2>
+        <button (click)="close()" id="close-btn">X</button>
+      </div>
+      <div class="modal-content">
+        <div class="scrollable-text">
+          <div *ngIf="showModal">
+            <div class="modal-content">
+              <div [innerHTML]="markdownContent"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

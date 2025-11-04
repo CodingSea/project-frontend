@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -6,15 +6,19 @@ import { IssueService } from '@app/services/issue.service';
 import { Sidebar } from '@app/sidebar/sidebar';
 import { Categories } from '../categories';
 import { jwtDecode } from 'jwt-decode';
+import { ExternalSitePopupComponent } from '@app/external-site-popup-component/external-site-popup-component';
 
 @Component({
   selector: 'app-issue-create',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, Sidebar],
+  imports: [CommonModule, ReactiveFormsModule, Sidebar, ExternalSitePopupComponent],
   templateUrl: './issue-create.html',
-  styleUrls: ['./issue-create.css'],
+  styleUrls: [ './issue-create.css' ],
 })
-export class IssueCreateComponent {
+export class IssueCreateComponent
+{
+  @ViewChild(ExternalSitePopupComponent) popup!: ExternalSitePopupComponent;
+
   form: any;
 
   attachments: File[] = [];
@@ -32,7 +36,8 @@ export class IssueCreateComponent {
     private fb: FormBuilder,
     private issueService: IssueService,
     private router: Router
-  ) {
+  )
+  {
     this.form = this.fb.group({
       title: [
         '',
@@ -51,28 +56,33 @@ export class IssueCreateComponent {
           Validators.maxLength(5000)
         ]
       ],
-      category: [''],
-      otherCategory: ['']
+      category: [ '' ],
+      otherCategory: [ '' ]
     });
 
     // ✅ Get current user ID from JWT
     const token = localStorage.getItem('token');
-    if (token) {
+    if (token)
+    {
       const decoded: any = jwtDecode(token);
       this.currentUserId = Number(decoded.sub);
     }
   }
 
-  private totalSize(files: File[]) {
+  private totalSize(files: File[])
+  {
     return files.reduce((s, f) => s + f.size, 0) / (1024 * 1024);
   }
 
-  private validateAndAdd(files: File[]): boolean {
-    if (this.attachments.length + files.length > this.MAX_FILES) {
+  private validateAndAdd(files: File[]): boolean
+  {
+    if (this.attachments.length + files.length > this.MAX_FILES)
+    {
       this.fileError = `Maximum ${this.MAX_FILES} files allowed`;
       return false;
     }
-    if (this.totalSize([...this.attachments, ...files]) > this.MAX_TOTAL_MB) {
+    if (this.totalSize([ ...this.attachments, ...files ]) > this.MAX_TOTAL_MB)
+    {
       this.fileError = `Maximum ${this.MAX_TOTAL_MB}MB total size`;
       return false;
     }
@@ -81,36 +91,44 @@ export class IssueCreateComponent {
     return true;
   }
 
-  onFileSelected(e: Event) {
+  onFileSelected(e: Event)
+  {
     const input = e.target as HTMLInputElement;
     if (input.files) this.validateAndAdd(Array.from(input.files));
     input.value = '';
   }
 
-  onDragOver(e: DragEvent) {
+  onDragOver(e: DragEvent)
+  {
     e.preventDefault();
   }
 
-  onFileDropped(e: DragEvent) {
+  onFileDropped(e: DragEvent)
+  {
     e.preventDefault();
     if (e.dataTransfer?.files) this.validateAndAdd(Array.from(e.dataTransfer.files));
   }
 
-  removeFile(i: number) {
+  removeFile(i: number)
+  {
     this.attachments.splice(i, 1);
   }
 
-  onCancel() {
-    this.router.navigate(['/home']);
+  onCancel()
+  {
+    this.router.navigate([ '/home' ]);
   }
 
-  onSubmit() {
-    if (this.form.invalid || this.fileError) {
+  onSubmit()
+  {
+    if (this.form.invalid || this.fileError)
+    {
       this.message = '⚠️ Please fix form errors';
       return;
     }
 
-    if (!this.currentUserId) {
+    if (!this.currentUserId)
+    {
       alert('User not logged in');
       return;
     }
@@ -127,15 +145,23 @@ export class IssueCreateComponent {
 
     this.loading = true;
     this.issueService.createIssue(payload, this.attachments).subscribe({
-      next: () => {
+      next: () =>
+      {
         this.message = '✅ Issue created successfully';
         this.loading = false;
-        setTimeout(() => this.router.navigate(['/issues']), 800);
+        setTimeout(() => this.router.navigate([ '/issues' ]), 800);
       },
-      error: () => {
+      error: () =>
+      {
         this.message = '❌ Error creating issue';
         this.loading = false;
       }
     });
   }
+
+  openExternalSite()
+  {
+    this.popup.open();
+  }
+
 }
