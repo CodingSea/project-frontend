@@ -5,35 +5,44 @@
     <header class="header">
       <h1>Recent Issues</h1>
       <div class="controls">
+
         <div class="search-box">
-          <input type="text" [(ngModel)]="searchQuery" (keydown.enter)="onFilterChange()" (input)="checkText()"  placeholder="Search issues..." />
+          <input
+            type="text"
+            [(ngModel)]="searchQuery"
+            (input)="onFilterChange()"
+            (keydown.enter)="onFilterChange()"
+            placeholder="Search issues..."
+          />
         </div>
+
         <select [(ngModel)]="selectedCategory" (change)="onFilterChange()">
           <option *ngFor="let category of categories" [value]="category">{{ category }}</option>
         </select>
+
         <select [(ngModel)]="selectedStatus" (change)="onFilterChange()">
           <option *ngFor="let s of status" [value]="s">{{ s }}</option>
         </select>
-<button class="new-issue" (click)="goToCreateIssue()">+ New Issue</button>
+
+        <button class="new-issue" (click)="goToCreateIssue()">+ New Issue</button>
       </div>
     </header>
 
     <section class="card-grid">
-      <div *ngFor="let issue of filteredIssues()">
+      <div *ngFor="let issue of issues">
         <div class="card">
+
           <div class="card-tags">
-            <span [ngClass]="getCategoryClass(issue.category)">
-              {{ issue.category }}
-            </span>
-            <span [ngClass]="getStatusClass(issue.status)">
-              {{ issue.status }}
-            </span>
+            <span [ngClass]="getCategoryClass(issue.category)">{{ issue.category }}</span>
+            <span [ngClass]="getStatusClass(issue.status)">{{ issue.status }}</span>
           </div>
+
           <h3>{{ issue.title }}</h3>
-          <p>{{ issue.description }}</p>
+<p>{{ issue.previewDescription }}</p>
+
           <div class="card-footer">
             <span>{{ getTimeAgo(issue) }}</span>
-              <button class="details-btn" (click)="openIssue(issue.id)">View Details</button>
+            <button class="details-btn" (click)="openIssue(issue.id)">View Details</button>
           </div>
         </div>
       </div>
@@ -42,16 +51,22 @@
     <div class="pagination">
       <button (click)="jumpToPage(true)" [disabled]="currentPage === 1">&lt;&lt;</button>
       <button (click)="changePage(currentPage - 1)" [disabled]="currentPage === 1">&lt;</button>
-      <button *ngFor="let page of pageNumbers" (click)="changePage(page)" [class.active]="currentPage === page">
+
+      <button
+        *ngFor="let page of pageNumbers"
+        (click)="changePage(page)"
+        [class.active]="currentPage === page"
+      >
         {{ page }}
       </button>
+
       <button (click)="changePage(currentPage + 1)" [disabled]="currentPage >= getTotalPages()">&gt;</button>
       <button (click)="jumpToPage(false)" [disabled]="currentPage >= getTotalPages()">&gt;&gt;</button>
     </div>
 
     <footer class="footer">
       <p>Contact Us</p>
-      <p>© 2024 Developer Issues Dashboard. All rights reserved.</p>
+      <p>© 2025 Developer Issues Dashboard. All rights reserved.</p>
     </footer>
   </main>
 </div>

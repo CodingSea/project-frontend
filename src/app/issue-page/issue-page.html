@@ -34,7 +34,7 @@
 
               <span>{{ issue.createdBy?.first_name }} {{ issue.createdBy?.last_name }}</span>
               <span class="dot">•</span>
-              <span class="time">{{ issue.createdAt | date:'medium' }}</span>
+              <span class="time">{{ getTimeAgo(issue.createdAt) }}</span>
             </div>
           </div>
 
@@ -44,12 +44,7 @@
           <!-- Issue Attachments -->
           <div class="attachments-section" *ngIf="issue.attachments?.length">
             <div class="attachments-title">Issue Attachments</div>
-
-            <div
-              class="attachment-item"
-              *ngFor="let file of issue.attachments"
-              (click)="download(file)"
-            >
+            <div class="attachment-item" *ngFor="let file of issue.attachments" (click)="download(file)">
               <div class="file-info">
                 <i class="fa-regular fa-file-lines file-icon"></i>
                 <span class="file-name">{{ file.name }}</span>
@@ -57,7 +52,6 @@
               <i class="fa-solid fa-download download-icon"></i>
             </div>
           </div>
-
         </section>
 
         <!-- FEEDBACK SECTION -->
@@ -86,13 +80,14 @@
 
                 <strong>{{ fb.user?.first_name }} {{ fb.user?.last_name }}</strong>
                 <span class="dot">•</span>
-                <span class="time">{{ fb.createdAt | date:'short' }}</span>
+                <span class="time">{{ getTimeAgo(fb.createdAt) }}</span>
               </div>
 
               <button *ngIf="currentUserId === issue?.createdBy?.id"
                       class="accept-btn"
                       [ngClass]="{'accepted-btn': fb.isAccepted}"
                       (click)="acceptFeedback(fb.id!)">
+                <i class="fa-solid" [ngClass]="fb.isAccepted ? 'fa-check' : 'fa-thumbs-up'"></i>
                 {{ fb.isAccepted ? 'Accepted' : 'Mark as Accepted' }}
               </button>
             </div>
@@ -102,21 +97,30 @@
             <!-- Attachments -->
             <div class="attachments-section" *ngIf="fb.attachments?.length">
               <div class="attachments-title">Attachments</div>
-
-              <div
-                class="attachment-item"
-                *ngFor="let file of fb.attachments"
-                (click)="download(file)"
-              >
+              <div class="attachment-item" *ngFor="let file of fb.attachments" (click)="download(file)">
                 <div class="file-info">
                   <i class="fa-regular fa-file-lines file-icon"></i>
                   <span class="file-name">{{ file.name }}</span>
                 </div>
-
                 <i class="fa-solid fa-download download-icon"></i>
               </div>
             </div>
 
+            <!-- === COMMENTS LIST === -->
+            <div class="comments-list" *ngIf="fb.comments?.length">
+              <div class="comment-item" *ngFor="let c of fb.comments">
+                <img class="comment-avatar" [src]="fixImage(c.user?.profileImage)" />
+                <div class="comment-bubble">
+                  <div class="comment-meta">
+                    <span class="author">{{ c.user?.first_name }} {{ c.user?.last_name }}</span> •
+                    <span>{{ getTimeAgo(c.createdAt) }}</span>
+                  </div>
+                  {{ c.content }}
+                </div>
+              </div>
+            </div>
+
+            <!-- Reply -->
             <button class="reply-toggle" (click)="toggleReplyBox(fb.id!)">
               <i class="fa-regular fa-comment-dots"></i> Reply
             </button>
@@ -127,12 +131,12 @@
                 [(ngModel)]="replyContent[fb.id!]"
                 placeholder="Write a reply..."
                 rows="1"
-                (input)="autoResize($event)"
-              ></textarea>
+                (input)="autoResize($event)">
+              </textarea>
 
               <button class="reply-send-btn"
-                (click)="submitComment(fb.id!)"
-                [disabled]="!replyContent[fb.id!]">
+                      (click)="submitComment(fb.id!)"
+                      [disabled]="!replyContent[fb.id!]">
                 <i class="fa-solid fa-paper-plane"></i>
               </button>
             </div>
@@ -140,28 +144,35 @@
           </article>
 
           <!-- ADD FEEDBACK -->
-          <div class="add-solution-box feedback-box">
-            <h3 class="add-feedback-title">Add Feedback</h3>
+<div class="add-solution-box feedback-box">
+  <h3 class="add-feedback-title">Add Feedback</h3>
 
-            <textarea [(ngModel)]="newFeedback" class="solution-textarea" placeholder="Write your feedback..."></textarea>
+  <textarea
+    [(ngModel)]="newFeedback"
+    class="solution-textarea auto-textarea"
+    placeholder="Write your feedback..."
+    rows="1"
+    (input)="autoResize($event)">
+  </textarea>
 
-            <div class="file-chip-wrapper" *ngIf="selectedFiles.length">
-              <div class="file-chip" *ngFor="let f of selectedFiles; let i=index">
-                <i class="fa-solid fa-paperclip"></i>
-                <span>{{ f.name }}</span>
-                <button class="remove-file" (click)="removeFile(i)">x</button>
-              </div>
-            </div>
+  <div class="file-chip-wrapper" *ngIf="selectedFiles.length">
+    <div class="file-chip" *ngFor="let f of selectedFiles; let i=index">
+      <i class="fa-solid fa-paperclip"></i>
+      <span>{{ f.name }}</span>
+      <button class="remove-file" (click)="removeFile(i)">x</button>
+    </div>
+  </div>
 
-            <div class="action-row">
-              <label class="file-upload">
-                <i class="fa-solid fa-paperclip"></i> Attach
-                <input type="file" hidden multiple (change)="onFileSelected($event)" />
-              </label>
+  <div class="action-row">
+    <label class="file-upload">
+      <i class="fa-solid fa-paperclip"></i> Attach
+      <input type="file" hidden multiple (change)="onFileSelected($event)" />
+    </label>
 
-              <button class="submit-btn" (click)="submitFeedback()">Post Feedback</button>
-            </div>
-          </div>
+    <button class="submit-btn" (click)="submitFeedback()">Post Feedback</button>
+  </div>
+</div>
+
 
         </section>
       </ng-container>
