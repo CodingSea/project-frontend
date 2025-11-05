@@ -1,4 +1,6 @@
 <div class="container">
+    <app-header></app-header>
+
   <app-sidebar />
 
   <div class="pm-container">
@@ -78,11 +80,11 @@
                     (click)="onCardClick(p)">
                     <!-- Header -->
                     <header class="pm-card-header">
-                      @if (p.name.length <= 25) 
+                      @if (p.name.length <= 25)
                       {
                         <h3>{{ p.name }}</h3>
                       }
-                      @else 
+                      @else
                       {
                         <h3>{{ getLimitedString(p.name, 25) }}</h3>
                       }
@@ -190,7 +192,7 @@
 
 
 
-                
+
 
                 <!-- Edit Form -->
                 <ng-container *ngIf="showEditProject">

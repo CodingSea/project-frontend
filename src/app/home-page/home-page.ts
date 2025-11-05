@@ -2,26 +2,27 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@
 import { Sidebar } from "@app/sidebar/sidebar";
 import { Categories, CategoryClasses } from '@app/categories';
 import { HttpClient } from '@angular/common/http';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { environment } from '@environments/environment';
 import { CommonModule } from '@angular/common';
 import { Issue } from '@app/issue';
 import { Status, StatusClasses } from '@app/status';
 import { FormsModule } from '@angular/forms';
+import { HeaderComponent } from '@app/header/header';
 
 @Component({
   selector: 'app-home-page',
-  imports: [ Sidebar, CommonModule, FormsModule ],
+  imports: [ Sidebar, CommonModule, FormsModule, HeaderComponent ],
   templateUrl: './home-page.html',
   styleUrl: './home-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class HomePage implements OnInit
-{
-  constructor(private http: HttpClient, private activatedRoute: ActivatedRoute, private router: Router, private cdr: ChangeDetectorRef) { }
+export class HomePage implements OnInit {
 
-  categories: string[] = Object.values(Categories);
-  status: string[] = Object.values(Status);
+  constructor(private http: HttpClient, private router: Router, private cdr: ChangeDetectorRef) {}
+
+  categories = Object.values(Categories);
+  status = Object.values(Status);
 
   issues: Issue[] = [];
   currentPage: number = 1;
@@ -33,239 +34,147 @@ export class HomePage implements OnInit
   selectedCategory: Categories = Categories.AllCategories;
   selectedStatus: Status = Status.All;
 
-  ngOnInit()
-  {
-    this.updateTotalIssues();
-    this.loadIssues();
+  ngOnInit() {
+    this.loadData();
   }
 
-  loadIssues(): void
-  {
-    // Construct the query string manually
-    const queryParams = new URLSearchParams();
-    queryParams.append('page', this.currentPage.toString());
-    queryParams.append('limit', this.pageSize.toString());
+  buildQueryParams(): string {
+    const params = new URLSearchParams();
+    params.append('page', this.currentPage.toString());
+    params.append('limit', this.pageSize.toString());
+    params.append('status', this.selectedStatus);
+    params.append('category', this.selectedCategory);
 
-    if (this.selectedStatus !== Status.All)
-    {
-      queryParams.append('status', this.selectedStatus);
+    if (this.searchQuery.trim() !== '') {
+      params.append('search', this.searchQuery.trim());
     }
 
-    if (this.selectedCategory !== Categories.AllCategories)
-    {
-      queryParams.append('category', this.selectedCategory);
-    }
-
-    if (this.searchQuery)
-    {
-      queryParams.append('search', this.searchQuery);
-    }
-
-    this.http.get<Issue[]>(`${environment.apiUrl}/issue?${queryParams.toString()}`).subscribe(
-      (res) =>
-      {
-        this.issues = res;
-        this.cdr.markForCheck();
-      },
-      (err) =>
-      {
-        console.error('Error loading issues:', err);
-      }
-    );
+    return params.toString();
   }
 
-  updateTotalIssues(): void
-  {
-    this.http.get<number>(`${environment.apiUrl}/issue/count`).subscribe(
-      (count) =>
-      {
-        
-        this.totalIssues = count;
-        this.updatePageNumbers();
-      },
-      (err) =>
-      {
-        console.error('Error fetching total issues:', err);
-      }
-    );
+  // ✅ merged final version
+  loadData(): void {
+    const params = this.buildQueryParams();
+
+    this.http.get<number>(`${environment.apiUrl}/issue/count?${params}`).subscribe(count => {
+      this.totalIssues = count;
+      this.updatePageNumbers();
+
+      this.http.get<Issue[]>(`${environment.apiUrl}/issue?${params}`).subscribe(res => {
+        this.issues = res.map(issue => ({
+          ...issue,
+          previewDescription: this.stripMarkdown(issue.description)
+        }));
+
+        this.cdr.detectChanges();
+      });
+    });
   }
 
-  changePage(page: number): void
-  {
+  stripMarkdown(text: string): string {
+    if (!text) return '';
+
+    return text
+      .replace(/[#_*~`>-]/g, '')
+      .replace(/\[(.*?)\]\((.*?)\)/g, '$1')
+      .replace(/!\[(.*?)\]\((.*?)\)/g, '')
+      .replace(/<\/?[^>]+(>|$)/g, '')
+      .trim();
+  }
+
+  onFilterChange(): void {
+    this.currentPage = 1;
+    this.loadData();
+  }
+
+  changePage(page: number): void {
     if (page < 1 || page > this.getTotalPages()) return;
     this.currentPage = page;
-    this.updatePageNumbers();
-    this.loadIssues();
+    this.loadData();
   }
 
-  jumpToPage(firstPage: boolean): void
-  {
-    const totalPages = this.getTotalPages();  // Get total number of pages
-
-    // Set the current page to either the first or last page
-    if (firstPage)
-    {
-      this.currentPage = 1;  // Navigate to the first page
-    }
-    else
-    {
-      this.currentPage = totalPages;  // Navigate to the last page
-    }
-
-    // Update the page numbers and load the issues based on the new current page
-    this.updatePageNumbers();
-    this.loadIssues();
+  jumpToPage(firstPage: boolean): void {
+    this.currentPage = firstPage ? 1 : this.getTotalPages();
+    this.loadData();
   }
 
-  getTotalPages(): number
-  {
-    const totalPages = Math.ceil(this.totalIssues / this.pageSize);
-    return totalPages || 1; // Ensure at least one page is returned
+  getTotalPages(): number {
+    return Math.ceil(this.totalIssues / this.pageSize) || 1;
   }
 
-  getTotalIssuesCount(): void
-  {
-    const queryParams = new URLSearchParams();
-    if (this.selectedStatus !== Status.All)
-    {
-      queryParams.append('status', this.selectedStatus);
-    }
-
-    if (this.selectedCategory !== Categories.AllCategories)
-    {
-      queryParams.append('category', this.selectedCategory);
-    }
-
-    if (this.searchQuery)
-    {
-      queryParams.append('search', this.searchQuery);
-    }
-
-    this.http.get<number>(`${environment.apiUrl}/issue/count?${queryParams.toString()}`).subscribe(
-      (count) =>
-      {
-        this.totalIssues = count; // Update the total issues count
-        this.updatePageNumbers(); // Recalculate the page numbers
-        this.loadIssues(); // Load issues based on updated filters
-      },
-      (err) =>
-      {
-        console.error('Error fetching total issues count:', err);
-      }
-    );
-  }
-
-  updatePageNumbers(): void
-  {
-    const totalPages = this.getTotalPages();
-    const currentPage = this.currentPage;
-
+  updatePageNumbers(): void {
+    const total = this.getTotalPages();
+    const curr = this.currentPage;
     this.pageNumbers = [];
 
-    // Calculate the start and end page indexes
-    let startPage = Math.max(1, currentPage - 2); // Start from 2 pages before the current page
-    let endPage = Math.min(totalPages, currentPage + 2); // End at 2 pages after the current page
+    let start = Math.max(1, curr - 2);
+    let end = Math.min(total, curr + 2);
 
-    // Ensure we always show exactly 5 pages
-    if (endPage - startPage < 4)
-    {
-      if (currentPage <= 3)
-      {
-        endPage = Math.min(5, totalPages); // If near the start
-      } else
-      {
-        startPage = Math.max(1, endPage - 4); // Adjust start page if near the end
-      }
+    if (end - start < 4) {
+      if (curr <= 3) end = Math.min(5, total);
+      else start = Math.max(1, end - 4);
     }
 
-    // Add pages to the pageNumbers array
-    for (let i = startPage; i <= endPage; i++)
-    {
-      this.pageNumbers.push(i);
-    }
-
-    // Remove duplicates and sort the page numbers
-    this.pageNumbers = Array.from(new Set(this.pageNumbers)).sort((a, b) => a - b);
+    for (let i = start; i <= end; i++) this.pageNumbers.push(i);
   }
 
-  getTimeAgo(issue: Issue): string
-  {
-    // Convert createdAt to Date if it's a string
-    const createdAt: Date = typeof issue.createdAt === 'string' ? new Date(issue.createdAt) : issue.createdAt;
+getCategoryClass(category: any): string {
+if (!category) return '';
+
+  // If value is one of the enum categories
+  if (Object.values(Categories).includes(category)) {
+    return CategoryClasses[category as Categories];
+  }
+
+  // Fallback for custom user category
+  const clean = String(category).toLowerCase().replace(/\s+/g, '-');
+  return `tag category-generic category-${clean}`;
+}
+
+getStatusClass(status: any): string {
+  if (!status) return 'tag status-generic';
+
+  // If value is one of the enum statuses
+  if (Object.values(Status).includes(status)) {
+    return StatusClasses[status as Status];
+  }
+
+  // Fallback for custom/unknown status
+  const clean = String(status).toLowerCase().replace(/\s+/g, '-');
+  return `tag status-generic status-${clean}`;
+}
+
+
+  getTimeAgo(issue: Issue): string {
+    const createdAt: any = typeof issue.createdAt === 'string' ? new Date(issue.createdAt) : issue.createdAt;
     const now = new Date();
     const seconds = Math.floor((now.getTime() - createdAt.getTime()) / 1000);
 
-    // Check if the time is more than a week (7 days)
-    if (seconds >= 7 * 24 * 60 * 60)
-    {
-      const options: Intl.DateTimeFormatOptions = {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-      };
-      return createdAt.toLocaleDateString(undefined, options); // Format the date
+    if (seconds >= 7 * 24 * 60 * 60) {
+      return createdAt.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
     }
 
-    // Calculate intervals for time less than a week
-    let interval = Math.floor(seconds / 31536000);
-    if (interval >= 1) return interval + ' year' + (interval === 1 ? '' : 's') + ' ago';
+    const units = [
+      { t: 31536000, l: 'year' },
+      { t: 2592000, l: 'month' },
+      { t: 86400, l: 'day' },
+      { t: 3600, l: 'hour' },
+      { t: 60, l: 'minute' }
+    ];
 
-    interval = Math.floor(seconds / 2592000);
-    if (interval >= 1) return interval + ' month' + (interval === 1 ? '' : 's') + ' ago';
-
-    interval = Math.floor(seconds / 86400);
-    if (interval >= 1) return interval + ' day' + (interval === 1 ? '' : 's') + ' ago';
-
-    interval = Math.floor(seconds / 3600);
-    if (interval >= 1) return interval + ' hour' + (interval === 1 ? '' : 's') + ' ago';
-
-    interval = Math.floor(seconds / 60);
-    if (interval >= 1) return interval + ' minute' + (interval === 1 ? '' : 's') + ' ago';
-
-    return seconds + ' second' + (seconds === 1 ? '' : 's') + ' ago';
-  }
-
-  getCategoryClass(category: Categories): string
-  {
-    return CategoryClasses[ category ];
-  }
-
-  getStatusClass(status: Status): string
-  {
-    return StatusClasses[ status ];
-  }
-
-  filteredIssues(): Issue[]
-  {
-    return this.issues;
-  }
-
-  onFilterChange(): void
-  {
-    this.currentPage = 1; // Reset to the first page when changing filters
-    this.getTotalIssuesCount(); // Reload issues based on the new filters
-
-  }
-
-  checkText(): void
-  {
-    if (this.searchQuery == "")
-    {
-      this.currentPage = 1;
-      this.getTotalIssuesCount();
+    for (const u of units) {
+      const v = Math.floor(seconds / u.t);
+      if (v >= 1) return `${v} ${u.l}${v > 1 ? 's' : ''} ago`;
     }
+
+    return `${seconds} seconds ago`;
   }
 
-  openIssue(id: number): void
-  {
-    this.router.navigate([ '/issues', id ]);
+  openIssue(id: number): void {
+    this.router.navigate(['/issues', id]);
   }
 
-  goToCreateIssue(): void
-  {
-    this.router.navigate([ '/issues/create' ]);
+  goToCreateIssue(): void {
+    this.router.navigate(['/issues/create']);
   }
-
-
-
 }

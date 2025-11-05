@@ -313,3 +313,49 @@ h3 {
 .progress-tr {
     display: flex;
 }
+/* ===== SIDEBAR + CONTENT LAYOUT FIX FOR DASHBOARD ===== */
+.app {
+  display: flex;
+  width: 100%;
+}
+
+/* Sidebar fixed */
+app-sidebar {
+  width: 240px;
+  position: fixed;
+  top: 70px; /* header height */
+  left: 0;
+  height: calc(100vh - 70px);
+  background: #ffffff;
+  border-right: 1px solid #eee;
+  z-index: 1000;
+}
+
+/* ✅ Dashboard main content */
+.main {
+  flex: 1;
+  margin-left: 240px; /* push content right */
+  margin-top: 70px; /* push under header */
+  padding: 2rem 3rem;
+  width: calc(100% - 240px);
+  box-sizing: border-box;
+}
+
+/* ✅ Mobile responsive */
+@media (max-width: 1100px) {
+  app-sidebar {
+    position: relative;
+    width: 100%;
+    top: 0;
+    height: auto;
+    border-right: none;
+    border-bottom: 1px solid #eee;
+  }
+
+  .main {
+    margin-left: 0;
+    margin-top: 120px;
+    width: 100%;
+    padding: 1.5rem;
+  }
+}

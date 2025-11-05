@@ -1,4 +1,5 @@
-<div class="container">
+<div class="layout-wrapper">
+  <app-header></app-header>
   <app-sidebar></app-sidebar>
 
   <div class="page-content">
@@ -11,6 +12,7 @@
 
       <form [formGroup]="form" (ngSubmit)="onSubmit()" class="issue-form">
 
+        <!-- Title -->
         <div class="form-group">
           <label>Title <span>*</span></label>
           <input type="text" formControlName="title" placeholder="Enter issue title">
@@ -19,15 +21,34 @@
           </small>
         </div>
 
+        <!-- Description -->
         <div class="form-group">
-          <label>Description <span>*</span></label>
-          <button (click)="openExternalSite()">View Reference heet</button>
-          <textarea formControlName="description" rows="6" placeholder="Describe the issue"></textarea>
+          <div class="label-row">
+            <label>Description <span>*</span></label>
+
+            <!-- ✅ merged reference button -->
+            <button type="button" class="md-ref-inline" (click)="openExternalSite()">
+              <i class="fa-regular fa-circle-question"></i>
+              Markdown Reference
+            </button>
+          </div>
+
+
+
+          <textarea
+            formControlName="description"
+            class="auto-textarea"
+            placeholder="Describe the issue (Markdown supported)"
+            rows="1"
+            (input)="autoResize($event)">
+          </textarea>
+
           <small class="error" *ngIf="form.get('description')?.invalid && form.get('description')?.touched">
             Description must be at least 10 characters.
           </small>
         </div>
 
+        <!-- Category -->
         <div class="form-group">
           <label>Category</label>
           <select formControlName="category">
@@ -37,10 +58,10 @@
           </select>
 
           <input *ngIf="form.get('category')?.value === 'Other'"
-                type="text"
-                formControlName="otherCategory"
-                placeholder="Type custom category"
-                class="other-category">
+                 type="text"
+                 formControlName="otherCategory"
+                 placeholder="Type custom category"
+                 class="other-category">
 
           <small class="error"
                 *ngIf="form.get('category')?.value === 'Other' && !form.get('otherCategory')?.value && form.get('otherCategory')?.touched">
@@ -48,13 +69,14 @@
           </small>
         </div>
 
+        <!-- Attachments -->
         <div class="form-group">
           <label>Attachments</label>
 
           <div class="attachment-dropzone"
-                (dragover)="onDragOver($event)"
-                (drop)="onFileDropped($event)"
-                (click)="fileInput.click()">
+               (dragover)="onDragOver($event)"
+               (drop)="onFileDropped($event)"
+               (click)="fileInput.click()">
             <input #fileInput type="file" multiple hidden (change)="onFileSelected($event)">
             <i class="fa-solid fa-upload upload-icon"></i>
             <p><strong>Click to upload</strong> or drag & drop</p>
@@ -71,6 +93,7 @@
           <small class="error" *ngIf="fileError">{{ fileError }}</small>
         </div>
 
+        <!-- Buttons -->
         <div class="form-footer">
           <button type="button" class="btn-cancel" (click)="onCancel()">Cancel</button>
           <button type="submit" class="btn-submit" [disabled]="loading">Create Issue</button>
@@ -80,5 +103,6 @@
     </div>
   </div>
 
+  <!-- ✅ keep your popup modal -->
   <app-external-site-popup-component #popup></app-external-site-popup-component>
 </div>

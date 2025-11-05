@@ -3,15 +3,17 @@ import { Feedback } from "./feedback";
 import { Status } from "./status";
 import { User } from "./user";
 
-export interface Issue
-{
+export interface Issue {
     id: number;
     title: string;
     description: string;
     status: Status;
     category: Categories;
-    createdBy: User; // Assuming User is also an interface
+    createdBy: User;
     createdAt: Date;
     updatedAt: Date;
-    feedbacks: Feedback[]; // Assuming Feedback is also an interface
+    feedbacks: Feedback[];
+
+    previewDescription?: string;
 }
+
