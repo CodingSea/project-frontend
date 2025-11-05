@@ -76,7 +76,6 @@ export class HomePage implements OnInit
 
   updateTotalIssues(): void
   {
-    console.log(`${environment.apiUrl}`)
     this.http.get<number>(`${environment.apiUrl}/issue/count`).subscribe(
       (count) =>
       {
@@ -243,7 +242,6 @@ export class HomePage implements OnInit
 
   onFilterChange(): void
   {
-    console.log("pressed")
     this.currentPage = 1; // Reset to the first page when changing filters
     this.getTotalIssuesCount(); // Reload issues based on the new filters
 
@@ -253,7 +251,6 @@ export class HomePage implements OnInit
   {
     if (this.searchQuery == "")
     {
-      console.log("none")
       this.currentPage = 1;
       this.getTotalIssuesCount();
     }

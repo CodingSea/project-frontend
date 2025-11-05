@@ -74,9 +74,17 @@ export class ExcelImporter
 
       this.groupedData.shift();
 
-      console.log(this.groupedData); // Logs grouped projects and their services
+      this.ImportInDB();
     };
 
     reader.readAsBinaryString(target.files[ 0 ]);
   }
+
+  ImportInDB()
+  {
+    console.log(this.groupedData);
+
+    
+  }
+
 }
