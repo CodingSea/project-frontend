@@ -40,7 +40,6 @@ body {
   border: 1px solid #ccc;
   border-radius: 8px;
   font-size: 0.9rem;
-
   color: #374151;
   background-color: #ffffff;
   transition: all 0.2s ease;
@@ -48,13 +47,6 @@ body {
   background-repeat: no-repeat;
   background-position: 12px center;
   background-size: 18px;
-}
-
-.search-icon {
-  position: absolute;
-  left: 8px;
-  top: 5px;
-  color: #888;
 }
 
 select, button {
@@ -99,17 +91,58 @@ select, button {
   margin-bottom: 0.5rem;
 }
 
+/* ===== TAG SYSTEM ===== */
 .tag {
   font-size: 0.75rem;
   padding: 2px 8px;
   border-radius: 12px;
   font-weight: 500;
+  text-transform: capitalize;
 }
 
-.tag.red { background: #fde8e8; color: #c62828; }
-.tag.green { background: #e8f5e9; color: #2e7d32; }
-.tag.blue { background: #e3f2fd; color: #1565c0; }
-.tag.yellow { background: #fff8e1; color: #f9a825; }
+/* ✅ STATUS COLORS */
+.tag.status-open {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.tag.status-resolved {
+  background: #e3f2fd;
+  color: #1565c0;
+}
+
+.tag.status-all {
+  background: #eeeeee;
+  color: #555;
+}
+
+/* ✅ CATEGORY COLORS */
+.tag.category-bug {
+  background: #fde8e8;
+  color: #c62828;
+}
+
+.tag.category-feature {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.tag.category-security {
+  background: #e3f2fd;
+  color: #1565c0;
+}
+
+.tag.category-database {
+  background: #fff8e1;
+  color: #f9a825;
+}
+
+.tag.category-all {
+  background: #eeeeee;
+  color: #555;
+}
+
+/* ===== END TAG SYSTEM ===== */
 
 .card h3 {
   margin: 0.5rem 0;
@@ -428,4 +461,34 @@ app-sidebar {
     margin-top: 120px;
     padding: 1rem;
   }
+}
+/* Generic category style */
+.tag.category-generic {
+  background: #f3f4f6;
+  color: #374151;
+  border: 1px solid #d1d5db;
+}
+
+/* Generic status style */
+.tag.status-generic {
+  background: #eef2ff;
+  color: #4338ca;
+  border: 1px solid #c7d2fe;
+}
+
+.tag.status-progress {
+  background: #dbeafe;
+  color: #1d4ed8;
+  border: 1px solid #93c5fd;
+}
+/* Generic custom category - Purple */
+.tag.category-generic {
+  background: #f3e8ff; /* soft purple */
+  color: #6b21a8;     /* deep purple */
+  border: 1px solid #d8b4fe;
+}
+/* placeholder for empty category to keep layout aligned */
+.tag.placeholder-category {
+  visibility: hidden;
+  padding: 2px 8px;
 }

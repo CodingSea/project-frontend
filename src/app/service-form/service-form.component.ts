@@ -16,6 +16,8 @@ import { UserService, User } from '@app/services/user.service';
 import { DevelopersSearchComponent } from '@app/developers.search.component/developers.search.component';
 import { ServiceStatus, ServiceStatusForEdit } from '@app/service';
 import { Service } from '@app/service';
+import { Sidebar } from '@app/sidebar/sidebar';
+import { HeaderComponent } from '@app/header/header';
 
 interface ExistingFile
 {
@@ -32,7 +34,8 @@ enum DefaultStatus
 @Component({
   selector: 'app-service-form',
   standalone: true,
-  imports: [ CommonModule, ReactiveFormsModule, RouterModule, DevelopersSearchComponent, FormsModule ],
+  imports: [ CommonModule, ReactiveFormsModule, RouterModule, DevelopersSearchComponent, FormsModule,  Sidebar,
+  HeaderComponent ],
   templateUrl: './service-form.component.html',
   styleUrls: [ './service-form.component.scss' ],
 })

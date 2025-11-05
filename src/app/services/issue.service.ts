@@ -41,6 +41,7 @@ export interface Issue {
   updatedAt?: string;
   createdBy?: User;
   feedbacks?: Feedback[];
+previewDescription?: string;
 }
 
 @Injectable({
@@ -90,4 +91,8 @@ export class IssueService {
       responseType: 'blob'
     });
   }
+  updateIssueStatus(issueId: number, status: string) {
+return this.http.patch(`${environment.apiUrl}/issue/${issueId}/status`, { status });
+}
+
 }

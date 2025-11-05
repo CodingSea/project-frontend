@@ -408,6 +408,7 @@ select:focus {
     padding: 24px;
   }
 }
+
 /* ===== Global Layout matching Certificate Page ===== */
 .layout-wrapper {
   width: 100%;
@@ -495,5 +496,32 @@ app-sidebar {
 
 .md-ref-inline:hover {
   color: #1e40af;
+}
+/* Auto-expand textarea for description */
+.auto-textarea {
+  min-height: 120px;
+  max-height: 300px;
+  overflow-y: auto !important;
+  resize: none !important;
+  line-height: 1.6;
+}
+.md-helper {
+  font-size: 13px;
+  color: #6b7280;
+  display: flex;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.md-cheat-btn {
+  background: none;
+  border: none;
+  color: #2563eb;
+  cursor: pointer;
+  font-size: 13px;
+  padding: 0;
+}
+
+.md-cheat-btn:hover {
   text-decoration: underline;
 }
