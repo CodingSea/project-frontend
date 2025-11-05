@@ -180,7 +180,7 @@ export class ExcelImporter
             };
 
             await this.http.post(`${environment.apiUrl}/service`, newService).toPromise();
-          } 
+          }
           else
           {
             console.log(`Service "${element}" already exists. Skipping.`);
