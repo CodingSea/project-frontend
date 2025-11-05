@@ -21,7 +21,7 @@ import { HeaderComponent } from '@app/header/header';
   selector: 'app-service-tasks',
   templateUrl: './service.tasks.component.html',
   styleUrls: [ './service.tasks.component.css' ],
-  imports: [ jqxKanbanModule, jqxSplitterModule, CommonModule, AddTaskPopup, TaskPopup, Sidebar, FormsModule, IssuePageTemplate,HeaderComponent ]
+  imports: [ jqxKanbanModule, jqxSplitterModule, CommonModule, AddTaskPopup, TaskPopup, Sidebar, FormsModule, IssuePageTemplate, HeaderComponent ]
 })
 
 export class ServiceTasksComponent implements OnInit, AfterViewInit
@@ -45,6 +45,8 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
   taskBoard: TaskBoard | null = null;
 
   isTaskboardSelected: boolean = true;
+
+  users: any[] = [];
 
   servicesInfo: ServiceInfo =
     {
@@ -76,6 +78,19 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
     })
 
     this.getCurrentServiceInfo();
+    this.getUsers();
+  }
+
+  async getUsers(): Promise<void>
+  {
+    try
+    {
+      const response = await this.http.get<any[]>(`${environment.apiUrl}/user/developers`).toPromise();
+      this.users = response || [];
+    } catch (err)
+    {
+      console.error('Failed to fetch users', err);
+    }
   }
 
   async getCurrentServiceInfo(): Promise<void>
@@ -228,8 +243,6 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
         await this.http.patch<Service>(`${environment.apiUrl}/service/${this.serviceId}/status`, { status: ServiceStatus.New }).toPromise();
         return;
       }
-
-      console.log(this.dataAdapter.localData)
 
       if (this.dataAdapter.localData.length > 0)
       {
@@ -419,10 +432,12 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
     return array.join(', ');
   }
 
-  onTaskAdded(task: { text: string; tags: string, description: string, color: string }): void
+  onTaskAdded(task: { text: string; tags: string; description: string; color: string; assigneeId?: number })
   {
-    this.createTask(task.text, 'new', task.tags, task.description, task.color); // Include empty description
+    this.createTask(task.text, 'backlog', task.tags, task.description, task.color, task.assigneeId);
   }
+
+
 
   async initializeKanbanDataSource(): Promise<void>
   {
@@ -453,7 +468,7 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
     this.checkServiceStatus();
   }
 
-  addTask(column: string, taskText: string, tagsText: string)
+  addTask(column: string, taskText: string, tagsText: string, assigneeId?: number)
   {
     const newTaskOrder = this.data.filter(task => task.status === 'new').length;
 
@@ -463,6 +478,7 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
       text: taskText,
       tags: this.textToArray(tagsText),
       order: newTaskOrder,
+      assigneeId: assigneeId ?? null
     };
 
     this.data.push(newTask);
@@ -494,29 +510,16 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
   }
 
 
-  async createTask(taskText: string, column: string, tagsText: string, description: string, color: string): Promise<void>
+  async createTask(title: string, column: string, tags: string, description: string, color: string, assigneeId?: number): Promise<void>
   {
-    let formattedTags;
-
-    if (tagsText.length === 0)
-    {
-      formattedTags = [ " " ];
-    }
-    else
-    {
-      formattedTags = this.textToArray(tagsText); // Convert to an array
-    }
-
-    const newTaskOrder = this.data.filter(task => task.status === 'new').length;
-
-    const newTask: TaskCard =
-    {
-      title: taskText,
+    const formattedTags = tags ? this.textToArray(tags) : [];
+    const newTask: any = {
+      title,
       column,
-      description, // Include the description here
+      description,
       tags: formattedTags,
-      order: newTaskOrder,
-      color: color,
+      color,
+      assigneeId: assigneeId ?? null // ✅ send selected user ID
     };
 
     try
@@ -527,29 +530,24 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
         { headers: { 'Content-Type': 'application/json' } }
       ).toPromise();
 
-      const createdTask = response;
-
-      const newTask02 =
+      if (response)
       {
-        id: createdTask?.id,
-        status: column,
-        text: taskText,
-        description: description,
-        tags: formattedTags,
-        order: newTaskOrder,
-        color: color,
-      };
+        this.data.push({
+          id: response.id,
+          text: title,
+          status: column,
+          description,
+          tags: formattedTags,
+          color,
+          assignee: response.assignee ? response.assignee.id : assigneeId ?? null
+        });
 
-      this.data.push(newTask02);
-      this.dataAdapter.localData = this.data;
-      this.rebuildKanban();
-      this.closePopup();
-
-      await this.getCurrentServiceInfo();
-      await this.initializeKanbanDataSource();
-    } catch (error)
+        this.dataAdapter.localData = this.data;
+        this.rebuildKanban();
+      }
+    } catch (err)
     {
-      console.error('Error creating task:', error);
+      console.error('Error creating task:', err);
     }
   }
 
@@ -567,7 +565,8 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
       description: task.description || '', // Optional
       tags: Array.isArray(task.tags) ? task.tags : this.textToArray(task.tags) || [], // Ensure it's an array
       order: task.order,
-      color: task.color === null ? "#008000" : task.color
+      color: task.color === null ? "#008000" : task.color,
+      assigneeId: task.assignee ?? null
     };
 
     try

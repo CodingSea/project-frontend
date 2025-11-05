@@ -1,3 +1,5 @@
+import { User } from "./user";
+
 export interface TaskCard
 {
     id?: number;
@@ -9,6 +11,8 @@ export interface TaskCard
     tags?: string[];
     order: number;
     color?: string;
+    assignee?: User | null;
+    assigneeId?: number | null;
 }
 
 export interface TaskCardDisplayed
@@ -22,4 +26,5 @@ export interface TaskCardDisplayed
     tags?: string;
     order: number;
     color?: string;
+    assignee?: User;
 }

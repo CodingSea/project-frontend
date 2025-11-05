@@ -57,7 +57,7 @@
       </jqxKanban>
     </div>
 
-    <add-task-popup *ngIf="showPopup" (taskAdded)="onTaskAdded($event)" (close)="closePopup()"></add-task-popup>
+    <add-task-popup *ngIf="showPopup" (taskAdded)="onTaskAdded($event)" (close)="closePopup()" [users]="users"></add-task-popup>
 
     <task-popup *ngIf="showTaskDetailPopup" [task]="selectedTask" (close)="closeTaskDetailPopup()"
       (delete)="deleteTask($event)">
