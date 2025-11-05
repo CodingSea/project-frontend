@@ -1,5 +1,12 @@
 import { CommonModule } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
+import { Project } from '@app/project';
+import { ProjectManagement } from '@app/project-management/project-management';
+import { Service } from '@app/service';
+import { User } from '@app/user';
+import { environment } from '@environments/environment';
+import { jwtDecode } from 'jwt-decode';
 import * as XLSX from 'xlsx';
 
 @Component({
@@ -10,8 +17,11 @@ import * as XLSX from 'xlsx';
 })
 export class ExcelImporter
 {
+  constructor(private http: HttpClient, private projectManagement: ProjectManagement) { }
+
   excelData: any[] = [];
   groupedData: { projectName: string; services: string[] }[] = []; // Array to hold projects and their services
+  allProjects: Project[] = [];
 
   onFileChange(event: any)
   {
@@ -80,11 +90,107 @@ export class ExcelImporter
     reader.readAsBinaryString(target.files[ 0 ]);
   }
 
-  ImportInDB()
+  async ImportInDB()
   {
-    console.log(this.groupedData);
+    try
+    {
+      this.allProjects = await this.http.get<Project[]>(`${environment.apiUrl}/project`).toPromise() || [];
+    } catch (err)
+    {
+      console.log(err);
+      return;
+    }
 
-    
+    // Check if each project in groupedData exists in allProjects
+    for (let i = 0; i < this.groupedData.length; i++)
+    {
+      const project = this.groupedData[ i ];
+
+      if (!this.allProjects.find(x => x.name === project.projectName))
+      {
+        this.addProjects(project);
+      }
+    }
+
+    this.allProjects = await this.http.get<Project[]>(`${environment.apiUrl}/project`).toPromise() || [];
+
+    for (let i = 0; i < this.groupedData.length; i++)
+    {
+      const project = this.groupedData[ i ];
+
+      if (this.allProjects.find(x => x.name === project.projectName))
+      {
+        this.addServices(project);
+      }
+    }
+
+    this.projectManagement.loadProjects();
+  }
+
+  async addProjects(project: { projectName: string; services: string[] })
+  {
+    try
+    {
+      const newProject =
+      {
+        name: project.projectName,
+        status: "Active"
+      }
+
+      const createdProject = await this.http.post(`${environment.apiUrl}/project`, newProject).toPromise();
+    }
+    catch (err)
+    {
+      console.log(err);
+    }
+  }
+
+  async addServices(project: { projectName: string; services: string[] })
+  {
+    try
+    {
+      const selectedProject = this.allProjects.find(x => x.name === project.projectName);
+      const currentDate: Date = new Date();
+      const nextWeekDate: Date = new Date(currentDate);
+      nextWeekDate.setDate(currentDate.getDate() + 7);
+
+      const token = localStorage.getItem("token");
+      const decodedToken = jwtDecode(token!);
+
+      if (project.services.length > 0 && selectedProject !== undefined)
+      {
+        // Fetch existing services for the selected project
+        const existingServices: Service[] = selectedProject.services;
+
+        const existingServiceNames = existingServices.map(service => service.name);
+
+        for (let i = 0; i < project.services.length; i++)
+        {
+          const element = project.services[ i ];
+
+          // Check if the service already exists
+          if (!existingServiceNames.includes(element))
+          {
+            const newService = {
+              name: element,
+              description: "",
+              projectId: selectedProject.projectID,
+              deadline: nextWeekDate,
+              chiefId: decodedToken.sub
+            };
+
+            await this.http.post(`${environment.apiUrl}/service`, newService).toPromise();
+          } 
+          else
+          {
+            console.log(`Service "${element}" already exists. Skipping.`);
+          }
+        }
+      }
+    } catch (err)
+    {
+      console.log(err);
+    }
   }
 
 }
