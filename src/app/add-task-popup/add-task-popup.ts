@@ -12,24 +12,16 @@ import { ServiceTasksComponent } from '@app/service.tasks.component/service.task
 export class AddTaskPopup
 {
   @Input() task: any;
-  @Input() users: any[] = []; // ✅ List of assignable users
   @Output() close = new EventEmitter<void>();
   @Output() delete = new EventEmitter<number>();
-  @Output() taskAdded = new EventEmitter<{
-    text: string;
-    tags: string;
-    description: string;
-    color: string;
-    assigneeId?: number;
-  }>();
+  @Output() taskAdded = new EventEmitter<{ text: string; tags: string; description: string; color: string }>();
 
   title: string = '';
   description: string = '';
   tagsString: string = '';
   tags: string[] = [];
-  priority: string = 'Low Priority';
+  priority: string = 'Low Priority'; // Default priority
   hasChanges: boolean = false;
-  assigneeId: number | null = null; // ✅ Selected user ID
 
   constructor(private taskService: ServiceTasksComponent) { }
 
@@ -38,19 +30,20 @@ export class AddTaskPopup
     this.title = this.task?.text || '';
     this.description = this.task?.description || '';
     this.tagsString = this.task?.tags || '';
-    this.priority = this.task?.priority || 'Low Priority';
-    this.assigneeId = this.task?.assigneeId || null; // ✅ Set from existing task if any
+    this.priority = this.task?.priority || 'Low Priority'; // Set priority if available
     this.tags = this.taskService.textToArray(this.task?.tags);
+
+    console.log(this.task);
   }
 
   onInputChange()
   {
-    this.hasChanges = true;
+    this.hasChanges = true; // Mark that there are changes
   }
 
   async closePopup()
   {
-    this.close.emit();
+    this.close.emit(); // Emit close event
   }
 
   async saveTask()
@@ -59,33 +52,37 @@ export class AddTaskPopup
     {
       const newTaskOrder = this.taskService.data.filter(task => task.status === 'new').length;
 
-      let selectedColor = '#008000';
-      if (this.priority === 'Medium Priority') selectedColor = '#FFD700';
-      else if (this.priority === 'High Priority') selectedColor = '#C21A25';
+      let selectedColor = "#008000";
+
+      if (this.priority == "Low Priority")
+      {
+        selectedColor = "#008000";
+      }
+      else if (this.priority == "Medium Priority")
+      {
+        selectedColor = "#FFD700";
+      }
+      else if (this.priority == "High Priority")
+      {
+        selectedColor = "#C21A25";
+      }
 
       const updatedTask = {
         ...this.task,
         text: this.title,
         order: newTaskOrder,
         description: this.description,
-        tags: this.tagsString,
-        assigneeId: this.assigneeId // ✅ Include assignee
+        tags: this.tagsString
       };
 
-      this.taskAdded.emit({
-        text: updatedTask.text,
-        tags: updatedTask.tags,
-        description: updatedTask.description,
-        color: selectedColor,
-        assigneeId: updatedTask.assigneeId
-      });
+      // Emit the task added event with priority
+      this.taskAdded.emit({ text: updatedTask.text, tags: updatedTask.tags, description: updatedTask.description, color: selectedColor });
 
-      // Reset form
+      // Reset form fields
       this.title = '';
       this.description = '';
       this.tagsString = '';
-      this.priority = 'Low Priority';
-      this.assigneeId = null;
+      this.priority = 'Low Priority'; // Reset priority
 
       this.closePopup();
     } catch (error)
@@ -96,7 +93,7 @@ export class AddTaskPopup
 
   deleteTask()
   {
-    this.delete.emit(this.task.id);
+    this.delete.emit(this.task.id); // Emit the task ID when deleting
   }
 
   getPriorityClass(priority: string): string
@@ -113,4 +110,5 @@ export class AddTaskPopup
         return '';
     }
   }
+
 }

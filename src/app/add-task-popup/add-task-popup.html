@@ -1,52 +1,41 @@
 <div class="modal">
-  <div class="modal-content">
-    <h2>Create New Task</h2>
-    <p>Fill in the details below to create your new task</p>
-
-    <div class="form-group">
-      <label for="title">Title:</label>
-      <input id="title" type="text" placeholder="Add a title..." [(ngModel)]="title"
-        (ngModelChange)="onInputChange()" />
-    </div>
-
-    <div class="form-group">
-      <label for="description">Description:</label>
-      <textarea id="description" rows="4" placeholder="Add a description..." [(ngModel)]="description"
-        (ngModelChange)="onInputChange()"></textarea>
-    </div>
-
-    <div class="form-group">
-      <label for="tags">Tags:</label>
-      <input id="tags" type="text" placeholder="Add tags... (comma-separated)" [(ngModel)]="tagsString"
-        (ngModelChange)="onInputChange()" />
-    </div>
-
-    <div class="form-group">
-      <label for="priority">Priority:</label>
-      <select id="priority" [(ngModel)]="priority" (ngModelChange)="onInputChange()">
-        <option value="Low Priority">Low Priority</option>
-        <option value="Medium Priority">Medium Priority</option>
-        <option value="High Priority">High Priority</option>
-      </select>
-      <span class="priority-indicator" [ngClass]="getPriorityClass(priority)">
-        {{ priority }}
-      </span>
-    </div>
-
-    <!-- ✅ New: Assignee Dropdown -->
-    <div class="form-group">
-      <label for="assignee">Assign to:</label>
-      <select id="assignee" class="form-control" [(ngModel)]="assigneeId" (ngModelChange)="onInputChange()">
-        <option [ngValue]="null">Unassigned</option>
-        <option *ngFor="let user of users" [ngValue]="user.id">
-          {{ user.first_name }} {{ user.last_name }}
-        </option>
-      </select>
-    </div>
-
-    <div class="popup-actions">
-      <button class="close-button" (click)="closePopup()">Cancel</button>
-      <button class="save-button" (click)="saveTask()">Create</button>
+    <div class="modal-content">
+      <h2>Create New Task</h2>
+      <p>Fill in the details below to create your new task</p>
+      
+      <div class="form-group">
+        <label for="title">Title:</label>
+        <input id="title" type="text" placeholder="Add a title..." 
+               [(ngModel)]="title" (ngModelChange)="onInputChange()" />
+      </div>
+      
+      <div class="form-group">
+        <label for="description">Description:</label>
+        <textarea id="description" rows="4" placeholder="Add a description..." 
+                  [(ngModel)]="description" (ngModelChange)="onInputChange()"></textarea>
+      </div>
+      
+      <div class="form-group">
+        <label for="tags">Tags:</label>
+        <input id="tags" type="text" placeholder="Add tags... (comma-separated)" 
+               [(ngModel)]="tagsString" (ngModelChange)="onInputChange()" />
+      </div>
+      
+      <div class="form-group">
+        <label for="priority">Priority:</label>
+        <select id="priority" [(ngModel)]="priority" (ngModelChange)="onInputChange()">
+          <option value="Low Priority">Low Priority</option>
+          <option value="Medium Priority">Medium Priority</option>
+          <option value="High Priority">High Priority</option>
+        </select>
+        <span class="priority-indicator" [ngClass]="getPriorityClass(priority)">
+          {{ priority }}
+        </span>
+      </div>
+      
+      <div class="popup-actions">
+          <button class="close-button" (click)="closePopup()">Cancel</button>
+        <button class="save-button" (click)="saveTask()">Create</button>
+      </div>
     </div>
   </div>
-</div>
