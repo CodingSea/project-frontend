@@ -8,11 +8,12 @@ import { Project } from '@app/project';
 import { ServiceInfo } from '@app/service-info';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '@environments/environment';
+import { HeaderComponent } from '@app/header/header';
 
 @Component({
   selector: 'app-project-management',
   standalone: true,
-  imports: [ CommonModule, FormsModule, Sidebar ],
+  imports: [ CommonModule, FormsModule, Sidebar,HeaderComponent ],
   templateUrl: './project-management.html',
   styleUrls: [ './project-management.scss' ] // ✅ plural
 })

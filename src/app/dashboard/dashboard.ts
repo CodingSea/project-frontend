@@ -8,10 +8,11 @@ import { environment } from '@environments/environment';
 import { CommonModule } from '@angular/common';
 import { ProjectService } from '@app/services/project.service';
 import { Certificate } from '@app/certificate';
+import { HeaderComponent } from '@app/header/header';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [ Sidebar, CommonModule ],
+  imports: [ Sidebar, CommonModule,HeaderComponent ],
   templateUrl: './dashboard.html',
   styleUrls: [ './dashboard.css' ] // Fixed typo: styleUrl to styleUrls
 })

@@ -15,12 +15,13 @@ import { ServiceInfo } from '@app/service-info';
 import { Service, ServiceStatus } from '@app/service';
 import { FormsModule } from '@angular/forms';
 import { IssuePageTemplate } from '@app/issue-page/issue-page-template';
+import { HeaderComponent } from '@app/header/header';
 
 @Component({
   selector: 'app-service-tasks',
   templateUrl: './service.tasks.component.html',
   styleUrls: [ './service.tasks.component.css' ],
-  imports: [ jqxKanbanModule, jqxSplitterModule, CommonModule, AddTaskPopup, TaskPopup, Sidebar, FormsModule, IssuePageTemplate ]
+  imports: [ jqxKanbanModule, jqxSplitterModule, CommonModule, AddTaskPopup, TaskPopup, Sidebar, FormsModule, IssuePageTemplate,HeaderComponent ]
 })
 
 export class ServiceTasksComponent implements OnInit, AfterViewInit
@@ -340,7 +341,7 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
       this.getCurrentServiceInfoFromData();
       await this.checkServiceStatus();
     }
-    else 
+    else
     {
       console.error('Task to update not found:', movedTask);
     }

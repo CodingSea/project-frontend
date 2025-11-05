@@ -1,258 +1,262 @@
-<div class="page">
-  <div class="card-frame">
-    <!-- Header -->
-    <div class="topbar">
-      <h1 style="color: black; font-weight: bolder;">
-        {{ isEditMode ? 'Edit Service' : 'Create New Service' }}
-      </h1>
-    </div>
+<div class="layout-wrapper">
+  <app-header></app-header>
 
-    <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
-      <!-- Basic Info -->
-      <section class="section">
-        <header class="section__header">
-          <span class="bullet bullet-red"></span>
-          <h2>Basic Information</h2>
-        </header>
+  <div class="layout-body">
+    <app-sidebar></app-sidebar>
 
-        <div class="section__body">
-          <div class="grid-2">
-            <div class="field">
-              <label>Service Name<span class="req">*</span></label>
-              <input type="text" formControlName="name" placeholder="Enter service name" />
-              <div class="error" *ngIf="form.get('name')?.touched && form.get('name')?.invalid">
-                <small *ngIf="form.get('name')?.hasError('required')">Service name is required.</small>
-                <small *ngIf="form.get('name')?.hasError('pattern')">
-                  Only letters, numbers, and spaces allowed (3–50 characters).
-                </small>
+    <main class="content-area">
+
+      <!-- ====== SERVICE FORM PAGE START ====== -->
+      <div class="page">
+        <div class="card-frame">
+
+          <!-- Header -->
+          <div class="topbar">
+            <h1 style="color: black; font-weight: bolder;">
+              {{ isEditMode ? 'Edit Service' : 'Create New Service' }}
+            </h1>
+          </div>
+
+          <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+
+            <!-- Basic Info -->
+            <section class="section">
+              <header class="section__header">
+                <span class="bullet bullet-red"></span>
+                <h2>Basic Information</h2>
+              </header>
+
+              <div class="section__body">
+                <div class="grid-2">
+                  <div class="field">
+                    <label>Service Name<span class="req">*</span></label>
+                    <input type="text" formControlName="name" placeholder="Enter service name" />
+                    <div class="error" *ngIf="form.get('name')?.touched && form.get('name')?.invalid">
+                      <small *ngIf="form.get('name')?.hasError('required')">Service name is required.</small>
+                      <small *ngIf="form.get('name')?.hasError('pattern')">
+                        Only letters, numbers, and spaces allowed (3–50 characters).
+                      </small>
+                    </div>
+                  </div>
+
+                  <div class="field">
+                    <label>Service Deadline<span class="req">*</span></label>
+                    <input type="date" formControlName="deadline" />
+                    <div class="error" *ngIf="form.get('deadline')?.touched && form.get('deadline')?.invalid">
+                      Deadline is required.
+                    </div>
+                  </div>
+                </div>
+
+                <div class="field mt-16">
+                  <label>Service Description</label>
+                  <textarea rows="4" formControlName="description"
+                    placeholder="(optional) Briefly describe the service scope and objectives"></textarea>
+                  <div class="error" *ngIf="form.get('description')?.touched && form.get('description')?.invalid">
+                    <small *ngIf="form.get('description')?.hasError('pattern')">
+                      Only letters, numbers, punctuation, and spaces allowed (max 300 characters).
+                    </small>
+                    <small *ngIf="form.get('description')?.hasError('maxlength')">
+                      Maximum 300 characters allowed.
+                    </small>
+                  </div>
+                </div>
               </div>
-            </div>
+            </section>
 
-            <div class="field">
-              <label>Service Deadline<span class="req">*</span></label>
-              <input type="date" formControlName="deadline" />
-              <div class="error" *ngIf="form.get('deadline')?.touched && form.get('deadline')?.invalid">
-                Deadline is required.
-              </div>
-            </div>
-          </div>
-
-          <div class="field mt-16">
-            <label>Service Description</label>
-            <textarea rows="4" formControlName="description"
-              placeholder="(optional) Briefly describe the service scope and objectives"></textarea>
-            <div class="error" *ngIf="form.get('description')?.touched && form.get('description')?.invalid">
-              <small *ngIf="form.get('description')?.hasError('pattern')">
-                Only letters, numbers, punctuation, and spaces allowed (max 300 characters).
-              </small>
-              <small *ngIf="form.get('description')?.hasError('maxlength')">
-                Maximum 300 characters allowed.
-              </small>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Statsu -->
-      <section class="section" *ngIf="isEditMode">
-        <header class="section__header">
-          <span class="icon">
-            <svg viewBox="0 0 24 24" width="18" height="18">
-              <path d="M12 12a5 5 0 100-10 5 5 0 000 10zm-7 9a7 7 0 0114 0v1H5v-1z" fill="currentColor" />
-            </svg>
-          </span>
-          <h2>Service Status</h2>
-        </header>
-
-        <div class="section__body">
-          <div class="grid">
-            <!-- Chief -->
-            <div class="field">
-              <label>Status<span class="req">*</span></label>
-
-              <select formControlName="status">
-                <option *ngFor="let s of status" [value]="s">{{ s }}</option>
-              </select>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Management Team -->
-      <section class="section">
-        <header class="section__header">
-          <span class="icon">
-            <svg viewBox="0 0 24 24" width="18" height="18">
-              <path d="M12 12a5 5 0 100-10 5 5 0 000 10zm-7 9a7 7 0 0114 0v1H5v-1z" fill="currentColor" />
-            </svg>
-          </span>
-          <h2>Management Team</h2>
-        </header>
-
-        <div class="section__body">
-          <div class="grid-2">
-            <!-- Chief -->
-            <div class="field">
-              <label>Chief<span class="req">*</span></label>
-              <button type="button" class="btn btn-red" (click)="openChiefModal($event)">+ Select Chief</button>
-
-              <div *ngIf="selectedChief" class="chips mt-8">
-                <span class="chip">
-                  {{ selectedChief.first_name }} {{ selectedChief.last_name }}
-                  <button type="button" (click)="removeChief()">×</button>
+            <!-- Status -->
+            <section class="section" *ngIf="isEditMode">
+              <header class="section__header">
+                <span class="icon">
+                  <svg viewBox="0 0 24 24" width="18" height="18">
+                    <path d="M12 12a5 5 0 100-10 5 5 0 000 10zm-7 9a7 7 0 0114 0v1H5v-1z" fill="currentColor" />
+                  </svg>
                 </span>
+                <h2>Service Status</h2>
+              </header>
+
+              <div class="section__body">
+                <div class="grid">
+                  <div class="field">
+                    <label>Status<span class="req">*</span></label>
+                    <select formControlName="status">
+                      <option *ngFor="let s of status" [value]="s">{{ s }}</option>
+                    </select>
+                  </div>
+                </div>
               </div>
+            </section>
 
-              <div class="error" *ngIf="form.get('chiefId')?.touched && form.get('chiefId')?.invalid">
-                <small>Chief is required.</small>
-              </div>
-            </div>
-
-            <!-- Manager -->
-            <div class="field">
-              <label>Project Manager</label>
-              <button type="button" class="btn btn-red" (click)="openManagerModal($event)">+ Select Manager</button>
-
-              <div *ngIf="selectedManager" class="chips mt-8">
-                <span class="chip">
-                  {{ selectedManager.first_name }} {{ selectedManager.last_name }}
-                  <button type="button" (click)="removeManager()">×</button>
+            <!-- Management Team -->
+            <section class="section">
+              <header class="section__header">
+                <span class="icon">
+                  <svg viewBox="0 0 24 24" width="18" height="18">
+                    <path d="M12 12a5 5 0 100-10 5 5 0 000 10zm-7 9a7 7 0 0114 0v1H5v-1z" fill="currentColor" />
+                  </svg>
                 </span>
+                <h2>Management Team</h2>
+              </header>
+
+              <div class="section__body">
+                <div class="grid-2">
+
+                  <!-- Chief -->
+                  <div class="field">
+                    <label>Chief<span class="req">*</span></label>
+                    <button type="button" class="btn btn-red" (click)="openChiefModal($event)">+ Select Chief</button>
+
+                    <div *ngIf="selectedChief" class="chips mt-8">
+                      <span class="chip">
+                        {{ selectedChief.first_name }} {{ selectedChief.last_name }}
+                        <button type="button" (click)="removeChief()">×</button>
+                      </span>
+                    </div>
+
+                    <div class="error" *ngIf="form.get('chiefId')?.touched && form.get('chiefId')?.invalid">
+                      <small>Chief is required.</small>
+                    </div>
+                  </div>
+
+                  <!-- Manager -->
+                  <div class="field">
+                    <label>Project Manager</label>
+                    <button type="button" class="btn btn-red" (click)="openManagerModal($event)">+ Select Manager</button>
+
+                    <div *ngIf="selectedManager" class="chips mt-8">
+                      <span class="chip">
+                        {{ selectedManager.first_name }} {{ selectedManager.last_name }}
+                        <button type="button" (click)="removeManager()">×</button>
+                      </span>
+                    </div>
+                  </div>
+
+                </div>
               </div>
-            </div>
-          </div>
-        </div>
-      </section>
+            </section>
 
-      <!-- Assigned Resources -->
-      <section class="section">
-        <header class="section__header">
-          <span class="icon">
-            <svg viewBox="0 0 24 24" width="18" height="18">
-              <path d="M4 7h16v2H4zM4 11h10v2H4zM4 15h16v2H4z" fill="currentColor" />
-            </svg>
-          </span>
-          <h2>Assigned Resources</h2>
-        </header>
+            <!-- Assigned Resources -->
+            <section class="section">
+              <header class="section__header">
+                <span class="icon">
+                  <svg viewBox="0 0 24 24" width="18" height="18">
+                    <path d="M4 7h16v2H4zM4 11h10v2H4zM4 15h16v2H4z" fill="currentColor" />
+                  </svg>
+                </span>
+                <h2>Assigned Resources</h2>
+              </header>
 
-        <div class="section__body">
-          <div class="grid-resource">
-            <div class="field">
-              <label>Assign Resources</label>
-              <button type="button" class="btn btn-red" (click)="openDevelopersModal($event)">+ Select
-                Developers</button>
-            </div>
-          </div>
+              <div class="section__body">
+                <div class="grid-resource">
+                  <div class="field">
+                    <label>Assign Resources</label>
+                    <button type="button" class="btn btn-red" (click)="openDevelopersModal($event)">+ Select Developers</button>
+                  </div>
+                </div>
 
-          <div class="chips" *ngIf="resourcesFA.length">
-            <span class="chip" *ngFor="let r of resourcesFA.controls">
-              {{ getResourceName(r.value) }}
-              <button type="button" (click)="removeResource(r.value!)">×</button>
-            </span>
-          </div>
-        </div>
-      </section>
-
-      <!-- Attachments -->
-      <section class="section">
-        <header class="section__header">
-          <span class="bullet bullet-pink"></span>
-          <h2>Attachments</h2>
-        </header>
-
-        <div class="section__body">
-          <div class="dropzone" [class.dragging]="isDragging">
-            <div class="dz-inner">
-              <div class="cloud">
-                <svg viewBox="0 0 24 24" width="28" height="28">
-                  <path d="M19 18H6a4 4 0 110-8 5 5 0 019.9-.9A3.5 3.5 0 1119 18z" fill="currentColor" />
-                </svg>
+                <div class="chips" *ngIf="resourcesFA.length">
+                  <span class="chip" *ngFor="let r of resourcesFA.controls">
+                    {{ getResourceName(r.value) }}
+                    <button type="button" (click)="removeResource(r.value!)">×</button>
+                  </span>
+                </div>
               </div>
-              <p>Drag and drop files here or</p>
+            </section>
 
-              <label class="btn btn-red">
-                <input type="file" multiple (change)="onFilesSelected($event)" hidden />
-                Browse Files
-              </label>
+            <!-- Attachments -->
+            <section class="section">
+              <header class="section__header">
+                <span class="bullet bullet-pink"></span>
+                <h2>Attachments</h2>
+              </header>
 
-              <small>Upload project documents, images, or references (Max 10MB per file)</small>
+              <div class="section__body">
+                <div class="dropzone" [class.dragging]="isDragging">
+                  <div class="dz-inner">
+                    <div class="cloud">
+                      <svg viewBox="0 0 24 24" width="28" height="28">
+                        <path d="M19 18H6a4 4 0 110-8 5 5 0 019.9-.9A3.5 3.5 0 1119 18z" fill="currentColor" />
+                      </svg>
+                    </div>
+                    <p>Drag and drop files here or</p>
+
+                    <label class="btn btn-red">
+                      <input type="file" multiple (change)="onFilesSelected($event)" hidden />
+                      Browse Files
+                    </label>
+
+                    <small>Upload project documents, images, or references (Max 10MB per file)</small>
+                  </div>
+                </div>
+
+                <ul class="file-list" *ngIf="existingFiles.length">
+                  <li *ngFor="let f of existingFiles">
+                    <a [href]="f.url" target="_blank">{{ f.name }}</a>
+                    <button type="button" class="delete-btn" (click)="markFileForDeletion(f)">×</button>
+                  </li>
+                </ul>
+
+                <ul class="file-list" *ngIf="files.length">
+                  <li *ngFor="let f of files">
+                    <span>{{ f.name }} <small>(new)</small></span>
+                    <button type="button" class="delete-btn" (click)="removeNewFile(f)">×</button>
+                  </li>
+                </ul>
+              </div>
+            </section>
+
+            <!-- Footer -->
+            <div class="footer-actions">
+              <button type="button" class="btn btn-ghost" (click)="cancel()">Cancel</button>
+              <button type="submit" class="btn btn-red" [disabled]="isSubmitting">
+                <span class="plus" *ngIf="!isEditMode">+</span>
+                {{ isEditMode ? (isSubmitting ? 'Saving...' : 'Save Update') : (isSubmitting ? 'Creating...' : 'Create Service') }}
+              </button>
             </div>
-          </div>
 
-          <!-- Existing files -->
-          <ul class="file-list" *ngIf="existingFiles.length">
-            <li *ngFor="let f of existingFiles">
-              <a [href]="f.url" target="_blank">{{ f.name }}</a>
-              <button type="button" class="delete-btn" (click)="markFileForDeletion(f)">×</button>
-            </li>
-          </ul>
-
-          <!-- Newly added files -->
-          <ul class="file-list" *ngIf="files.length">
-            <li *ngFor="let f of files">
-              <span>{{ f.name }} <small>(new)</small></span>
-              <button type="button" class="delete-btn" (click)="removeNewFile(f)">×</button>
-            </li>
-          </ul>
+          </form>
         </div>
-      </section>
-
-      <!-- Footer -->
-      <div class="footer-actions">
-        <button type="button" class="btn btn-ghost" (click)="cancel()">Cancel</button>
-        <button type="submit" class="btn btn-red" [disabled]="isSubmitting">
-          <span class="plus" *ngIf="!isEditMode">+</span>
-          {{
-          isEditMode
-          ? (isSubmitting ? 'Saving...' : 'Save Update')
-          : (isSubmitting ? 'Creating...' : 'Create Service')
-          }}
-        </button>
       </div>
-    </form>
-  </div>
+      <!-- ====== SERVICE FORM PAGE END ====== -->
 
-  <!-- ========= OVERLAYS ========= -->
+      <!-- ========= MODALS / OVERLAYS ========= -->
 
-  <!-- Developers overlay -->
-  <div class="overlay" *ngIf="showDevelopersModal" (click)="closeDevelopersModal($event)">
-    <div class="dev-modal" (click)="$event.stopPropagation()">
-      <header class="modal-header">
-        <h3>Select Developers</h3>
-        <button type="button" class="pm-close done-btn" (click)="closeDevelopersModal($event)">Done</button>
-      </header>
-      <div>
-        <app-developers-search (developerSelected)="onDeveloperSelected($event)"
-          [selectedIds]="selectedResourceIds"></app-developers-search>
+      <div class="overlay" *ngIf="showDevelopersModal" (click)="closeDevelopersModal($event)">
+        <div class="dev-modal" (click)="$event.stopPropagation()">
+          <header class="modal-header">
+            <h3>Select Developers</h3>
+            <button type="button" class="pm-close done-btn" (click)="closeDevelopersModal($event)">Done</button>
+          </header>
+          <div>
+            <app-developers-search (developerSelected)="onDeveloperSelected($event)" [selectedIds]="selectedResourceIds"></app-developers-search>
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
 
-  <!-- Chief overlay -->
-  <div class="overlay" *ngIf="showChiefModal" (click)="closeChiefModal()">
-    <div class="dev-modal" (click)="$event.stopPropagation()">
-      <header class="modal-header">
-        <h3>Select Chief</h3>
-        <button type="button" class="pm-close done-btn" (click)="closeChiefModal()">Done</button>
-      </header>
-      <div>
-        <app-developers-search (developerSelected)="onChiefSelected($event)"
-          [selectedIds]="selectedChief ? [selectedChief.id] : []"></app-developers-search>
+      <div class="overlay" *ngIf="showChiefModal" (click)="closeChiefModal()">
+        <div class="dev-modal" (click)="$event.stopPropagation()">
+          <header class="modal-header">
+            <h3>Select Chief</h3>
+            <button type="button" class="pm-close done-btn" (click)="closeChiefModal()">Done</button>
+          </header>
+          <div>
+            <app-developers-search (developerSelected)="onChiefSelected($event)" [selectedIds]="selectedChief ? [selectedChief.id] : []"></app-developers-search>
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
 
-  <!-- Manager overlay -->
-  <div class="overlay" *ngIf="showManagerModal" (click)="closeManagerModal()">
-    <div class="dev-modal" (click)="$event.stopPropagation()">
-      <header class="modal-header">
-        <h3>Select Project Manager</h3>
-        <button type="button" class="pm-close done-btn" (click)="closeManagerModal()">Done</button>
-      </header>
-      <div>
-        <app-developers-search (developerSelected)="onManagerSelected($event)"
-          [selectedIds]="selectedManager ? [selectedManager.id] : []"></app-developers-search>
+      <div class="overlay" *ngIf="showManagerModal" (click)="closeManagerModal()">
+        <div class="dev-modal" (click)="$event.stopPropagation()">
+          <header class="modal-header">
+            <h3>Select Project Manager</h3>
+            <button type="button" class="pm-close done-btn" (click)="closeManagerModal()">Done</button>
+          </header>
+          <div>
+            <app-developers-search (developerSelected)="onManagerSelected($event)" [selectedIds]="selectedManager ? [selectedManager.id] : []"></app-developers-search>
+          </div>
+        </div>
       </div>
-    </div>
+
+    </main>
   </div>
 </div>

@@ -46,23 +46,28 @@ export class Sidebar implements OnInit
 
   setActiveLink(url: string)
   {
-    if (url.includes('/home'))
+    if (url.startsWith('/dashboard'))
     {
       this.activeLink = 'dashboard';
     }
-    else if (url.includes('/projects'))
+    else if (url.startsWith('/projects') || url.startsWith('/services'))
     {
       this.activeLink = 'projectManagement';
     }
-    else if (url.includes('/profile'))
+    else if (url.startsWith('/profile') || url.startsWith('/certificate'))
     {
       this.activeLink = 'profile';
+    }
+    else if (url.startsWith('/home') || url.startsWith('/issues'))
+    {
+      this.activeLink = 'home';
     }
     else
     {
       this.activeLink = '';
     }
   }
+
 
   logout()
   {

@@ -7,6 +7,7 @@ import { CertificateService, CreateCertificateDto } from '@app/services/certific
 import { environment } from '@environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { Sidebar } from '@app/sidebar/sidebar';
+import { HeaderComponent } from '@app/header/header';
 
 interface ExistingFile {
   name: string;
@@ -16,7 +17,7 @@ interface ExistingFile {
 @Component({
   selector: 'app-certificate-create',
   standalone: true,
-  imports: [Sidebar, RouterLink, ReactiveFormsModule, CommonModule],
+  imports: [Sidebar, RouterLink, ReactiveFormsModule, CommonModule,HeaderComponent],
   templateUrl: './certificate.create.component.html',
   styleUrls: ['./certificate.create.component.css'],
 })

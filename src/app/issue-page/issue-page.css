@@ -1,16 +1,14 @@
-.page-wrapper {
-  display: flex;
-  width: 100%;
-}
-
+/* ===== Layout Fix for header + sidebar ===== */
 .content-area {
   width: 100%;
   max-width: 1200px;
   padding: 2rem;
   margin: 0 auto;
+  padding-top: 90px;   /* space for header */
+  padding-left: 260px; /* space for sidebar */
+  box-sizing: border-box;
 }
 
-/* Container */
 .issue-container {
   max-width: 880px;
   margin: 35px auto;
@@ -18,7 +16,7 @@
   font-family: "Inter", sans-serif;
 }
 
-/* Back Button */
+/* ===================== Back Button ===================== */
 .back-btn {
   display: flex;
   align-items: center;
@@ -37,7 +35,7 @@
 .back-btn:hover,
 .back-btn:hover i { color: #dc2626; }
 
-/* Issue Card */
+/* ===================== Issue Card ===================== */
 .issue-card {
   background: #fff;
   border: 1px solid #e5e7eb;
@@ -65,8 +63,6 @@
   margin: 14px 0;
   color: #111827;
 }
-
-/* Category Badge */
 .category-badge {
   background: #eef2ff;
   color: #4338ca;
@@ -76,7 +72,7 @@
   font-weight: 600;
 }
 
-/* Solutions Section */
+/* ===================== Solutions Section ===================== */
 .solutions-header-line {
   display: flex;
   align-items: center;
@@ -95,7 +91,7 @@
   margin: 0;
 }
 
-/* Feedback Card */
+/* ===================== Solution Card ===================== */
 .solution-card {
   background: #fff;
   border: 1px solid #dbe1e4;
@@ -105,16 +101,10 @@
   margin-bottom: 18px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.03);
 }
-
-/* Accepted Feedback Styling */
 .solution-card.accepted {
   background: #f0fdf4;
   border-left-color: #16a34a;
   border-color: #b5e4c7;
-}
-.accepted-btn {
-  background: #15803d;
-  color: white;
 }
 .accepted-label {
   font-size: 13px;
@@ -128,7 +118,39 @@
   margin-bottom: 8px;
 }
 
-/* Avatar */
+/* ===================== Accept Button ===================== */
+.solution-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.accept-btn {
+  background: #f3f4f6;
+  color: #374151;
+  border: 1px solid #d1d5db;
+  padding: 8px 14px;
+  font-size: 14px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
+}
+.accept-btn:hover {
+  background: #2563eb;
+  color: white;
+  border-color: #2563eb;
+}
+.accepted-btn {
+  background: #16a34a !important;
+  color: white !important;
+  border-color: #16a34a !important;
+}
+.accepted-btn:hover { opacity: 0.9; }
+
+/* ===================== User Avatar ===================== */
 .avatar-wrapper {
   width: 34px;
   height: 34px;
@@ -142,16 +164,11 @@
   object-fit: cover;
 }
 
-/* Attachments */
+/* ===================== Attachments ===================== */
 .attachments-section {
   margin-top: 12px;
   padding-top: 8px;
   border-top: 1px solid #e5e7eb;
-}
-.attachments-title {
-  font-size: 14px;
-  font-weight: 600;
-  margin-bottom: 6px;
 }
 .attachment-item {
   display: flex;
@@ -169,38 +186,18 @@
   background: #eef2ff;
   border-color: #c7d2fe;
 }
-.file-info {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.file-name {
-  font-size: 14px;
-  font-weight: 500;
-  max-width: 240px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.download-icon {
-  font-size: 16px;
-  opacity: .8;
-}
 
-/* Reply Section */
+/* ===================== Replies ===================== */
 .reply-toggle {
   margin-top: 8px;
   background: none;
   border: none;
   color: #2563eb;
   font-size: 14px;
-  font-weight: 500;
   cursor: pointer;
 }
-.reply-toggle:hover { text-decoration: underline; }
-
 .reply-box-modern {
   display: flex;
-  align-items: center;
   gap: 10px;
   background: #f8fafc;
   border: 1px solid #e2e8f0;
@@ -224,17 +221,14 @@
   cursor: pointer;
 }
 
-/* Comments */
+/* ===================== Comments ===================== */
 .comments-list {
   margin-top: 10px;
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
-.comment-item {
-  display: flex;
-  gap: 10px;
-}
+.comment-item { display: flex; gap: 10px; }
 .comment-avatar {
   width: 32px;
   height: 32px;
@@ -256,97 +250,151 @@
   color: #0f172a;
 }
 
-/* Add Feedback Box */
-.add-solution-box {
-  border-left: 5px solid #dc2626;
-}
-.add-feedback-title {
-  font-size: 18px;
-  font-weight: 700;
-  color: #dc2626;
-  margin-bottom: 12px;
-}
-.solution-textarea {
-  width: 100%;
-  min-height: 120px;
-  padding: 14px;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-}
-.action-row {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 12px;
-}
-.submit-btn {
-  background: #2563eb;
-  color: white;
-  padding: 10px 22px;
-  border-radius: 8px;
-  font-weight: 500;
-  border: none;
-  cursor: pointer;
-}
-.file-chip {
-  display: flex;
-  gap: 8px;
-  background: #f3f4f6;
-  padding: 6px 10px;
-  border-radius: 6px;
-  font-size: 13px;
-}
-.remove-file {
-  background: none;
-  border: none;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-/* Status Badges */
-.status-badge {
-  font-size: 12px;
-  padding: 4px 10px;
-  border-radius: 12px;
-  font-weight: 600;
-}
-.status-badge.open {
-  background: #dcfce7;
-  color: #166534;
-}
-.status-badge.resolved {
-  background: #dbeafe;
-  color: #1e40af;
-}
-.status-badge.closed {
-  background: #fee2e2;
-  color: #991b1b;
-}
-/* Add Feedback Box Container */
+/* ===================== Add Feedback Box ===================== */
 .add-solution-box {
   background: #fff;
   border: 1px solid #e5e7eb;
-  border-left: 5px solid #dc2626; /* red stripe */
+  border-left: 5px solid #dc2626;
   border-radius: 12px;
   padding: 24px;
   margin-top: 26px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.04);
 }
-
-/* Feedback header */
 .add-feedback-title {
   font-size: 18px;
   font-weight: 700;
   color: #dc2626;
   margin-bottom: 12px;
 }
-/* Make feedback textarea end at the same width as the card/buttons */
 .add-solution-box .solution-textarea {
-  width: calc(100% - 10px);
+  width: 100%;
+  min-height: 120px;
+  padding: 14px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  font-size: 14px;
+  resize: vertical;
   box-sizing: border-box;
 }
+.file-chip-wrapper {
+  margin-top: 8px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.file-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #f3f4f6;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 13px;
+  border: 1px solid #d1d5db;
+}
+.file-chip .remove-file {
+  background: none;
+  border: none;
+  color: #dc2626;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+}
+.action-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12px;
+}
+.file-upload {
+  display: inline-flex;
+  gap: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  align-items: center;
+  color: #374151;
+}
+.submit-btn {
+  background: #2563eb;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  border: none;
+  font-weight: 600;
+  transition: background .2s ease;
+}
+.submit-btn:hover { background: #1e40af; }
 
-/* Fix Grammarly extension conflict */
+/* Grammarly fix */
 .add-solution-box textarea + div[role="presentation"] {
   max-width: 100% !important;
   right: 0 !important;
+}
+
+/* Auto textarea */
+.auto-textarea {
+  min-height: 90px;
+  max-height: 240px;
+  overflow-y: auto !important;
+  resize: none !important;
+  line-height: 1.5;
+}
+.reply-textarea:focus {
+  outline: none;
+  border: none;
+}
+.status-badge {
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-transform: capitalize;
+}
+
+/* Status Colors */
+.open, .pending {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.in-progress, .not-started-yet {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.completed {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.rejected, .closed {
+  background: #fee2e2;
+  color: #dc2626;
+}
+.resolved {
+  background: #dcfce7;
+  color: #15803d;
+}
+/* ===== Comments Header ===== */
+.comments-header {
+  margin-top: 18px;
+  margin-bottom: 6px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.comments-header h3 {
+  font-size: 15px;
+  font-weight: 600;
+  color: #0f172a;
+  margin: 0;
+}
+
+/* Extra spacing between feedback & comments */
+.solution-card {
+  margin-bottom: 28px !important;
 }

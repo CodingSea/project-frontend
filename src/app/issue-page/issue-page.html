@@ -1,9 +1,20 @@
-<div class="page-wrapper">
-  <app-sidebar></app-sidebar>
+<div class="layout">
 
-  <div class="content-area">
+  <!-- Fixed Header -->
+  <app-header></app-header>
 
-    <app-issue-page-template/>
+  <!-- Body -->
+  <div class="body-container">
 
+    <!-- Fixed Sidebar -->
+    <app-sidebar></app-sidebar>
+
+    <!-- Page Content -->
+    <div class="content-area">
+
+      <!-- ✅ Load the Issue Page Template Component -->
+      <app-issue-page-template></app-issue-page-template>
+
+    </div>
   </div>
 </div>
