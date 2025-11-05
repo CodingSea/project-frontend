@@ -248,32 +248,41 @@ if (data.createdBy?.profileImage) {
     this.isImageLoading[String(id)] = false;
     event.target.src = 'images/user.png';
   }
+addCopyButtons() {
+  const blocks = document.querySelectorAll("pre:not(.copy-added)") as NodeListOf<HTMLElement>;
 
-  addCopyButtons() {
-    const blocks = document.querySelectorAll("pre:not(.copy-added)") as NodeListOf<HTMLElement>;
-    blocks.forEach(pre => {
-      pre.classList.add("copy-added");
-      const wrapper = document.createElement("div");
-      wrapper.style.position = "relative";
-      pre.parentNode!.insertBefore(wrapper, pre);
-      wrapper.appendChild(pre);
+  blocks.forEach(pre => {
+    pre.classList.add("copy-added");
+    pre.style.position = "relative"; // keep
+    // pre.style.overflow = "visible"; // leave commented; we want horizontal scroll only
 
-      const button = document.createElement("button");
-      button.textContent = "Copy";
-      button.style.position = "absolute";
-      button.style.top = "6px";
-      button.style.right = "6px";
+    // Prevent double buttons
+    if (pre.querySelector(".code-copy-btn")) return;
 
-      button.addEventListener("click", () => {
-        const code = pre.querySelector("code")?.textContent ?? "";
-        navigator.clipboard.writeText(code);
-        button.textContent = "Copied!";
-        setTimeout(() => (button.textContent = "Copy"), 800);
-      });
+    const button = document.createElement("button");
+    button.type = "button"; // 🔒 prevent form submit
+    button.classList.add("code-copy-btn");
+    button.innerHTML = '<i class="fa-regular fa-copy"></i>';
 
-      wrapper.appendChild(button);
+    button.addEventListener("click", () => {
+      const code = pre.querySelector("code")?.textContent ?? "";
+      navigator.clipboard.writeText(code);
+      button.innerHTML = '<i class="fa-solid fa-check"></i>';
+      setTimeout(() => (button.innerHTML = '<i class="fa-regular fa-copy"></i>'), 800);
     });
-  }
+
+    // ⬇️ Use append so absolute positioning anchors cleanly to pre’s box
+    pre.appendChild(button);
+  });
+}
+
+
+
+
+
+
+
+
 
   onFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;

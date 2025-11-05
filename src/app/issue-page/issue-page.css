@@ -398,3 +398,41 @@
 .solution-card {
   margin-bottom: 28px !important;
 }
+
+
+
+
+
+
+
+/* Prevent blockquote from shifting the code */
+.markdown-body blockquote pre {
+  margin-left: 0 !important;
+  width: fit-content !important;
+}
+
+.code-copy-btn {
+  position: absolute !important;
+  top: 6px !important;
+  right: 6px !important;
+  background: white; /* ✅ so icon is always visible */
+  border: 1px solid #e5e7eb !important;
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 12px;
+  cursor: pointer;
+  z-index: 3000; /* ✅ make sure it's above markdown */
+}
+
+.code-copy-btn:hover {
+  background: #f3f4f6 !important;
+}
+
+
+pre.copy-added {
+  padding-top: 34px !important;
+}
+
+pre.copy-added code {
+  margin-top: 0 !important;
+}

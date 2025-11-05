@@ -1,5 +1,4 @@
 @import 'jqwidgets-ng/jqwidgets/styles/jqx.base.css';
-@import 'highlight.js/styles/atom-one-light.css';
 
 
 *
@@ -16,3 +15,57 @@ button:hover
 {
     filter: brightness(0.8);
 }
+/* ==========================
+   Elegant Code Block Style
+==========================*/
+
+
+/* Code inside block */
+.markdown-body pre code,
+.issue-body pre code {
+  background: transparent !important;
+  padding: 0 !important;
+  color: inherit !important;
+}
+
+/* Inline code */
+.markdown-body code:not(pre code),
+.issue-body code:not(pre code) {
+  background: #f3f4f6 !important;
+  color: #d6336c !important; /* soft red/pink accent */
+  padding: 3px 6px !important;
+  border-radius: 6px !important;
+  font-family: "Inter", "Fira Code", monospace !important;
+  font-size: 13px !important;
+}
+
+
+.markdown-body pre,
+.issue-body pre {
+  background: #fafafa !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 10px !important;
+  padding: 14px !important;
+  padding-top: 38px !important;
+  color: #111827 !important;
+  line-height: 1.55 !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04) !important;
+  font-family: "Inter", "Fira Code", monospace !important;
+  font-size: 14px !important;
+}
+
+/* Button anchored to top-right INSIDE the pre */
+.markdown-body pre > .code-copy-btn,
+.issue-body pre > .code-copy-btn {
+  position: absolute !important;
+  top: 6px !important;
+  right: 6px !important;
+  z-index: 3000 !important;
+  background: white;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
