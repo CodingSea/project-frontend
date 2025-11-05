@@ -9,6 +9,8 @@ import { marked } from 'marked';
 import { ActivatedRoute } from '@angular/router';
 import { jwtDecode } from 'jwt-decode';
 import { environment } from '@environments/environment';
+import { Categories, CategoryClasses } from '@app/categories';
+import { Status, StatusClasses } from '@app/status';
 
 @Component({
   selector: 'app-issue-page-template',
@@ -73,6 +75,28 @@ isImageLoading: { [key: string]: boolean } = {};
     });
   }
 };
+getCategoryClass(category: any): string {
+  if (!category) return '';
+
+  if (Object.values(Categories).includes(category)) {
+    return CategoryClasses[category as Categories];
+  }
+
+  const clean = String(category).toLowerCase().replace(/\s+/g, '-');
+  return `tag category-generic category-${clean}`;
+}
+
+getStatusClass(status: any): string {
+  if (!status) return 'tag status-generic';
+
+  if (Object.values(Status).includes(status)) {
+    return StatusClasses[status as Status];
+  }
+
+  const clean = String(status).toLowerCase().replace(/\s+/g, '-');
+  return `tag status-generic status-${clean}`;
+}
+
 
   async getIssueId() {
     let id = -1;
