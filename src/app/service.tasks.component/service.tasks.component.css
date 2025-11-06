@@ -46,6 +46,8 @@ app-sidebar {
 
 .page-tabs div:hover {
   background: #f8f9fb;
+  color: black;
+  filter: brightness(0.8);
 }
 
 .page-tabs .active {
