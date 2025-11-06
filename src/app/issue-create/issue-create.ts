@@ -38,15 +38,16 @@ export class IssueCreateComponent {
     private router: Router
   ) {
     this.form = this.fb.group({
-      title: [
-        '',
-        [
-          Validators.required,
-          Validators.minLength(3),
-          Validators.maxLength(100),
-          Validators.pattern(/^[a-zA-Z0-9 _\-():.,#]+$/)
-        ]
-      ],
+title: [
+  '',
+  [
+    Validators.required,
+    Validators.minLength(3),
+    Validators.maxLength(100),
+    Validators.pattern(/^[A-Za-z\u0600-\u06FF0-9 _\-():.,#]+$/)
+  ]
+],
+
       description: [
         '',
         [
