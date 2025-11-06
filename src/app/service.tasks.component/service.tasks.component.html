@@ -11,8 +11,6 @@
     </div>
 
     <!-- ===================== Board View ===================== -->
-    @if (isTaskboardSelected)
-    {
     <header class="board-header">
 
       <div class="board-info">
@@ -46,14 +44,15 @@
       </div>
 
       <div class="actions-row">
-        <button class="btn-primary" (click)="openCreateModal()">+ Add Task</button>
+        <button *ngIf="isTaskboardSelected" class="btn-primary" (click)="openCreateModal()">+ Add Task</button>
+        <button *ngIf="!isTaskboardSelected" class="btn-primary" (click)="toggleEdit()">Edit</button>
         <button class="btn-secondary" (click)="goBack()">Back</button>
       </div>
 
     </header>
 
     <!-- Kanban -->
-    <div class="modern-kanban-board" *ngIf="showKanban">
+    <div class="modern-kanban-board" *ngIf="showKanban && isTaskboardSelected">
       <jqxKanban #kanbanReference *ngIf="columns && dataAdapter" [width]="'100%'" [columns]="columns"
         [source]="dataAdapter" (onItemAttrClicked)="openEditModal($event.args.item)"
         (onItemMoved)="onItemMoved($event)">
@@ -176,37 +175,6 @@
 
       </form>
     </div>
-
-    }
-
-    <!-- ===================== Discussion View ===================== -->
-    @else
-    {
-
-    <header class="board-header discussion-header">
-      <div class="board-title">
-        <h2>{{ taskBoard?.service?.name }}</h2>
-      </div>
-
-      <!-- <input type="text" class="description-box" [disabled]="!editMode" [(ngModel)]="taskBoard!.service!.description"
-        placeholder="Add a Description..." /> -->
-
-      <div class="actions-row">
-
-        <button *ngIf="!editMode" class="btn-primary" (click)="toggleEdit()">Edit</button>
-
-        <div *ngIf="editMode" class="edit-group">
-          <button class="btn-secondary" (click)="toggleEdit()">Cancel</button>
-          <button class="btn-success" (click)="saveChanges()">Save</button>
-        </div>
-
-        <button class="btn-secondary" (click)="goBack()">Back</button>
-      </div>
-    </header>
-
-    <app-issue-page-template #issuePage />
-
-    }
 
   </div>
 </div>
