@@ -143,7 +143,7 @@
                     <form #projectForm="ngForm" (ngSubmit)="saveNewProject(projectForm)">
                       <!-- ✅ Project Name with Regex -->
                       <label class="pm-label">Project name<span class="req">*</span></label>
-                      <input class="pm-input" type="text" name="name" required pattern="^[A-Za-z0-9 ]{3,50}$"
+                        <input class="pm-input" type="text" name="name" required pattern="^[A-Za-z\u0600-\u06FF0-9 ]{3,50}$"
                         #nameField="ngModel" [(ngModel)]="newProject.name" placeholder="e.g., Website Revamp">
 
                       <!-- Error message -->

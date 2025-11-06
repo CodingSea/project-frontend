@@ -9,47 +9,62 @@
   <ng-container *ngIf="issue">
 
     <!-- ISSUE CARD -->
-    <section class="issue-card issue-highlight">
-      <div class="issue-header">
-        <div class="meta-left">
-          <span class="status-badge" [ngClass]="normalizeStatus(issue.status)">
-            {{ issue.status ? (issue.status | titlecase) : 'Open' }}
-          </span>
-          <span class="category-badge" *ngIf="issue.category">{{ issue.category }}</span>
-          <span class="issue-id">#{{ issue.id }}</span>
-        </div>
+<section class="issue-card issue-highlight">
 
-        <div class="meta-right">
-          <div class="avatar-wrapper" [class.loading]="isImageLoading[issue.createdBy?.id || 0]">
-            <img class="avatar-sm" [src]="fixImage(issue.createdBy?.profileImage, issue.createdBy?.id)"
-              (load)="onImgLoad(issue.createdBy?.id || 0)" (error)="onImgError($event, issue.createdBy?.id || 0)"
-              [style.opacity]="isImageLoading[issue.createdBy?.id || 0] ? '0' : '1'" />
-          </div>
+  <div class="issue-header">
+    <div class="meta-left">
 
+      <!-- ✅ Your new tag styling for Status -->
+      <span class="tag" [ngClass]="getStatusClass(issue.status)">
+        {{ issue.status ? (issue.status | titlecase) : 'Open' }}
+      </span>
 
-          <span>{{ issue.createdBy?.first_name }} {{ issue.createdBy?.last_name }}</span>
-          <span class="dot">•</span>
-          <span class="time">{{ getTimeAgo(issue.createdAt) }}</span>
-        </div>
+      <!-- ✅ Your new tag styling for Category -->
+      <span *ngIf="issue.category"
+        class="tag"
+        [ngClass]="getCategoryClass(issue.category)">
+        {{ issue.category }}
+      </span>
+
+      <span class="issue-id">#{{ issue.id }}</span>
+    </div>
+
+    <div class="meta-right">
+      <div class="avatar-wrapper" [class.loading]="isImageLoading[issue.createdBy?.id || 0]">
+        <img
+          class="avatar-sm"
+          [src]="fixImage(issue.createdBy?.profileImage, issue.createdBy?.id)"
+          (load)="onImgLoad(issue.createdBy?.id || 0)"
+          (error)="onImgError($event, issue.createdBy?.id || 0)"
+          [style.opacity]="isImageLoading[issue.createdBy?.id || 0] ? '0' : '1'"
+        />
       </div>
 
+      <span>{{ issue.createdBy?.first_name }} {{ issue.createdBy?.last_name }}</span>
+      <span class="dot">•</span>
+      <span class="time">{{ getTimeAgo(issue.createdAt) }}</span>
+    </div>
+  </div>
 
-      <h1 class="issue-title">{{ issue.title }}</h1>
-      <div class="markdown-body issue-body" [innerHTML]="issue.descriptionHtml"></div>
+  <h1 class="issue-title">{{ issue.title }}</h1>
 
-      <!-- Issue Attachments -->
-      <div class="attachments-section" *ngIf="issue.attachments?.length">
-        <div class="attachments-title">Issue Attachments</div>
-        <div class="attachment-item" *ngFor="let file of issue.attachments" (click)="download(file)">
-          <div class="file-info">
-            <i class="fa-regular fa-file-lines file-icon"></i>
-            <span class="file-name">{{ file.name }}</span>
-          </div>
-          <i class="fa-solid fa-download download-icon"></i>
-        </div>
+  <div class="markdown-body issue-body" [innerHTML]="issue.descriptionHtml"></div>
+
+  <!-- Issue Attachments -->
+  <div class="attachments-section" *ngIf="issue.attachments?.length">
+    <div class="attachments-title">Issue Attachments</div>
+
+    <div class="attachment-item" *ngFor="let file of issue.attachments" (click)="download(file)">
+      <div class="file-info">
+        <i class="fa-regular fa-file-lines file-icon"></i>
+        <span class="file-name">{{ file.name }}</span>
       </div>
+      <i class="fa-solid fa-download download-icon"></i>
+    </div>
+  </div>
 
-    </section>
+</section>
+
 
     <!-- FEEDBACK SECTION -->
     <section class="solutions-wrapper">

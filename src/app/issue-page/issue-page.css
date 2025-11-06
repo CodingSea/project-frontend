@@ -63,14 +63,7 @@
   margin: 14px 0;
   color: #111827;
 }
-.category-badge {
-  background: #eef2ff;
-  color: #4338ca;
-  font-size: 12px;
-  padding: 4px 10px;
-  border-radius: 12px;
-  font-weight: 600;
-}
+
 
 /* ===================== Solutions Section ===================== */
 .solutions-header-line {
@@ -344,41 +337,9 @@
   outline: none;
   border: none;
 }
-.status-badge {
-  padding: 4px 10px;
-  font-size: 12px;
-  font-weight: 600;
-  border-radius: 12px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  text-transform: capitalize;
-}
 
-/* Status Colors */
-.open, .pending {
-  background: #fef3c7;
-  color: #d97706;
-}
 
-.in-progress, .not-started-yet {
-  background: #dbeafe;
-  color: #1d4ed8;
-}
 
-.completed {
-  background: #dcfce7;
-  color: #15803d;
-}
-
-.rejected, .closed {
-  background: #fee2e2;
-  color: #dc2626;
-}
-.resolved {
-  background: #dcfce7;
-  color: #15803d;
-}
 /* ===== Comments Header ===== */
 .comments-header {
   margin-top: 18px;
@@ -397,4 +358,42 @@
 /* Extra spacing between feedback & comments */
 .solution-card {
   margin-bottom: 28px !important;
+}
+
+
+
+
+
+
+
+/* Prevent blockquote from shifting the code */
+.markdown-body blockquote pre {
+  margin-left: 0 !important;
+  width: fit-content !important;
+}
+
+.code-copy-btn {
+  position: absolute !important;
+  top: 6px !important;
+  right: 6px !important;
+  background: white; /* ✅ so icon is always visible */
+  border: 1px solid #e5e7eb !important;
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 12px;
+  cursor: pointer;
+  z-index: 3000; /* ✅ make sure it's above markdown */
+}
+
+.code-copy-btn:hover {
+  background: #f3f4f6 !important;
+}
+
+
+pre.copy-added {
+  padding-top: 34px !important;
+}
+
+pre.copy-added code {
+  margin-top: 0 !important;
 }

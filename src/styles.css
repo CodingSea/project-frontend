@@ -1,18 +1,228 @@
 @import 'jqwidgets-ng/jqwidgets/styles/jqx.base.css';
-@import 'highlight.js/styles/atom-one-light.css';
 
-
-*
-{
-    font-family: Arial, sans-serif;
+* {
+  font-family: Arial, sans-serif;
 }
 
-button
-{
-    transition: filter 0.2s;
+button {
+  transition: filter 0.2s;
 }
 
-button:hover
-{
-    filter: brightness(0.8);
+button:hover {
+  filter: brightness(0.8);
+}
+
+/* ==========================
+   Elegant Code Block Style
+==========================*/
+
+/* Code inside block */
+.markdown-body pre code,
+.issue-body pre code {
+  background: transparent !important;
+  padding: 0 !important;
+  color: inherit !important;
+}
+
+/* Inline code */
+.markdown-body code:not(pre code),
+.issue-body code:not(pre code) {
+  background: #f3f4f6 !important;
+  color: #d6336c !important; /* soft red/pink accent */
+  padding: 3px 6px !important;
+  border-radius: 6px !important;
+  font-family: "Inter", "Fira Code", monospace !important;
+  font-size: 13px !important;
+}
+
+.markdown-body pre,
+.issue-body pre {
+  background: #fafafa !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 10px !important;
+  padding: 14px !important;
+  padding-top: 38px !important;
+  color: #111827 !important;
+  line-height: 1.55 !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04) !important;
+  font-family: "Inter", "Fira Code", monospace !important;
+  font-size: 14px !important;
+}
+
+/* Button anchored to top-right INSIDE the pre */
+.markdown-body pre > .code-copy-btn,
+.issue-body pre > .code-copy-btn {
+  position: absolute !important;
+  top: 6px !important;
+  right: 6px !important;
+  z-index: 3000 !important;
+  background: white;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+/* ==== GLOBAL KANBAN STYLING ==== */
+.jqx-kanban-column {
+  width: 28% !important;
+  min-width: 28% !important;
+  max-width: 28% !important;
+  margin-right: 8px !important;
+}
+
+.jqx-kanban-column-header {
+  background: none !important;
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  padding: 12px !important;
+  border-bottom: 1px solid #eee !important;
+  text-transform: none !important;
+}
+
+/* === FORCE JQX KANBAN COLUMNS IN ONE ROW === */
+/* === FORCE ALL KANBAN COLUMNS IN ONE ROW + NORMAL TASKS === */
+.modern-kanban-board {
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  white-space: nowrap !important;
+}
+
+/* Keep columns in one line */
+.jqx-kanban {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+}
+
+/* Columns layout */
+.jqx-kanban-column {
+  width: 33% !important;
+  min-width: 33% !important;
+  max-width: 33% !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+/* ===== GLOBAL KANBAN MODERN STYLE (FIGMA LOOK) ===== */
+.modern-kanban-board {
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  white-space: nowrap !important;
+  padding-bottom: 10px;
+}
+/* ✅ Make Kanban columns evenly distributed like the header */
+.jqx-kanban {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: flex-start !important;
+  gap: 20px !important;
+  padding: 5px 0 !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* ✅ Columns now auto-scale equally */
+.jqx-kanban-column {
+  flex: 1 1 0 !important;            /* Each column takes equal share */
+  min-width: 0 !important;           /* Prevent overflow */
+  max-width: 100% !important;        /* Respect container width */
+  background: #fff !important;
+  border-radius: 14px !important;
+  border: 1px solid #e5e7eb !important;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.06) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  padding: 10px 12px !important;
+  box-sizing: border-box !important;
+}
+
+/* Optional: add responsiveness for smaller screens */
+@media (max-width: 1024px) {
+  .jqx-kanban {
+    flex-direction: column !important;
+    gap: 16px !important;
+  }
+  .jqx-kanban-column {
+    width: 100% !important;
+  }
+}
+
+
+/* Column Header */
+.jqx-kanban-column-header {
+  background: none !important;
+  border: none !important;
+  padding-bottom: 12px !important;
+  border-bottom: 1px solid #eee !important;
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  color: #1f2937 !important;
+}
+
+.tag {
+  font-size: 0.75rem;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+/* Category Colors */
+.tag.category-bug {
+  background: #fde8e8;
+  color: #c62828;
+}
+
+.tag.category-feature {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.tag.category-security {
+  background: #e3f2fd;
+  color: #1565c0;
+}
+
+.tag.category-database {
+  background: #fff8e1;
+  color: #f9a825;
+}
+
+.tag.category-generic {
+  background: #f3e8ff;
+  color: #6b21a8;
+  border: 1px solid #d8b4fe;
+}
+
+/* ✅ Unified STATUS COLORS */
+.tag.status-open {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.tag.status-resolved {
+  background: #e3f2fd;
+  color: #1565c0;
+}
+
+.tag.status-pending {
+  background: #fff8e1;
+  color: #9c6b00;
+}
+
+.tag.status-in-progress {
+  background: #e8f3ff;
+  color: #1565c0;
+}
+
+.tag.status-closed,
+.tag.status-rejected {
+  background: #fde8e8;
+  color: #c62828;
+}
+
+.tag.status-generic {
+  background: #eeeeee;
+  color: #555;
 }

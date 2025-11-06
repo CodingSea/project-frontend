@@ -1,103 +1,211 @@
 <div class="container">
-    <app-header></app-header>
-
+  <app-header></app-header>
   <app-sidebar></app-sidebar>
 
   <div class="kanban-container">
 
-    <div class="nav-header">
-      @if(isTaskboardSelected)
-      {
-      <div class="nav-section active left" (click)="selectSection(true)">Task Board</div>
-      <div class="nav-section right" (click)="selectSection(false)">Discussion</div>
-      }
-      @else
-      {
-      <div class="nav-section left" (click)="selectSection(true)">Task Board</div>
-      <div class="nav-section active right" (click)="selectSection(false)">Discussion</div>
-      }
+    <!-- Tabs -->
+    <div class="page-tabs">
+      <div [class.active]="isTaskboardSelected" (click)="selectSection(true)">Board</div>
+      <div [class.active]="!isTaskboardSelected" (click)="selectSection(false)">Discussion</div>
     </div>
 
-    @if(isTaskboardSelected)
+    <!-- ===================== Board View ===================== -->
+    @if (isTaskboardSelected)
     {
-    <header class="kanban-header">
+    <header class="board-header">
 
-      <div class="header-title">
-        <h2>{{ taskBoard?.service?.name }}</h2>
-        <div class="header-info">
-          <p>Cheif: {{ taskBoard?.service?.chief?.first_name}} {{ taskBoard?.service?.chief?.last_name}}</p>
+      <div class="board-info">
+        <div class="board-title">
+          <h2>{{ taskBoard?.service?.name }}</h2>
+          <div class="subtext">
+            <span> Led by {{ taskBoard?.service?.chief?.first_name }} {{ taskBoard?.service?.chief?.last_name }}</span>
 
-          @if(taskBoard?.service?.projectManager)
-          {
-            <p>Project Manager: {{ taskBoard?.service?.projectManager?.first_name}} {{
-            taskBoard?.service?.projectManager?.last_name}}</p>
-          }
 
-          <p>Deadline: {{ taskBoard?.service?.deadline | date: "dd/MM/yyyy"}}</p>
+            <hr>
+
+            <span *ngIf="taskBoard?.service?.projectManager">
+              Project Manager: {{ taskBoard?.service?.projectManager?.first_name }} {{
+              taskBoard?.service?.projectManager?.last_name }}
+            </span>
+          </div>
+        </div>
+
+        <div class="header-meta">
+          <span class="deadline-label">Deadline:</span>
+          <span class="deadline">{{ taskBoard?.service?.deadline | date: 'dd/MM/yyyy' }}</span>
         </div>
       </div>
 
-      <div class="header-progress">
-        <p>Project Progress: </p>
+      <div class="progress-wrapper">
+        <span class="progress-text">Progress</span>
         <div class="progress-bar">
-          <div class="progress" [style.width.%]="servicesInfo.completionRate"></div>
+          <div class="progress-fill" [style.width.%]="servicesInfo.completionRate"></div>
         </div>
-        <strong>{{ formatDecimal(servicesInfo.completionRate) }}%</strong>
+        <span class="progress-percent">{{ formatDecimal(servicesInfo.completionRate) }}%</span>
       </div>
 
-      <div class="header-actions">
-        <button class="add-task" (click)="openPopup()">Add Task</button>
-        <button class="back-btn" (click)="goBack()">Back</button>
+      <div class="actions-row">
+        <button class="btn-primary" (click)="openCreateModal()">+ Add Task</button>
+        <button class="btn-secondary" (click)="goBack()">Back</button>
       </div>
+
     </header>
 
-    <div *ngIf="showKanban">
-      <jqxKanban #kanbanReference [width]="'100%'" [height]="'100%'" [columns]="columns" [source]="dataAdapter"
-        (onItemAttrClicked)="openTaskDetailPopup($event.args.item)" (onItemMoved)="onItemMoved($event)">
+    <!-- Kanban -->
+    <div class="modern-kanban-board" *ngIf="showKanban">
+      <jqxKanban #kanbanReference *ngIf="columns && dataAdapter" [width]="'100%'" [columns]="columns"
+        [source]="dataAdapter" (onItemAttrClicked)="openEditModal($event.args.item)"
+        (onItemMoved)="onItemMoved($event)">
       </jqxKanban>
     </div>
 
-    <add-task-popup *ngIf="showPopup" (taskAdded)="onTaskAdded($event)" (close)="closePopup()"></add-task-popup>
+    <!-- ===================== Create Task Modal ===================== -->
+    <div class="modal-backdrop" *ngIf="showCreateModal" (click)="closeCreateModal()"></div>
+    <div class="modal-container" *ngIf="showCreateModal">
 
-    <task-popup *ngIf="showTaskDetailPopup" [task]="selectedTask" (close)="closeTaskDetailPopup()"
-      (delete)="deleteTask($event)">
-    </task-popup>
+      <div class="modal-header">
+        <h2>Create Task</h2>
+        <button class="close-btn" (click)="closeCreateModal()">✕</button>
+      </div>
+
+      <p class="modal-subtitle">Fill the details below to add a new task</p>
+
+      <form (ngSubmit)="submitCreateTask()" #createForm="ngForm" class="modal-form">
+
+        <div class="form-group">
+          <label>Title <span>*</span></label>
+          <input type="text" class="form-input" [(ngModel)]="createModel.title" name="title" placeholder="Task title…"
+            required />
+        </div>
+
+        <div class="form-group">
+          <label>Description</label>
+          <textarea class="form-textarea" [(ngModel)]="createModel.description" name="description"
+            placeholder="Short description…"></textarea>
+        </div>
+
+        <div class="form-2col">
+          <div class="form-group">
+            <label>Tags <span class="muted">(comma separated)</span></label>
+            <input type="text" class="form-input" [(ngModel)]="createModel.tags" name="tags"
+              placeholder="UI, API, urgent" />
+          </div>
+
+          <div class="form-group">
+            <label>Priority</label>
+            <select class="form-input" [(ngModel)]="createModel.priority" name="priority"
+              (change)="updatePriorityColor(createModel)">
+              <option value="low">Low Priority</option>
+              <option value="medium">Medium Priority</option>
+              <option value="high">High Priority</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="modal-buttons">
+          <button type="button" class="btn-secondary" (click)="closeCreateModal()">Cancel</button>
+          <button type="submit" class="btn-primary" [disabled]="!createForm.form.valid">Create</button>
+        </div>
+
+      </form>
+    </div>
+
+    <!-- ===================== Edit Task Modal ===================== -->
+    <div class="modal-backdrop" *ngIf="showEditModal" (click)="closeEditModal()"></div>
+    <div class="modal-container" *ngIf="showEditModal">
+
+      <div class="modal-header">
+        <h2>Edit Task</h2>
+        <button class="close-btn" (click)="closeEditModal()">✕</button>
+      </div>
+
+      <p class="modal-subtitle">Update the task information</p>
+
+      <form (ngSubmit)="submitEditTask()" #editForm="ngForm" class="modal-form">
+
+        <div class="form-group">
+          <label>Title <span>*</span></label>
+          <input type="text" class="form-input" [(ngModel)]="editModel.title" name="editTitle" required />
+        </div>
+
+        <div class="form-group">
+          <label>Description</label>
+          <textarea class="form-textarea" [(ngModel)]="editModel.description" name="editDescription"></textarea>
+        </div>
+
+        <div class="form-2col">
+
+          <div class="form-group">
+            <label>Tags <span class="muted">(comma separated)</span></label>
+            <input type="text" class="form-input" [(ngModel)]="editModel.tags" name="editTags" />
+          </div>
+
+          <div class="form-group">
+            <label>Priority</label>
+            <select class="form-input" [(ngModel)]="editModel.priority" name="editPriority"
+              (change)="updatePriorityColor(editModel)">
+              <option value="low">Low Priority</option>
+              <option value="medium">Medium Priority</option>
+              <option value="high">High Priority</option>
+            </select>
+          </div>
+
+        </div>
+
+        <!-- Column Above Danger Zone -->
+        <div class="form-group">
+          <label>Column</label>
+          <select class="form-input" [(ngModel)]="editModel.column" name="editColumn">
+            <option value="new">Backlog</option>
+            <option value="work">In Progress</option>
+            <option value="done">Done</option>
+          </select>
+        </div>
+
+        <!-- Better Danger Layout -->
+        <div class="danger-box">
+          <div class="danger-label">Danger Zone</div>
+          <button type="button" class="btn-danger-full" (click)="confirmDelete()">Delete Task</button>
+        </div>
+
+        <div class="modal-buttons">
+          <button type="button" class="btn-secondary" (click)="closeEditModal()">Close</button>
+          <button type="submit" class="btn-primary" [disabled]="!editForm.form.valid">Save</button>
+        </div>
+
+      </form>
+    </div>
+
     }
+
+    <!-- ===================== Discussion View ===================== -->
     @else
     {
-      <header class="kanban-header">
 
-        <div class="header-title">
-          <h2>{{ taskBoard?.service?.name }}</h2>
-          <div class="header-info">
-            <p>Cheif: {{ taskBoard?.service?.chief?.first_name}} {{ taskBoard?.service?.chief?.last_name}}</p>
+    <header class="board-header discussion-header">
+      <div class="board-title">
+        <h2>{{ taskBoard?.service?.name }}</h2>
+      </div>
 
-            @if(taskBoard?.service?.projectManager)
-            {
-              <p>Project Manager: {{ taskBoard?.service?.projectManager?.first_name}} {{
-              taskBoard?.service?.projectManager?.last_name}}</p>
-            }
+      <!-- <input type="text" class="description-box" [disabled]="!editMode" [(ngModel)]="taskBoard!.service!.description"
+        placeholder="Add a Description..." /> -->
 
-            <p>Deadline: {{ taskBoard?.service?.deadline | date: "dd/MM/yyyy"}}</p>
-          </div>
+      <div class="actions-row">
+
+        <button *ngIf="!editMode" class="btn-primary" (click)="toggleEdit()">Edit</button>
+
+        <div *ngIf="editMode" class="edit-group">
+          <button class="btn-secondary" (click)="toggleEdit()">Cancel</button>
+          <button class="btn-success" (click)="saveChanges()">Save</button>
         </div>
 
-        <h3>Description:</h3>
-        <input type="text" name="description" class="description-conatiner"
-        [disabled]="!editMode" [(ngModel)]="taskBoard!.service!.description"
-        placeholder="Add a Description...">
+        <button class="btn-secondary" (click)="goBack()">Back</button>
+      </div>
+    </header>
 
-        <div class="header-actions">
-          <button *ngIf="!editMode" (click)="toggleEdit()" class="btn edit-btn">Edit</button>
-          <div *ngIf="editMode" class="edit-buttons">
-            <button class="btn btn-secondary" (click)="toggleEdit()">Cancel</button>
-            <button class="btn btn-save" (click)="saveChanges()">Save</button>
-          </div>
-          <button class="back-btn" (click)="goBack()">Back</button>
-        </div>
-      </header>
+    <app-issue-page-template #issuePage />
 
-      <app-issue-page-template #issuePage/>
     }
 
   </div>
