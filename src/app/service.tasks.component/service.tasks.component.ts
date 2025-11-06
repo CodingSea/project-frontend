@@ -9,7 +9,7 @@ import { TaskCard } from '@app/task-card';
 import { ServiceInfo } from '@app/service-info';
 import { Service, ServiceStatus } from '@app/service';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Sidebar } from '@app/sidebar/sidebar';
 import { HeaderComponent } from '@app/header/header';
 import { IssuePageTemplate } from '@app/issue-page/issue-page-template';
@@ -97,11 +97,14 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
   constructor(
     private http: HttpClient,
     private route: ActivatedRoute,
-    private location: Location
+    private location: Location,
+    private router: Router
   ) { }
 
   ngOnInit(): void
   {
+    window.scroll({ top: 0, left: 0 });
+
     this.route.params.subscribe(params =>
     {
       this.serviceId = params[ 'serviceId' ];
@@ -176,7 +179,7 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
         return;
       }
 
-      if(this.taskBoard?.service.status == "On Hold") return;
+      if (this.taskBoard?.service.status == "On Hold") return;
 
       if (this.servicesInfo.completionRate === 100)
       {
@@ -519,8 +522,10 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
 
   toggleEdit()
   {
-    this.editMode = !this.editMode;
-    if (!this.editMode) this.getCurrentServiceInfo();
+    // this.editMode = !this.editMode;
+    // if (!this.editMode) this.getCurrentServiceInfo();
+    // console.log(this.taskBoard?.service.project.projectID)
+    this.router.navigate([ `/projects/${this.taskBoard?.service.project.projectID}/services/${this.taskBoard?.service.serviceID}/edit` ])
   }
 
   kanbanItemRenderer = (element: any, item: any, resource: any) =>

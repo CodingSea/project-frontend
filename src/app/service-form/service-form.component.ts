@@ -34,8 +34,8 @@ enum DefaultStatus
 @Component({
   selector: 'app-service-form',
   standalone: true,
-  imports: [ CommonModule, ReactiveFormsModule, RouterModule, DevelopersSearchComponent, FormsModule,  Sidebar,
-  HeaderComponent ],
+  imports: [ CommonModule, ReactiveFormsModule, RouterModule, DevelopersSearchComponent, FormsModule, Sidebar,
+    HeaderComponent ],
   templateUrl: './service-form.component.html',
   styleUrls: [ './service-form.component.scss' ],
 })
@@ -297,7 +297,12 @@ export class ServiceFormComponent implements OnInit, OnDestroy
         {
           alert('Service updated successfully!');
           if (this.submitted.observed) this.submitted.emit();
-          else this.router.navigateByUrl(`/projects/${this.projectId}/services`);
+          else
+          {
+            // this.router.navigateByUrl(`/projects/${this.projectId}/services`);
+            this.location.back();
+
+          };
         },
         error: (err) =>
         {
