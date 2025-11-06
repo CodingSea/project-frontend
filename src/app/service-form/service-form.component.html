@@ -1,8 +1,10 @@
 <div class="layout-wrapper">
-  <app-header></app-header>
+
+  <!-- ✅ Show header & sidebar only in edit mode -->
+  <app-header *ngIf="isEditMode"></app-header>
 
   <div class="layout-body">
-    <app-sidebar></app-sidebar>
+    <app-sidebar *ngIf="isEditMode"></app-sidebar>
 
     <main class="content-area">
 
@@ -220,7 +222,7 @@
       <!-- ====== SERVICE FORM PAGE END ====== -->
 
       <!-- ========= MODALS / OVERLAYS ========= -->
-
+      <!-- (unchanged modals) -->
       <div class="overlay" *ngIf="showDevelopersModal" (click)="closeDevelopersModal($event)">
         <div class="dev-modal" (click)="$event.stopPropagation()">
           <header class="modal-header">
