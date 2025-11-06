@@ -167,7 +167,7 @@ app-sidebar {
   /* ✅ Flexible size based on viewport */
   width: min(90vw, 700px);
   max-width: 95vw;
-  height: auto;
+  height: 80%;
   max-height: 90vh;
 
   background: #fff;
@@ -177,6 +177,13 @@ app-sidebar {
   z-index: 3001;
   padding: clamp(1rem, 2vw, 2rem);
   overflow-y: auto;
+}
+
+/* Custom scrollbar styles */
+.modal-container::-webkit-scrollbar {
+  width: 8px; /* Width of the scrollbar */
+  position: absolute; /* Position it as needed */
+  left: 0; /* Move it to the left */
 }
 
 
