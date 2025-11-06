@@ -163,15 +163,22 @@ app-sidebar {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 640px;
-  max-width: calc(100% - 32px);
+
+  /* ✅ Flexible size based on viewport */
+  width: min(90vw, 700px);
+  max-width: 95vw;
+  height: auto;
+  max-height: 90vh;
+
   background: #fff;
-  border-radius: 14px;
+  border-radius: 1.2rem;
   border: 1px solid #e5e7eb;
-  box-shadow: 0 24px 60px rgba(0,0,0,.18);
+  box-shadow: 0 24px 60px rgba(0,0,0,0.18);
   z-index: 3001;
-  padding: 28px 30px;
+  padding: clamp(1rem, 2vw, 2rem);
+  overflow-y: auto;
 }
+
 
 .modal-header {
   display: flex;
@@ -292,12 +299,20 @@ textarea.form-textarea {
 /* Responsive */
 @media (max-width: 720px) {
   .modal-container {
-    width: 96%;
+    width: 94vw;
+    max-width: 94vw;
+    height: auto;
+    max-height: 88vh;
+    padding: 1rem;
+    border-radius: 10px;
   }
+
   .form-2col {
     grid-template-columns: 1fr;
+    gap: 16px;
   }
 }
+
 
 /* Modern Figma-style card */
 .task-card {

@@ -78,18 +78,24 @@ export class ServiceFormComponent implements OnInit, OnDestroy
     private location: Location
   )
   {
-    this.form = this.fb.group({
-      name: [ '', [ Validators.required, Validators.pattern(/^[A-Za-z0-9 ]{3,50}$/) ] ],
-      deadline: [ '', Validators.required ],
-      description: [
-        '',
-        [ Validators.pattern(/^$|^[A-Za-z0-9.,!?()\s-]{1,300}$/), Validators.maxLength(300) ],
-      ],
-      chiefId: [ null, Validators.required ],
-      managerId: [ null ],
-      resources: this.fb.array<number>([] as number[]),
-      status: [ ServiceStatus.New || DefaultStatus.Default, Validators.required ],
-    });
+this.form = this.fb.group({
+  // ✅ Allow Arabic + English letters, numbers, and spaces (3–50 chars)
+  name: [ '', [ Validators.required, Validators.pattern(/^[A-Za-z\u0600-\u06FF0-9 ]{3,50}$/) ] ],
+
+  deadline: [ '', Validators.required ],
+
+  // ✅ Allow Arabic + English, punctuation, numbers, and spaces
+  description: [
+    '',
+    [ Validators.pattern(/^$|^[A-Za-z\u0600-\u06FF0-9.,!?()\s-]{1,300}$/), Validators.maxLength(300) ],
+  ],
+
+  chiefId: [ null, Validators.required ],
+  managerId: [ null ],
+  resources: this.fb.array<number>([] as number[]),
+  status: [ ServiceStatus.New || DefaultStatus.Default, Validators.required ],
+});
+
   }
 
   ngOnInit(): void
