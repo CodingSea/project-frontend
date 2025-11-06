@@ -241,6 +241,7 @@ export class ProjectManagement implements OnInit, AfterViewInit
       }
     )
 
+    this.loadProjects();
     this.closeEditProject()
   }
 
