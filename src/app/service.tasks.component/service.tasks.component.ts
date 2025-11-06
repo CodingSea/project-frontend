@@ -17,11 +17,12 @@ import { IssuePageTemplate } from '@app/issue-page/issue-page-template';
 @Component({
   selector: 'app-service-tasks',
   templateUrl: './service.tasks.component.html',
-  styleUrls: ['./service.tasks.component.css'],
-  imports: [jqxKanbanModule, jqxSplitterModule, CommonModule, FormsModule, Sidebar, HeaderComponent, IssuePageTemplate],
+  styleUrls: [ './service.tasks.component.css' ],
+  imports: [ jqxKanbanModule, jqxSplitterModule, CommonModule, FormsModule, Sidebar, HeaderComponent, IssuePageTemplate ],
   standalone: true
 })
-export class ServiceTasksComponent implements OnInit, AfterViewInit {
+export class ServiceTasksComponent implements OnInit, AfterViewInit
+{
   @ViewChild('kanbanReference') kanban!: jqxKanbanComponent;
 
   // view state
@@ -45,7 +46,7 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit {
     title: '',
     description: '',
     tags: '',
-    priority: 'low' as 'low'|'medium'|'high',
+    priority: 'low' as 'low' | 'medium' | 'high',
     color: '#16a34a'
   };
 
@@ -54,21 +55,24 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit {
     title: '',
     description: '',
     tags: '',
-    priority: 'low' as 'low'|'medium'|'high',
+    priority: 'low' as 'low' | 'medium' | 'high',
     color: '#16a34a',
-    column: 'new' as 'new'|'work'|'done'
+    column: 'new' as 'new' | 'work' | 'done'
   };
 
   // priority <-> color helpers
-  updatePriorityColor(task: { priority: 'low'|'medium'|'high'; color: string }) {
+  updatePriorityColor(task: { priority: 'low' | 'medium' | 'high'; color: string })
+  {
     if (!task) return;
     if (task.priority === 'low') task.color = '#16a34a';
     if (task.priority === 'medium') task.color = '#eab308';
     if (task.priority === 'high') task.color = '#dc2626';
   }
 
-  private colorToPriority(color?: string): 'low'|'medium'|'high' {
-    switch ((color || '').toLowerCase()) {
+  private colorToPriority(color?: string): 'low' | 'medium' | 'high'
+  {
+    switch ((color || '').toLowerCase())
+    {
       case '#dc2626': return 'high';
       case '#eab308': return 'medium';
       default: return 'low';
@@ -94,28 +98,32 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit {
     private http: HttpClient,
     private route: ActivatedRoute,
     private location: Location
-  ) {}
+  ) { }
 
-  ngOnInit(): void {
-    this.route.params.subscribe(params => {
-      this.serviceId = params['serviceId'];
-      this.taskBoardId = params['taskBoardId'];
+  ngOnInit(): void
+  {
+    this.route.params.subscribe(params =>
+    {
+      this.serviceId = params[ 'serviceId' ];
+      this.taskBoardId = params[ 'taskBoardId' ];
       this.initializeKanbanDataSource();
       this.getCurrentServiceInfo();
     });
   }
 
-  ngAfterViewInit() {}
+  ngAfterViewInit() { }
 
   /* -------------------- Info / Progress -------------------- */
-  async getCurrentServiceInfo(): Promise<void> {
+  async getCurrentServiceInfo(): Promise<void>
+  {
     this.servicesInfo = {
       totalServices: 0, backloggedTasks: 0, activeTasks: 0,
       completedTasks: 0, totalMembers: 0, completionRate: 0.0
     };
 
     this.http.get<TaskBoard>(`${environment.apiUrl}/tasks/task-board/${this.taskBoardId}`)
-      .subscribe((res) => {
+      .subscribe((res) =>
+      {
         this.taskBoard = res;
         if (!this.taskBoard) return;
 
@@ -137,7 +145,8 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit {
         this.servicesInfo.activeTasks = 0;
         this.servicesInfo.completedTasks = 0;
 
-        this.taskBoard.cards?.forEach(t => {
+        this.taskBoard.cards?.forEach(t =>
+        {
           total++;
           if (t.column === 'new') this.servicesInfo.backloggedTasks++;
           else if (t.column === 'work') this.servicesInfo.activeTasks++;
@@ -148,7 +157,8 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit {
       });
   }
 
-  async getCurrentServiceInfoFromData(): Promise<void> {
+  async getCurrentServiceInfoFromData(): Promise<void>
+  {
     const total = this.data.length;
     this.servicesInfo.backloggedTasks = this.data.filter(t => t.status === 'new').length;
     this.servicesInfo.activeTasks = this.data.filter(t => t.status === 'work').length;
@@ -156,31 +166,42 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit {
     this.servicesInfo.completionRate = total > 0 ? (this.servicesInfo.completedTasks / total) * 100 : 0;
   }
 
-  async checkServiceStatus() {
-    try {
-      if (!this.dataAdapter?.localData || this.dataAdapter.localData.length === 0 || this.dataAdapter.localData[0].status === 's') {
+  async checkServiceStatus()
+  {
+    try
+    {
+      if (!this.dataAdapter?.localData || this.dataAdapter.localData.length === 0 || this.dataAdapter.localData[ 0 ].status === 's')
+      {
         await this.http.patch<Service>(`${environment.apiUrl}/service/${this.serviceId}/status`, { status: ServiceStatus.New }).toPromise();
         return;
       }
 
-      if (this.servicesInfo.completionRate === 100) {
-        if (this.taskBoard?.service.status === 'Pending Approval' || this.taskBoard?.service.status === 'On Hold') return;
+      if(this.taskBoard?.service.status == "On Hold") return;
+
+      if (this.servicesInfo.completionRate === 100)
+      {
+        if (this.taskBoard?.service.status === 'Pending Approval') return;
 
         await this.http.patch<Service>(`${environment.apiUrl}/service/${this.serviceId}/status`, { status: ServiceStatus.Completed }).toPromise();
-      } else {
+      } else
+      {
         await this.http.patch<Service>(`${environment.apiUrl}/service/${this.serviceId}/status`, { status: ServiceStatus.InProgress }).toPromise();
       }
-    } catch (err) {
+    } catch (err)
+    {
       console.log(err);
     }
   }
 
   /* -------------------- Board Data -------------------- */
-  async getBoardCards(): Promise<void> {
-    try {
+  async getBoardCards(): Promise<void>
+  {
+    try
+    {
       const response = await this.http.get<TaskCard[]>(`${environment.apiUrl}/service/${this.serviceId}/tasks`).toPromise();
 
-      if (!response || response.length === 0) {
+      if (!response || response.length === 0)
+      {
         this.data = [];
         return;
       }
@@ -196,17 +217,20 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit {
         ...t,
         tags: (typeof t.tags === 'string' && t.tags.trim() !== '') ? t.tags : ' '
       }));
-    } catch (e) {
+    } catch (e)
+    {
       console.error('Error fetching board cards:', e);
       this.data = [];
     }
   }
 
-  async initializeKanbanDataSource(): Promise<void> {
+  async initializeKanbanDataSource(): Promise<void>
+  {
     await this.getBoardCards();
 
-    if (this.data.length === 0) {
-      this.data = [{
+    if (this.data.length === 0)
+    {
+      this.data = [ {
         id: '1',
         status: 's',
         text: 'eee',
@@ -214,7 +238,7 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit {
         description: 'ssssee',
         assignee: 'John sp',
         color: '#C21A25'
-      }];
+      } ];
     }
 
     this.dataAdapter = new jqx.dataAdapter({
@@ -237,18 +261,22 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit {
     await this.checkServiceStatus();
   }
 
-  async rebuildKanban() {
+  async rebuildKanban()
+  {
     if (this.kanban) this.kanban.destroy();
     this.showKanban = false;
 
     await this.getBoardCards();
 
-    setTimeout(() => {
+    setTimeout(() =>
+    {
       this.dataAdapter = new jqx.dataAdapter(this.data);
       this.showKanban = true;
 
-      setTimeout(() => {
-        if (this.kanban && this.kanban.host) {
+      setTimeout(() =>
+      {
+        if (this.kanban && this.kanban.host)
+        {
           (this.kanban as any).itemRenderer = this.kanbanItemRenderer;
         }
       }, 50);
@@ -256,33 +284,39 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit {
   }
 
   /* -------------------- Helpers -------------------- */
-  textToArray(text: string): string[] {
-    if (typeof text !== 'string') return [' '];
+  textToArray(text: string): string[]
+  {
+    if (typeof text !== 'string') return [ ' ' ];
     return text.split(',').map(t => t.trim()).filter(t => t.length > 0);
   }
 
-  arrayToString(arr: string[]): string {
+  arrayToString(arr: string[]): string
+  {
     if (!arr || arr.length === 0) return '';
     return arr.join(', ');
   }
 
-  formatDecimal(num: number): string {
+  formatDecimal(num: number): string
+  {
     const r = Math.round(num * 10) / 10;
     const s = String(r);
     return s.endsWith('.0') ? s.slice(0, -2) : s;
   }
 
   /* -------------------- Modal Openers -------------------- */
-  openCreateModal() {
+  openCreateModal()
+  {
     this.createModel = { title: '', description: '', tags: '', priority: 'low', color: '#16a34a' };
     this.showCreateModal = true;
   }
 
-  closeCreateModal() {
+  closeCreateModal()
+  {
     this.showCreateModal = false;
   }
 
-  openEditModal(item: any) {
+  openEditModal(item: any)
+  {
     const t = this.data.find(x => x.id === item.id);
     if (!t) return;
 
@@ -295,17 +329,19 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit {
       tags: typeof t.tags === 'string' ? t.tags : this.arrayToString(t.tags),
       priority,
       color: t.color || '#16a34a',
-      column: (t.status as 'new'|'work'|'done') || 'new'
+      column: (t.status as 'new' | 'work' | 'done') || 'new'
     };
     this.showEditModal = true;
   }
 
-  closeEditModal() {
+  closeEditModal()
+  {
     this.showEditModal = false;
   }
 
   /* -------------------- Create / Update / Delete -------------------- */
-  async submitCreateTask() {
+  async submitCreateTask()
+  {
     this.updatePriorityColor(this.createModel);
     await this.createTask(
       this.createModel.title,
@@ -317,7 +353,8 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit {
     this.closeCreateModal();
   }
 
-  async submitEditTask() {
+  async submitEditTask()
+  {
     this.updatePriorityColor(this.editModel);
 
     const payload = {
@@ -337,20 +374,23 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit {
     this.closeEditModal();
   }
 
-  confirmDelete() {
+  confirmDelete()
+  {
     if (!this.editModel?.id) return;
     this.deleteTask(this.editModel.id);
     this.closeEditModal();
   }
 
-  async onItemMoved(event: any): Promise<void> {
+  async onItemMoved(event: any): Promise<void>
+  {
     const movedTask = event.args.itemData;
     if (!movedTask) return;
 
     const newStatus = event.args.newColumn.dataField;
     const t = this.data.find(task => task.id === movedTask.id);
 
-    if (t) {
+    if (t)
+    {
       t.status = newStatus;
       await this.updateTaskOrder(newStatus);
       await this.updateTask(t);
@@ -359,24 +399,28 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit {
     }
   }
 
-  private async updateTaskOrder(column: string): Promise<void> {
+  private async updateTaskOrder(column: string): Promise<void>
+  {
     const tasksInColumn = this.data.filter(task => task.status === column);
-    for (let i = 0; i < tasksInColumn.length; i++) {
-      const task = tasksInColumn[i];
+    for (let i = 0; i < tasksInColumn.length; i++)
+    {
+      const task = tasksInColumn[ i ];
       (task as any).order = i;
       await this.updateTask(task);
     }
   }
 
-  async createTask(taskText: string, column: string, tagsText: string, description: string, color: string): Promise<void> {
-    const formattedTags = tagsText.length === 0 ? [' '] : this.textToArray(tagsText);
+  async createTask(taskText: string, column: string, tagsText: string, description: string, color: string): Promise<void>
+  {
+    const formattedTags = tagsText.length === 0 ? [ ' ' ] : this.textToArray(tagsText);
     const newTaskOrder = this.data.filter(task => task.status === 'new').length;
 
     const newTask: TaskCard = {
       title: taskText, column, description, tags: formattedTags, order: newTaskOrder, color
     };
 
-    try {
+    try
+    {
       const response = await this.http.post<TaskCard>(
         `${environment.apiUrl}/service/${this.taskBoardId}/cards`,
         newTask, { headers: { 'Content-Type': 'application/json' } }
@@ -391,12 +435,14 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit {
       this.dataAdapter.localData = this.data;
       await this.rebuildKanban();
       await this.getCurrentServiceInfo();
-    } catch (error) {
+    } catch (error)
+    {
       console.error('Error creating task:', error);
     }
   }
 
-  async updateTask(task: any): Promise<void> {
+  async updateTask(task: any): Promise<void>
+  {
     if (!task || !task.id) return;
 
     const payload = {
@@ -408,16 +454,18 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit {
       color: task.color === null ? '#008000' : task.color
     };
 
-    try {
+    try
+    {
       await this.http.patch<TaskCard>(
         `${environment.apiUrl}/service/${this.taskBoardId}/tasks/${task.id}`,
         payload, { headers: { 'Content-Type': 'application/json' } }
       ).toPromise();
 
       const idx = this.data.findIndex(x => x.id === task.id);
-      if (idx !== -1) {
-        this.data[idx] = {
-          ...this.data[idx],
+      if (idx !== -1)
+      {
+        this.data[ idx ] = {
+          ...this.data[ idx ],
           text: payload.title,
           description: payload.description,
           tags: payload.tags,
@@ -427,13 +475,16 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit {
       }
 
       this.dataAdapter.localData = this.data;
-    } catch (error) {
+    } catch (error)
+    {
       console.error('Error updating task:', error);
     }
   }
 
-  async deleteTask(taskId: number): Promise<void> {
-    try {
+  async deleteTask(taskId: number): Promise<void>
+  {
+    try
+    {
       const url = `${environment.apiUrl}/service/${this.taskBoardId}/tasks/${taskId}`;
       await this.http.delete(url).toPromise();
 
@@ -442,32 +493,38 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit {
 
       await this.rebuildKanban();
       await this.initializeKanbanDataSource();
-    } catch (error) {
+    } catch (error)
+    {
       console.error('Error deleting task:', error);
     }
   }
 
   /* navigation + misc */
-  goBack() {
+  goBack()
+  {
     this.location.back();
   }
 
-  selectSection(isTaskboard: boolean) {
+  selectSection(isTaskboard: boolean)
+  {
     this.isTaskboardSelected = isTaskboard;
     this.initializeKanbanDataSource();
   }
 
-  saveChanges(): void {
+  saveChanges(): void
+  {
     this.http.patch<TaskBoard>(`${environment.apiUrl}/service/${this.taskBoard?.service.serviceID}`, this.taskBoard?.service).subscribe();
     this.toggleEdit();
   }
 
-  toggleEdit() {
+  toggleEdit()
+  {
     this.editMode = !this.editMode;
     if (!this.editMode) this.getCurrentServiceInfo();
   }
 
-  kanbanItemRenderer = (element: any, item: any, resource: any) => {
+  kanbanItemRenderer = (element: any, item: any, resource: any) =>
+  {
     const tags = (item.tags || '').split(',').filter((x: string) => x.trim());
     const priority = item.color === '#dc2626' ? 'high' : item.color === '#eab308' ? 'medium' : 'low';
 

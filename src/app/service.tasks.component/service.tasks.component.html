@@ -17,12 +17,16 @@
       <div class="board-info">
         <div class="board-title">
           <h2>{{ taskBoard?.service?.name }}</h2>
-          <p class="subtext">
-            Led by {{ taskBoard?.service?.chief?.first_name }} {{ taskBoard?.service?.chief?.last_name }}
+          <div class="subtext">
+           <span> Led by {{ taskBoard?.service?.chief?.first_name }} {{ taskBoard?.service?.chief?.last_name }}</span>
+
+
+           <hr>
+
             <span *ngIf="taskBoard?.service?.projectManager">
-              • PM: {{ taskBoard?.service?.projectManager?.first_name }} {{ taskBoard?.service?.projectManager?.last_name }}
+              Project Manager: {{ taskBoard?.service?.projectManager?.first_name }} {{ taskBoard?.service?.projectManager?.last_name }}
             </span>
-          </p>
+          </div>
         </div>
 
         <div class="header-meta">
@@ -52,7 +56,6 @@
         #kanbanReference
         *ngIf="columns && dataAdapter"
         [width]="'100%'"
-        [height]="'calc(100vh - 300px)'"
         [columns]="columns"
         [source]="dataAdapter"
         (onItemAttrClicked)="openEditModal($event.args.item)"

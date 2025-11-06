@@ -285,6 +285,8 @@ textarea.form-textarea {
   overflow-x: auto !important;
   white-space: nowrap !important;
   padding-bottom: 10px;
+
+  max-height: calc(100vh - 100px)';
 }
 
 /* Responsive */
