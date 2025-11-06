@@ -9,61 +9,62 @@
   <ng-container *ngIf="issue">
 
     <!-- ISSUE CARD -->
-    <section class="issue-card issue-highlight">
-<div class="issue-header">
-  <div class="meta-left">
-<span
-  class="tag"
-  [ngClass]="getStatusClass(issue.status)"
->
-  {{ issue.status ? (issue.status | titlecase) : 'Open' }}
-</span>
+<section class="issue-card issue-highlight">
 
-<span
-  *ngIf="issue.category"
-  class="tag"
-  [ngClass]="getCategoryClass(issue.category)"
->
-  {{ issue.category }}
-</span>
+  <div class="issue-header">
+    <div class="meta-left">
 
-    <span class="issue-id">#{{ issue.id }}</span>
-  </div>
+      <!-- ✅ Your new tag styling for Status -->
+      <span class="tag" [ngClass]="getStatusClass(issue.status)">
+        {{ issue.status ? (issue.status | titlecase) : 'Open' }}
+      </span>
 
-  <div class="meta-right">
-<div class="avatar-wrapper"
-     [class.loading]="isImageLoading[issue.createdBy?.id || 0]">
-  <img class="avatar-sm"
-       [src]="fixImage(issue.createdBy?.profileImage, issue.createdBy?.id)"
-       (load)="onImgLoad(issue.createdBy?.id || 0)"
-       (error)="onImgError($event, issue.createdBy?.id || 0)"
-       [style.opacity]="isImageLoading[issue.createdBy?.id || 0] ? '0' : '1'"/>
-</div>
+      <!-- ✅ Your new tag styling for Category -->
+      <span *ngIf="issue.category"
+        class="tag"
+        [ngClass]="getCategoryClass(issue.category)">
+        {{ issue.category }}
+      </span>
 
+      <span class="issue-id">#{{ issue.id }}</span>
+    </div>
 
-    <span>{{ issue.createdBy?.first_name }} {{ issue.createdBy?.last_name }}</span>
-    <span class="dot">•</span>
-    <span class="time">{{ getTimeAgo(issue.createdAt) }}</span>
-  </div>
-</div>
-
-
-      <h1 class="issue-title">{{ issue.title }}</h1>
-      <div class="markdown-body issue-body" [innerHTML]="issue.descriptionHtml"></div>
-
-      <!-- Issue Attachments -->
-      <div class="attachments-section" *ngIf="issue.attachments?.length">
-        <div class="attachments-title">Issue Attachments</div>
-        <div class="attachment-item" *ngFor="let file of issue.attachments" (click)="download(file)">
-          <div class="file-info">
-            <i class="fa-regular fa-file-lines file-icon"></i>
-            <span class="file-name">{{ file.name }}</span>
-          </div>
-          <i class="fa-solid fa-download download-icon"></i>
-        </div>
+    <div class="meta-right">
+      <div class="avatar-wrapper" [class.loading]="isImageLoading[issue.createdBy?.id || 0]">
+        <img
+          class="avatar-sm"
+          [src]="fixImage(issue.createdBy?.profileImage, issue.createdBy?.id)"
+          (load)="onImgLoad(issue.createdBy?.id || 0)"
+          (error)="onImgError($event, issue.createdBy?.id || 0)"
+          [style.opacity]="isImageLoading[issue.createdBy?.id || 0] ? '0' : '1'"
+        />
       </div>
 
-    </section>
+      <span>{{ issue.createdBy?.first_name }} {{ issue.createdBy?.last_name }}</span>
+      <span class="dot">•</span>
+      <span class="time">{{ getTimeAgo(issue.createdAt) }}</span>
+    </div>
+  </div>
+
+  <h1 class="issue-title">{{ issue.title }}</h1>
+
+  <div class="markdown-body issue-body" [innerHTML]="issue.descriptionHtml"></div>
+
+  <!-- Issue Attachments -->
+  <div class="attachments-section" *ngIf="issue.attachments?.length">
+    <div class="attachments-title">Issue Attachments</div>
+
+    <div class="attachment-item" *ngFor="let file of issue.attachments" (click)="download(file)">
+      <div class="file-info">
+        <i class="fa-regular fa-file-lines file-icon"></i>
+        <span class="file-name">{{ file.name }}</span>
+      </div>
+      <i class="fa-solid fa-download download-icon"></i>
+    </div>
+  </div>
+
+</section>
+
 
     <!-- FEEDBACK SECTION -->
     <section class="solutions-wrapper">
@@ -82,12 +83,8 @@
         <div class="solution-header">
           <div class="meta-left">
             <div class="avatar-wrapper" [class.loading]="isImageLoading[fb.id!]">
-              <img class="avatar-sm"
-                [src]="fixImage(fb.user?.profileImage)"
-                (load)="onImgLoad(fb.id!)"
-                (error)="onImgError($event, fb.id!)"
-                [style.opacity]="isImageLoading[fb.id!] ? '0' : '1'"
-              />
+              <img class="avatar-sm" [src]="fixImage(fb.user?.profileImage)" (load)="onImgLoad(fb.id!)"
+                (error)="onImgError($event, fb.id!)" [style.opacity]="isImageLoading[fb.id!] ? '0' : '1'" />
             </div>
 
             <strong>{{ fb.user?.first_name }} {{ fb.user?.last_name }}</strong>
@@ -95,17 +92,14 @@
             <span class="time">{{ getTimeAgo(fb.createdAt) }}</span>
           </div>
 
-          <button *ngIf="currentUserId === issue?.createdBy?.id"
-                  class="accept-btn"
-                  [ngClass]="{'accepted-btn': fb.isAccepted}"
-                  (click)="acceptFeedback(fb.id!)">
+          <button *ngIf="currentUserId === issue.createdBy?.id" class="accept-btn"
+            [ngClass]="{'accepted-btn': fb.isAccepted}" (click)="acceptFeedback(fb.id!)">
             <i class="fa-solid" [ngClass]="fb.isAccepted ? 'fa-check' : 'fa-thumbs-up'"></i>
             {{ fb.isAccepted ? 'Accepted' : 'Mark as Accepted' }}
           </button>
         </div>
 
-        <div class="markdown-body solution-body"
-            [innerHTML]="renderMarkdown(getFeedbackContent(fb))"></div>
+        <div class="markdown-body solution-body" [innerHTML]="renderMarkdown(getFeedbackContent(fb))"></div>
 
         <!-- Attachments -->
         <div class="attachments-section" *ngIf="fb.attachments?.length">
@@ -120,18 +114,18 @@
         </div>
 
         <!-- Comments -->
-<!-- Comments Header -->
-<div class="comments-header" *ngIf="fb.comments?.length">
-  <h3>Comments</h3>
-</div>
+        <!-- Comments Header -->
+        <div class="comments-header" *ngIf="fb.comments?.length">
+          <h3>Comments</h3>
+        </div>
 
-<!-- Comments List -->
-<div class="comments-list" *ngIf="fb.comments?.length">
+        <!-- Comments List -->
+        <div class="comments-list" *ngIf="fb.comments?.length">
           <div class="comment-item" *ngFor="let c of fb.comments">
-            <img class="comment-avatar" [src]="fixImage(c.user?.profileImage)" />
+            <img class="comment-avatar" [src]="fixImage(c.user.profileImage)" />
             <div class="comment-bubble">
               <div class="comment-meta">
-                <span class="author">{{ c.user?.first_name }} {{ c.user?.last_name }}</span> •
+                <span class="author">{{ c.user.first_name }} {{ c.user.last_name }}</span> •
                 <span>{{ getTimeAgo(c.createdAt) }}</span>
               </div>
               {{ c.content }}
@@ -144,16 +138,11 @@
         </button>
 
         <div *ngIf="showReplyBox[fb.id!]" class="reply-box-modern">
-          <textarea class="reply-textarea"
-            [(ngModel)]="replyContent[fb.id!]"
-            placeholder="Write a reply..."
-            rows="1"
+          <textarea class="reply-textarea" [(ngModel)]="replyContent[fb.id!]" placeholder="Write a reply..." rows="1"
             (input)="autoResize($event)">
           </textarea>
 
-          <button class="reply-send-btn"
-            (click)="submitComment(fb.id!)"
-            [disabled]="!replyContent[fb.id!]">
+          <button class="reply-send-btn" (click)="submitComment(fb.id!)" [disabled]="!replyContent[fb.id!]">
             <i class="fa-solid fa-paper-plane"></i>
           </button>
         </div>
@@ -164,11 +153,8 @@
       <div class="add-solution-box feedback-box">
         <h3 class="add-feedback-title">Add Feedback</h3>
 
-        <textarea [(ngModel)]="newFeedback"
-          class="solution-textarea auto-textarea"
-          placeholder="Write your feedback..."
-          rows="1"
-          (input)="autoResize($event)">
+        <textarea [(ngModel)]="newFeedback" class="solution-textarea auto-textarea" placeholder="Write your feedback..."
+          rows="1" (input)="autoResize($event)">
         </textarea>
 
         <div class="file-chip-wrapper" *ngIf="selectedFiles.length">

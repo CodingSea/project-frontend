@@ -15,6 +15,7 @@ import { ServiceTasksComponent } from './service.tasks.component/service.tasks.c
 import { ServicesComponent } from './services.component/services.component';
 import { IssuePage } from './issue-page/issue-page';
 import { IssueCreateComponent } from './issue-create/issue-create';
+import { ExcelImporter } from './excel-importer/excel-importer';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'auth/signup', pathMatch: 'full' },
@@ -36,6 +37,11 @@ export const routes: Routes = [
   { path: 'issues/:id', component: IssuePage , canActivate: [AuthGuard]},
   { path: 'issues', redirectTo: 'home', pathMatch: 'full' },
   { path: 'home', component: HomePage, canActivate: [AuthGuard] },
+
+
+  { path: 'excel', component: ExcelImporter, canActivate: [AuthGuard] },
+
+
   { path: '**', component: UserComponent },
 ];
 
