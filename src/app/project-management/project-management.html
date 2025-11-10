@@ -10,33 +10,39 @@
             <div class="div_33-96">
               <div class="main_div">
 
-                <!-- ===== Page Header: Projects + Excel Importer + Search + Filter ===== -->
-                <header class="page-header">
-                  <div class="page-header-left">
-                    <h1>Projects</h1>
-                    <app-excel-importer></app-excel-importer>
-                    <input type="file" id="fileUpload" (change)="onFileSelected($event)" hidden />
-                  </div>
+<!-- ===== Page Header Section (aligned with cards) ===== -->
+<div class="page-header-wrapper">
+  <header class="page-header">
+    <div class="page-header-left">
+      <h1>Projects</h1>
+      <app-excel-importer></app-excel-importer>
+      <input type="file" id="fileUpload" (change)="onFileSelected($event)" hidden />
+    </div>
 
-                  <div class="page-header-right">
-                    <div class="search-box">
-                      <input
-                        type="text"
-                        [(ngModel)]="searchQuery"
-                        (input)="onFilterChange()"
-                        placeholder="Search projects..."
-                      />
-                    </div>
-                    <select [(ngModel)]="selectedFilter" (change)="onFilterChange()">
-                      <option value="all">All Projects</option>
-                      <option value="active">Active</option>
-                      <option value="on hold">On Hold</option>
-                    </select>
-                  </div>
-                </header>
+    <div class="page-header-right">
+      <div class="search-box">
+        <input
+          type="text"
+          [(ngModel)]="searchQuery"
+          (input)="onFilterChange()"
+          placeholder="Search projects..."
+        />
+      </div>
+      <select [(ngModel)]="selectedFilter" (change)="onFilterChange()">
+        <option value="all">All Projects</option>
+        <option value="active">Active</option>
+        <option value="on hold">On Hold</option>
+      </select>
+    </div>
+  </header>
+
+<div class="projects-summary">
+  <p class="total-projects-text">Total Projects: {{ totalProjects }}</p>
+</div>
+</div>
+
 
                 <!-- ✅ Total Projects Counter -->
-                <p class="total-projects-text">Total Projects: {{ totalProjects }}</p>
 
                 <!-- ===== Project Cards ===== -->
                 <div class="pm-cards">
@@ -89,7 +95,6 @@
 
                     <div class="pm-members">
                       <span class="pm-more">
-                        <!-- ✅ Added clickable for Services popup -->
                         <p class="clickable" (click)="openServicesModal(p, $event)">
                           Services: {{ p.services?.length || 0 }}
                         </p>
@@ -165,7 +170,7 @@
                       <tbody>
                         <tr *ngFor="let m of selectedMembers">
                           <td>
-                            <div class="member-info">
+                            <div class="member-info clickable" (click)="goToUserProfile(m.id)">
                               <div class="avatar">
                                 <img
                                   [src]="getMemberAvatar(m.image)"
@@ -212,10 +217,22 @@
                       </thead>
                       <tbody>
                         <tr *ngFor="let s of selectedServices">
-                          <td>{{ s.name }}</td>
+                          <td class="clickable" (click)="goToService(s)">
+                            {{ s.name }}
+                          </td>
                           <td>{{ s.deadline | date: 'MMM d, yyyy' }}</td>
-                          <td>{{ s.chief?.first_name }} {{ s.chief?.last_name }}</td>
-                          <td>{{ s.projectManager?.first_name }} {{ s.projectManager?.last_name }}</td>
+                          <td
+                            class="clickable"
+                            (click)="goToUserProfile(s.chief?.id)"
+                          >
+                            {{ s.chief?.first_name }} {{ s.chief?.last_name }}
+                          </td>
+                          <td
+                            class="clickable"
+                            (click)="goToUserProfile(s.projectManager?.id)"
+                          >
+                            {{ s.projectManager?.first_name }} {{ s.projectManager?.last_name }}
+                          </td>
                         </tr>
                       </tbody>
                     </table>
@@ -225,7 +242,6 @@
                 <!-- ===== New Project Modal ===== -->
                 <ng-container *ngIf="showNewProject">
                   <div class="pm-modal-backdrop" (click)="closeNewProject()"></div>
-
                   <div
                     class="pm-modal"
                     role="dialog"
@@ -322,7 +338,6 @@
                 <!-- ===== Edit Project Modal ===== -->
                 <ng-container *ngIf="showEditProject">
                   <div class="pm-modal-backdrop" (click)="closeEditProject()"></div>
-
                   <div
                     class="pm-modal"
                     role="dialog"

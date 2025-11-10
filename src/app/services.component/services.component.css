@@ -3349,3 +3349,87 @@ app-sidebar {
 .div_33-138 {
   margin-top: 25px !important;  /* adds subtle gap below search/filter row */
 }
+/* ✅ FINAL FIX: Make layout same as your page everywhere */
+.pm-cards {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 22px !important;
+  margin-top: 40px !important;
+  margin-bottom: 40px !important;
+  width: 100% !important;
+  max-width: 1180px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  padding: 0 10px !important;
+  box-sizing: border-box !important;
+}
+
+/* ✅ Each card fixed height and equal width */
+.pm-card {
+  width: auto !important;
+  height: 180px !important;
+  background: #fff !important;
+  border: 1px solid #f3f4f6 !important;
+  border-radius: 12px !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08) !important;
+  padding: 16px !important;
+  transition: all 0.2s ease !important;
+}
+
+/* ✅ Add New card consistent */
+.pm-card.add-new {
+  border: 2px dashed #e5e7eb !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  color: #6b7280 !important;
+}
+
+/* ✅ Responsive columns same as project page */
+@media (max-width: 1200px) {
+  .pm-cards { grid-template-columns: repeat(3, 1fr) !important; }
+}
+
+@media (max-width: 900px) {
+  .pm-cards { grid-template-columns: repeat(2, 1fr) !important; }
+}
+
+@media (max-width: 600px) {
+  .pm-cards { grid-template-columns: 1fr !important; }
+}
+/* 🎯 ALIGN CARDS LEFT — same start as search/filter controls */
+.pm-cards {
+  max-width: 1180px !important;
+  margin: 40px auto 80px !important;
+  display: grid !important;
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: 22px !important;
+  justify-content: start !important;  /* ✅ makes cards start from left edge */
+  padding-left: 0 !important;         /* ✅ remove center padding */
+  padding-right: 0 !important;
+}
+
+/* Optional: tiny spacing for breathing room */
+.div_33-138 {
+  padding-left: 12px !important; /* ✅ aligns with top section */
+}
+/* 🎯 ALIGN RECENT SERVICES GRID PERFECTLY UNDER LABEL */
+@media (min-width: 901px) {
+  .pm-cards {
+    margin-left: -8px !important;  /* ✅ small nudge to align with "Recent Services:" */
+    margin-right: auto !important;
+    justify-content: start !important;
+  }
+
+  .div_33-138 {
+    padding-left: 10px !important; /* keep label aligned with cards */
+  }
+}
+
+/* Ensure proper center on smaller screens */
+@media (max-width: 900px) {
+  .pm-cards {
+    margin-left: 0 !important;
+    justify-content: center !important;
+  }
+}

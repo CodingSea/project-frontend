@@ -39,7 +39,7 @@ export class ProjectManagement implements OnInit, AfterViewInit {
   showMembersModal = false;
   selectedMembers: { id?: number; name: string; role: string; image: string }[] = [];
 
-  // ✅ Added for Services Modal
+  // ✅ Services modal
   showServicesModal = false;
   selectedServices: any[] = [];
 
@@ -174,7 +174,7 @@ export class ProjectManagement implements OnInit, AfterViewInit {
     this.router.navigate([`/projects/${p.projectID}/services`]);
   }
 
-  /** ===== Modals ===== */
+  /** ===== New Project ===== */
   openNewProject(): void {
     this.showNewProject = true;
     this.newProject = this.blankNewProject();
@@ -240,16 +240,12 @@ export class ProjectManagement implements OnInit, AfterViewInit {
     if (!p.projectID) return;
     this.http
       .delete(`${environment.apiUrl}/project/${p.projectID}`)
-      .subscribe(
-        () => this.loadProjects(),
-        (err) => console.error(err)
-      );
+      .subscribe(() => this.loadProjects(), (err) => console.error(err));
   }
 
   /** ===== Members Modal ===== */
   openMembersModal(p: Project, event: Event): void {
     event.stopPropagation();
-
     const memberMap = new Map<number | string, any>();
 
     const addMember = (user: any, role: string) => {
@@ -263,7 +259,6 @@ export class ProjectManagement implements OnInit, AfterViewInit {
         user.profile_image ||
         user.profileImageURL ||
         '';
-
       if (!memberMap.has(key)) {
         memberMap.set(key, { id: user.id, name, roles: new Set([role]), image });
       } else {
@@ -271,7 +266,6 @@ export class ProjectManagement implements OnInit, AfterViewInit {
       }
     };
 
-    // collect members from project’s services
     (p.services || []).forEach((s: any) => {
       addMember(s.chief, 'Chief');
       addMember(s.projectManager, 'Project Manager');
@@ -280,24 +274,19 @@ export class ProjectManagement implements OnInit, AfterViewInit {
     });
 
     const members = Array.from(memberMap.values());
-
     Promise.all(
       members.map(async (m) => {
         if (!m.id) return m;
-
         const cacheKey = `profileImage_${m.id}`;
         const cached = localStorage.getItem(cacheKey);
-
         if (cached) {
           m.image = cached;
           return m;
         }
-
         try {
           const updated = await this.http
             .get<any>(`${environment.apiUrl}/user/${m.id}`)
             .toPromise();
-
           if (updated?.profileImage) {
             const img = updated.profileImage.startsWith('http')
               ? updated.profileImage
@@ -308,7 +297,6 @@ export class ProjectManagement implements OnInit, AfterViewInit {
         } catch (err) {
           console.warn(`Failed to fetch user ${m.id}`, err);
         }
-
         return m;
       })
     ).then((freshMembers) => {
@@ -318,7 +306,6 @@ export class ProjectManagement implements OnInit, AfterViewInit {
         role: Array.from(m.roles).join(', '),
         image: m.image,
       }));
-
       this.showMembersModal = true;
       this.cdr.detectChanges();
     });
@@ -332,10 +319,12 @@ export class ProjectManagement implements OnInit, AfterViewInit {
   openServicesModal(p: Project, event: Event): void {
     event.stopPropagation();
     this.selectedServices = (p.services || []).map((s: any) => ({
+      id: s.id || s.serviceID || s.serviceId,
       name: s.name || 'Untitled',
       deadline: s.deadline,
       chief: s.chief,
       projectManager: s.projectManager,
+      taskBoardId: s.taskBoard?.id ?? s.taskBoardId ?? s.taskboard_id ?? null,
     }));
     this.showServicesModal = true;
     this.cdr.detectChanges();
@@ -345,18 +334,37 @@ export class ProjectManagement implements OnInit, AfterViewInit {
     this.showServicesModal = false;
   }
 
+  /** ✅ Navigation (same behavior as profile.component) */
+  goToUserProfile(userId?: number): void {
+    if (!userId) return;
+    this.closeMembersModal();
+    this.closeServicesModal();
+    this.router.navigate([`/profile/user/${userId}`]);
+  }
+
+  goToService(service: any): void {
+    console.log('Navigating to service:', service);
+    const serviceId = service.id || service.serviceID || service.serviceId;
+    const taskBoardId = service.taskBoardId || service.taskboard_id || service.taskBoard?.id;
+
+    if (!serviceId || !taskBoardId) {
+      console.warn('⚠️ Missing serviceId or taskBoardId', service);
+      return;
+    }
+
+    this.closeServicesModal();
+    this.router.navigate([`/services/${serviceId}/taskboard/${taskBoardId}`]);
+    window.scrollTo(0, 0);
+  }
+
   /** ===== Image Helpers ===== */
   getMemberAvatar(image?: string | null): string {
     if (!image || !image.trim()) return 'images/user.png';
-
     const trimmed = image.trim();
-
     if (/^https?:\/\//i.test(trimmed)) return trimmed;
-
     if (trimmed.startsWith('profile-images/') || trimmed.startsWith('uploads/')) {
       return `https://iga-project-files.s3.me-south-1.amazonaws.com/${trimmed}`;
     }
-
     const base = environment.apiUrl.replace(/\/+$/, '');
     return trimmed.startsWith('/') ? `${base}${trimmed}` : `${base}/${trimmed}`;
   }
