@@ -9,7 +9,7 @@
   <ng-container *ngIf="issue">
 
     <!-- ISSUE CARD -->
-<section class="issue-card issue-highlight">
+<section *ngIf="showBackBtn" class="issue-card issue-highlight">
 
   <div class="issue-header">
     <div class="meta-left">
@@ -70,7 +70,7 @@
     <section class="solutions-wrapper">
       <div class="solutions-header-line">
         <span class="solutions-pipe"></span>
-        <h2 class="section-title">Solutions</h2>
+        <h2 class="section-title">Feedback</h2>
       </div>
 
       <div *ngIf="!issue.feedbacks?.length" class="empty-state">
