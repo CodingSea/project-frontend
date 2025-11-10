@@ -9,6 +9,8 @@ import { Issue } from '@app/issue';
 import { Status, StatusClasses } from '@app/status';
 import { FormsModule } from '@angular/forms';
 import { HeaderComponent } from '@app/header/header';
+import { Service } from '@app/service';
+import { jwtDecode } from 'jwt-decode';
 
 @Component({
   selector: 'app-home-page',
@@ -35,6 +37,8 @@ export class HomePage implements OnInit
   selectedCategory: Categories = Categories.AllCategories;
   selectedStatus: Status = Status.All;
 
+  userServices: Service[] | null = [];
+
   ngOnInit()
   {
     this.loadData();
@@ -42,11 +46,15 @@ export class HomePage implements OnInit
 
   buildQueryParams(): string
   {
+    const token = localStorage.getItem("token");
+    const decodedToken = jwtDecode(token!);
+
     const params = new URLSearchParams();
     params.append('page', this.currentPage.toString());
     params.append('limit', this.pageSize.toString());
     params.append('status', this.selectedStatus);
     params.append('category', this.selectedCategory);
+    params.append('userId', decodedToken.sub!);
 
     if (this.searchQuery.trim() !== '')
     {
@@ -57,25 +65,32 @@ export class HomePage implements OnInit
   }
 
   // ✅ merged final version
-  loadData(): void
+  async loadData(): Promise<void>
   {
-    const params = this.buildQueryParams();
-
-    this.http.get<number>(`${environment.apiUrl}/issue/count?${params}`).subscribe(count =>
+    try
     {
-      this.totalIssues = count;
-      this.updatePageNumbers();
+      const params = this.buildQueryParams();
 
-      this.http.get<Issue[]>(`${environment.apiUrl}/issue?${params}`).subscribe(res =>
+      await this.http.get<number>(`${environment.apiUrl}/issue/count?${params}`).subscribe(count =>
       {
-        this.issues = res.map(issue => ({
-          ...issue,
-          previewDescription: this.stripMarkdown(issue.description)
-        }));
+        this.totalIssues = count;
+        this.updatePageNumbers();
 
-        this.cdr.detectChanges();
+        this.http.get<Issue[]>(`${environment.apiUrl}/issue?${params}`).subscribe(res =>
+        {
+          this.issues = res.map(issue => ({
+            ...issue,
+            previewDescription: this.stripMarkdown(issue.description)
+          }));
+
+          this.cdr.detectChanges();
+        });
       });
-    });
+    }
+    catch (err)
+    {
+      console.log(err);
+    }
   }
 
   stripMarkdown(text: string): string

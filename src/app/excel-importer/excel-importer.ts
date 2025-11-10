@@ -40,17 +40,24 @@ export class ExcelImporter
       const wsname: string = wb.SheetNames[ 0 ];
       const ws: XLSX.WorkSheet = wb.Sheets[ wsname ];
 
-      // Convert the worksheet data to a JSON array
+      // Convert the worksheet data to a JSON array using the first row as headers
       this.excelData = XLSX.utils.sheet_to_json(ws, { header: 1 });
+
+      // Extract headers from the first row
+      const headers = this.excelData[ 0 ] as string[];
 
       // Initialize the groupedData array
       this.groupedData = [];
       let lastProjectEntry: { projectName: string; services: string[] } | null = null;
 
-      this.excelData.forEach(row =>
+      // Iterate through the rows starting from the second row
+      for (let i = 1; i < this.excelData.length; i++)
       {
-        const projectName = row[ 1 ]; // Assuming "Project Name" is in the 2nd column
-        const serviceModule = row[ 2 ]; // Assuming "Service/Module" is in the 3rd column
+        const row = this.excelData[ i ];
+
+        // Map the columns by header names
+        const projectName = row[ headers.indexOf('Project Name') ]; 
+        const serviceModule = row[ headers.indexOf('Service/Module') ];
 
         if (projectName)
         {
@@ -80,10 +87,9 @@ export class ExcelImporter
           // If the project is missing, add the service to the last added project
           lastProjectEntry.services.push(serviceModule);
         }
-      });
+      }
 
-      this.groupedData.shift();
-
+      this.groupedData.shift(); // Remove the first entry
       this.ImportInDB();
     };
 
