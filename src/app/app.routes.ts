@@ -16,6 +16,7 @@ import { ServicesComponent } from './services.component/services.component';
 import { IssuePage } from './issue-page/issue-page';
 import { IssueCreateComponent } from './issue-create/issue-create';
 import { ExcelImporter } from './excel-importer/excel-importer';
+import { ExcelDeveloperImporter } from './excel-developer-importer/excel-developer-importer';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'auth/signup', pathMatch: 'full' },
@@ -39,7 +40,7 @@ export const routes: Routes = [
   { path: 'home', component: HomePage, canActivate: [AuthGuard] },
 
 
-  { path: 'excel', component: ExcelImporter, canActivate: [AuthGuard] },
+  { path: 'excel', component: ExcelDeveloperImporter, canActivate: [AuthGuard] },
 
 
   { path: '**', component: UserComponent },
