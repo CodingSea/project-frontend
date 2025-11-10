@@ -3565,3 +3565,358 @@ app-sidebar {
   height: 100%;
   object-fit: cover;
 }
+/* ===== Responsive Cards ===== */
+@media (max-width: 600px) {
+  .pm-cards {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ===== Pagination (inline, same as home page style) ===== */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  background: transparent;
+  position: static;
+  transform: none;
+  box-shadow: none;
+  padding: 0;
+}
+
+/* Pagination buttons */
+.pagination button {
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  color: #374151;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pagination button:hover {
+  background: #f3f4f6;
+}
+
+/* Active (current page) */
+.pagination .active {
+  background: #C21A25;
+  color: #ffffff;
+  border-color: #C21A25;
+}
+
+/* Disabled arrows */
+.pagination button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Responsive Pagination */
+@media (max-width: 768px) {
+  .pagination {
+    flex-wrap: wrap;
+    gap: 0.3rem;
+  }
+
+  .pagination button {
+    padding: 5px 10px;
+    font-size: 0.8rem;
+  }
+}
+
+/* ===== Compact Grid to Fit Pagination ===== */
+.pm-cards {
+  margin-bottom: 0.5rem !important;
+  row-gap: 14px !important;
+  grid-row-gap: 14px !important;
+}
+
+.pm-card {
+  height: 160px;
+}
+
+/* Responsive tweak */
+@media (max-width: 900px) {
+  .pagination {
+    margin-top: 0.8rem;
+  }
+  .pm-card {
+    height: 140px;
+  }
+}
+
+/* ===== Projects Header Aligned Like Home Page ===== */
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1180px;
+  margin: 0 auto 1.5rem auto;
+  flex-wrap: wrap;
+}
+
+/* Left side: title + choose file */
+.page-header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.page-header-left h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+}
+
+/* Right side: search + filter dropdown */
+.page-header-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* Search box */
+.page-header-right .search-box input {
+  width: 260px;
+  padding: 0.55rem 2.2rem 0.55rem 2.4rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: #374151;
+  background-color: #fff;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2371717a' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M21 21l-4.35-4.35m0 0A7.5 7.5 0 1010.5 18a7.5 7.5 0 006.15-3.35z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: 10px center;
+  background-size: 18px;
+}
+
+.page-header-right .search-box input:focus {
+  border-color: #C21A25;
+  box-shadow: 0 0 0 3px rgba(194, 26, 37, 0.15);
+  outline: none;
+}
+
+/* Dropdown filter */
+.page-header-right select {
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  padding: 0.55rem 0.75rem;
+  background: #fff;
+  font-size: 0.9rem;
+  color: #374151;
+  cursor: pointer;
+}
+
+/* Responsive Header */
+@media (max-width: 1000px) {
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .page-header-right {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}
+
+/* ===== Description Paragraph ===== */
+.pm-desc {
+  font-size: 14px;
+  color: #555;
+  line-height: 1.4;
+  margin: 8px 0 10px;
+  white-space: normal;
+  word-break: break-word;
+  overflow: visible;
+}
+
+/* ===== Members Modal Table ===== */
+.members-table {
+  padding: 10px 20px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.members-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.members-table th,
+.members-table td {
+  text-align: left;
+  padding: 10px 15px;
+  border-bottom: 1px solid #eee;
+  font-size: 15px;
+}
+
+.members-table th {
+  font-weight: 600;
+  color: #333;
+}
+
+.member-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  color: #fff;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+
+.clickable {
+  color: #C21A25;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.clickable:hover {
+  text-decoration: underline;
+}
+
+.members-table .avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin-right: 8px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f3f4f6;
+}
+
+.members-table .avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ✅ ===== Added Total Projects Text ===== */
+.total-projects-text {
+  margin: -10px 0 20px 10px;
+  font-size: 15px;
+  color: #444;
+  font-weight: 500;
+}
+
+/* ✅ ===== Added Services Modal Styling ===== */
+.pm-modal-header strong {
+  font-weight: 600;
+  color: #111;
+}
+
+.members-table table th:nth-child(1),
+.members-table table td:nth-child(1) {
+  width: 35%;
+}
+
+.members-table table th:nth-child(2),
+.members-table table td:nth-child(2) {
+  width: 20%;
+}
+
+.members-table table th:nth-child(3),
+.members-table table td:nth-child(3),
+.members-table table th:nth-child(4),
+.members-table table td:nth-child(4) {
+  width: 22%;
+}
+
+/* ===== Modal Header (Consistent Design) ===== */
+
+.pm-modal-header .pm-close {
+  background: transparent;
+  border: none;
+  font-size: 22px;
+  cursor: pointer;
+  color: #555;
+  transition: color 0.2s;
+}
+
+.pm-modal-header .pm-close:hover {
+  color: #C21A25;
+}
+/* ===== Reposition Total Projects Text (below header line) ===== */
+.total-projects-text {
+  display: block;
+  font-size: 15px;
+  color: #444;
+  font-weight: 500;
+  margin-top: 6px;       /* small gap below the header */
+  margin-left: 6px;      /* slight indent for balance */
+}
+
+/* Make sure header spacing stays clean */
+.page-header {
+  margin-bottom: 0.5rem; /* tighter to connect header and total count */
+}
+
+/* Optional: highlight number in theme color */
+.total-projects-text strong {
+  color: #C21A25;
+  font-weight: 600;
+}
+/* ===== Move Total Projects to Top Right (above cards) ===== */
+.total-projects-text {
+  position: relative;
+  float: right;
+  top: -10px;          /* raise it slightly above the cards */
+  right: 5px;          /* align near the card grid edge */
+  font-size: 13px;     /* smaller size */
+  color: #777;         /* soft grey */
+  font-weight: 500;
+  margin: 0;
+  padding: 0;
+}
+
+.pm-cards {
+  clear: both; /* ensure cards start below the total count */
+  margin-top: 5px;
+}
+/* 🎯 Final alignment for Total Projects */
+.total-projects-text {
+  position: relative;
+  display: inline-block;
+  float: right;
+  transform: translate(-50px, 10px); /* move left (-x) and down (+y) */
+  font-size: 13px;
+  color: #777;
+  font-weight: 500;
+  padding: 6px 0; /* add small top & bottom breathing space */
+}
+/* 🎯 Shift Search + Filter Bar Slightly Left (align above cards) */
+.page-header-right {
+  position: relative;
+  transform: translateX(60px); /* move left; adjust as needed */
+}
+
+/* Keep Total Projects in its aligned spot */
+.total-projects-text {
+  position: relative;
+  display: inline-block;
+  float: right;
+  transform: translate(-50px, 10px);
+  font-size: 13px;
+  color: #777;
+  font-weight: 500;
+  padding: 6px 0;
+}

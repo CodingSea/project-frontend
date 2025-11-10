@@ -39,6 +39,10 @@ export class ProjectManagement implements OnInit, AfterViewInit {
   showMembersModal = false;
   selectedMembers: { id?: number; name: string; role: string; image: string }[] = [];
 
+  // ✅ Added for Services Modal
+  showServicesModal = false;
+  selectedServices: any[] = [];
+
   constructor(
     private projectService: ProjectService,
     private router: Router,
@@ -242,142 +246,123 @@ export class ProjectManagement implements OnInit, AfterViewInit {
       );
   }
 
-openMembersModal(p: Project, event: Event): void {
-  event.stopPropagation();
+  /** ===== Members Modal ===== */
+  openMembersModal(p: Project, event: Event): void {
+    event.stopPropagation();
 
-  const memberMap = new Map<number | string, any>();
+    const memberMap = new Map<number | string, any>();
 
-  const addMember = (user: any, role: string) => {
-    if (!user) return;
-    const key = user.id || user.email || `${user.first_name}${user.last_name}`;
-    const name = `${user.first_name || ''} ${user.last_name || ''}`.trim();
-    const image =
-      user.profileImage ||
-      user.image ||
-      user.profile_img ||
-      user.profile_image ||
-      user.profileImageURL ||
-      '';
+    const addMember = (user: any, role: string) => {
+      if (!user) return;
+      const key = user.id || user.email || `${user.first_name}${user.last_name}`;
+      const name = `${user.first_name || ''} ${user.last_name || ''}`.trim();
+      const image =
+        user.profileImage ||
+        user.image ||
+        user.profile_img ||
+        user.profile_image ||
+        user.profileImageURL ||
+        '';
 
-    if (!memberMap.has(key)) {
-      memberMap.set(key, { id: user.id, name, roles: new Set([role]), image });
-    } else {
-      memberMap.get(key).roles.add(role);
-    }
-  };
-
-  // collect members from project’s services
-  (p.services || []).forEach((s: any) => {
-    addMember(s.chief, 'Chief');
-    addMember(s.projectManager, 'Project Manager');
-    (s.assignedResources || []).forEach((r: any) => addMember(r, 'Developer'));
-    (s.backup || []).forEach((b: any) => addMember(b, 'Backup'));
-  });
-
-  const members = Array.from(memberMap.values());
-
-  // ✅ Like header: use cache + refresh if missing
-  Promise.all(
-    members.map(async (m) => {
-      if (!m.id) return m;
-
-      const cacheKey = `profileImage_${m.id}`;
-      const cached = localStorage.getItem(cacheKey);
-
-      if (cached) {
-        // Load instantly from cache
-        m.image = cached;
-        return m;
+      if (!memberMap.has(key)) {
+        memberMap.set(key, { id: user.id, name, roles: new Set([role]), image });
+      } else {
+        memberMap.get(key).roles.add(role);
       }
+    };
 
-      // Otherwise, call user API once and cache
-      try {
-        const updated = await this.http
-          .get<any>(`${environment.apiUrl}/user/${m.id}`)
-          .toPromise();
+    // collect members from project’s services
+    (p.services || []).forEach((s: any) => {
+      addMember(s.chief, 'Chief');
+      addMember(s.projectManager, 'Project Manager');
+      (s.assignedResources || []).forEach((r: any) => addMember(r, 'Developer'));
+      (s.backup || []).forEach((b: any) => addMember(b, 'Backup'));
+    });
 
-        if (updated?.profileImage) {
-          const img = updated.profileImage.startsWith('http')
-            ? updated.profileImage
-            : `${environment.apiUrl.replace('/api', '')}/${updated.profileImage}`;
-          m.image = img;
-          localStorage.setItem(cacheKey, img); // ✅ cache it
+    const members = Array.from(memberMap.values());
+
+    Promise.all(
+      members.map(async (m) => {
+        if (!m.id) return m;
+
+        const cacheKey = `profileImage_${m.id}`;
+        const cached = localStorage.getItem(cacheKey);
+
+        if (cached) {
+          m.image = cached;
+          return m;
         }
-      } catch (err) {
-        console.warn(`Failed to fetch user ${m.id}`, err);
-      }
 
-      return m;
+        try {
+          const updated = await this.http
+            .get<any>(`${environment.apiUrl}/user/${m.id}`)
+            .toPromise();
 
-    })
-  ).then((freshMembers) => {
-    this.selectedMembers = freshMembers.map((m) => ({
-      id: m.id,
-      name: m.name,
-      role: Array.from(m.roles).join(', '),
-      image: m.image,
-    }));
+          if (updated?.profileImage) {
+            const img = updated.profileImage.startsWith('http')
+              ? updated.profileImage
+              : `${environment.apiUrl.replace('/api', '')}/${updated.profileImage}`;
+            m.image = img;
+            localStorage.setItem(cacheKey, img);
+          }
+        } catch (err) {
+          console.warn(`Failed to fetch user ${m.id}`, err);
+        }
 
-    this.showMembersModal = true;
-    this.cdr.detectChanges();
-  });
-}
+        return m;
+      })
+    ).then((freshMembers) => {
+      this.selectedMembers = freshMembers.map((m) => ({
+        id: m.id,
+        name: m.name,
+        role: Array.from(m.roles).join(', '),
+        image: m.image,
+      }));
 
-
-
-  private refreshMembers(memberMap: Map<any, any>) {
-    this.selectedMembers = Array.from(memberMap.values()).map((m) => ({
-      id: m.id,
-      name: m.name,
-      role: Array.from(m.roles).join(', '),
-      image: m.image,
-    }));
+      this.showMembersModal = true;
+      this.cdr.detectChanges();
+    });
   }
 
   closeMembersModal(): void {
     this.showMembersModal = false;
   }
 
-  /** ===== Image Helpers ===== */
+  /** ===== Services Modal ===== */
+  openServicesModal(p: Project, event: Event): void {
+    event.stopPropagation();
+    this.selectedServices = (p.services || []).map((s: any) => ({
+      name: s.name || 'Untitled',
+      deadline: s.deadline,
+      chief: s.chief,
+      projectManager: s.projectManager,
+    }));
+    this.showServicesModal = true;
+    this.cdr.detectChanges();
+  }
 
-  /**
-   * Build the correct URL for member avatar:
-   * - If it's a full http/https URL (signed from backend) => use as-is.
-   * - If it's an S3 key like "profile-images/..." => map to your S3 bucket.
-   * - If it's a relative path => map via environment.apiUrl.
-   * - Fallback to default avatar.
-   */
+  closeServicesModal(): void {
+    this.showServicesModal = false;
+  }
+
+  /** ===== Image Helpers ===== */
   getMemberAvatar(image?: string | null): string {
-    if (!image || !image.trim()) {
-      return 'images/user.png';
-    }
+    if (!image || !image.trim()) return 'images/user.png';
 
     const trimmed = image.trim();
 
-    // Already full URL (e.g., signed URL from backend)
-    if (/^https?:\/\//i.test(trimmed)) {
-      return trimmed;
-    }
+    if (/^https?:\/\//i.test(trimmed)) return trimmed;
 
-    // S3 key patterns
-    if (
-      trimmed.startsWith('profile-images/') ||
-      trimmed.startsWith('uploads/')
-    ) {
+    if (trimmed.startsWith('profile-images/') || trimmed.startsWith('uploads/')) {
       return `https://iga-project-files.s3.me-south-1.amazonaws.com/${trimmed}`;
     }
 
-    // Relative path served by backend API
     const base = environment.apiUrl.replace(/\/+$/, '');
-    if (trimmed.startsWith('/')) {
-      return `${base}${trimmed}`;
-    }
-    return `${base}/${trimmed}`;
+    return trimmed.startsWith('/') ? `${base}${trimmed}` : `${base}/${trimmed}`;
   }
 
   onMemberImageError(event: Event): void {
-    const img = event.target as HTMLImageElement;
-    img.src = 'images/user.png';
+    (event.target as HTMLImageElement).src = 'images/user.png';
   }
 
   /** ===== Utilities ===== */

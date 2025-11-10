@@ -35,6 +35,9 @@
                   </div>
                 </header>
 
+                <!-- ✅ Total Projects Counter -->
+                <p class="total-projects-text">Total Projects: {{ totalProjects }}</p>
+
                 <!-- ===== Project Cards ===== -->
                 <div class="pm-cards">
                   <!-- Add New Project -->
@@ -86,7 +89,10 @@
 
                     <div class="pm-members">
                       <span class="pm-more">
-                        <p>Services: {{ p.services?.length || 0 }}</p>
+                        <!-- ✅ Added clickable for Services popup -->
+                        <p class="clickable" (click)="openServicesModal(p, $event)">
+                          Services: {{ p.services?.length || 0 }}
+                        </p>
                         <p class="clickable" (click)="openMembersModal(p, $event)">
                           Members: {{ p.members || 0 }}
                         </p>
@@ -171,6 +177,45 @@
                             </div>
                           </td>
                           <td>{{ m.role }}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                <!-- ✅ ===== Services Modal ===== -->
+                <div
+                  class="pm-modal-backdrop"
+                  *ngIf="showServicesModal"
+                  (click)="closeServicesModal()"
+                ></div>
+
+                <div
+                  class="pm-modal"
+                  *ngIf="showServicesModal"
+                  (click)="$event.stopPropagation()"
+                >
+                  <header class="pm-modal-header">
+                    <strong>Project Services</strong>
+                    <button class="pm-close" (click)="closeServicesModal()">×</button>
+                  </header>
+
+                  <div class="members-table">
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>Service</th>
+                          <th>Deadline</th>
+                          <th>Chief</th>
+                          <th>Manager</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr *ngFor="let s of selectedServices">
+                          <td>{{ s.name }}</td>
+                          <td>{{ s.deadline | date: 'MMM d, yyyy' }}</td>
+                          <td>{{ s.chief?.first_name }} {{ s.chief?.last_name }}</td>
+                          <td>{{ s.projectManager?.first_name }} {{ s.projectManager?.last_name }}</td>
                         </tr>
                       </tbody>
                     </table>
