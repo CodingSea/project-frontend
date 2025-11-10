@@ -308,6 +308,7 @@ openMembersModal(p: Project, event: Event): void {
       }
 
       return m;
+
     })
   ).then((freshMembers) => {
     this.selectedMembers = freshMembers.map((m) => ({
