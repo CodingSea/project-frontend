@@ -1,12 +1,12 @@
 import { CommonModule, Location } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Component, AfterViewInit } from '@angular/core';
+import { Component, AfterViewInit, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Project } from '@app/project';
 import { Service } from '@app/service';
 import { ServiceInfo } from '@app/service-info';
-import { CreateServiceDto, ServiceService } from '@app/services/service.service';
+import { ServiceService } from '@app/services/service.service';
 import { Sidebar } from '@app/sidebar/sidebar';
 import { environment } from '@environments/environment';
 import { ServiceFormComponent } from '@app/service-form/service-form.component';
@@ -15,13 +15,13 @@ import { HeaderComponent } from '@app/header/header';
 @Component({
   selector: 'app-services',
   standalone: true,
-  imports: [ CommonModule, FormsModule, Sidebar, ServiceFormComponent,HeaderComponent ],
+  imports: [CommonModule, FormsModule, Sidebar, ServiceFormComponent, HeaderComponent],
   templateUrl: './services.component.html',
-  styleUrls: [ './services.component.css' ],
+  styleUrls: ['./services.component.css'],
 })
-export class ServicesComponent implements AfterViewInit
-{
+export class ServicesComponent implements OnInit, AfterViewInit {
   services: Service[] = [];
+  filteredServices: Service[] = [];
   showNewService = false;
 
   projectId: string | null = null;
@@ -37,10 +37,25 @@ export class ServicesComponent implements AfterViewInit
   };
 
   openMenuId: number | null = null;
-
   showFilter = false;
-  selectedFilter: 'all' | 'active' | 'in-review' | 'urgent' = 'all';
-  filterState = { active: true, inReview: true, urgent: true };
+
+  searchTerm = '';
+  selectedStatus = '';
+  statuses: string[] = [
+    'Not Started Yet',
+    'Pending Approval',
+    'In-Progress',
+    'Completed',
+    'On Hold',
+    'At Risk',
+    'Overdue',
+  ];
+
+  // ✅ Pagination
+  currentPage = 1;
+  pageSize = 7;
+  totalPages = 1;
+  pages: number[] = [];
 
   constructor(
     private http: HttpClient,
@@ -48,215 +63,209 @@ export class ServicesComponent implements AfterViewInit
     private serviceService: ServiceService,
     private router: Router,
     private location: Location
-  ) { }
+  ) {}
 
-  ngOnInit()
-  {
-    this.route.paramMap.subscribe((params) =>
-    {
+  ngOnInit() {
+    this.route.paramMap.subscribe((params) => {
       this.projectId = params.get('projectId');
       this.projectIdNum = this.projectId ? +this.projectId : undefined;
       this.loadServices();
     });
   }
 
-  loadServices()
-  {
-    if (!this.projectId) return;
+loadServices() {
+  if (!this.projectId) return;
 
-    this.http.get<Project>(`${environment.apiUrl}/project/${this.projectId}`).subscribe(
-      (res) =>
-      {
-        this.services = res.services ?? [];
-        this.servicesInfo.totalServices = this.services.length;
+  this.http.get<Project>(`${environment.apiUrl}/project/${this.projectId}`).subscribe(
+    (res) => {
+      this.services = res.services ?? [];
 
-        let totalTasksCount = 0;
-        const uniqueMembers = new Set<number>();
+      // ✅ FIX: update total services count
+      this.servicesInfo.totalServices = this.services.length;
 
-        this.servicesInfo.completedTasks = 0;
-        this.servicesInfo.backloggedTasks = 0;
-        this.servicesInfo.activeTasks = 0;
+      this.applySearch();
+      this.calculateStats();
+    },
+    (error) => console.error('❌ Failed to load project services:', error)
+  );
+}
 
-        this.servicesInfo.totalMembers = this.services.reduce((total, service) =>
-        {
 
-          const serviceUniqueMembers = new Set<number>();
+  applySearch() {
+    let filtered = this.services;
 
-          if (service.chief)
-          {
-            uniqueMembers.add(service.chief.id);
-            serviceUniqueMembers.add(service.chief.id);
-          }
-          if (service.projectManager)
-          {
-            uniqueMembers.add(service.projectManager.id);
-            serviceUniqueMembers.add(service.projectManager.id);
-          }
-          if (service.assignedResources)
-          {
-            service.assignedResources.forEach((r) => uniqueMembers.add(r.id));
-            service.assignedResources.forEach((r) => serviceUniqueMembers.add(r.id));
-          }
-          if (service.backup)
-          {
-            service.backup.forEach((b) => uniqueMembers.add(b.id));
-            service.backup.forEach((b) => serviceUniqueMembers.add(b.id));
-          }
+    if (this.searchTerm.trim()) {
+      const term = this.searchTerm.toLowerCase();
+      filtered = filtered.filter(
+        (s) =>
+          s.name.toLowerCase().includes(term) ||
+          (s.description && s.description.toLowerCase().includes(term))
+      );
+    }
 
-          service.memberCount = serviceUniqueMembers.size;
-          service.completionRate = 0;
+    if (this.selectedStatus) {
+      filtered = filtered.filter((s) => s.status === this.selectedStatus);
+    }
 
-          let serviceCompletedTasksCount = 0;
-          let serviceTotalTasksCount = 0;
+    this.totalPages = Math.ceil(filtered.length / this.pageSize);
+    this.pages = Array.from({ length: this.totalPages }, (_, i) => i + 1);
 
-          if (service.taskBoard?.cards)
-          {
-            service.taskBoard.cards.forEach((task) =>
-            {
-              totalTasksCount++;
-              serviceTotalTasksCount++;
-
-              if (task.column === 'new')
-              {
-                this.servicesInfo.backloggedTasks++;
-              } else if (task.column === 'work')
-              {
-                this.servicesInfo.activeTasks++;
-              } else if (task.column === 'done')
-              {
-                serviceCompletedTasksCount++;
-                this.servicesInfo.completedTasks++;
-              }
-            });
-
-            service.completionRate =
-              serviceTotalTasksCount > 0
-                ? (serviceCompletedTasksCount / serviceTotalTasksCount) * 100
-                : 0;
-          }
-
-          return total + service.memberCount;
-        }, 0);
-
-        this.servicesInfo.totalMembers = uniqueMembers.size;
-
-        this.servicesInfo.completionRate = totalTasksCount > 0
-          ? (this.servicesInfo.completedTasks / totalTasksCount) * 100
-          : 0;
-      },
-      (error) => console.error('❌ Failed to load project services:', error)
-    );
+    const start = (this.currentPage - 1) * this.pageSize;
+    const end = start + this.pageSize;
+    this.filteredServices = filtered.slice(start, end);
   }
 
-  onCardClick(s: Service)
-  {
-    this.router.navigate([ `services/${s.serviceID}/taskboard/${s.taskBoard?.id}` ]);
+  // ✅ Pagination Controls
+  goToPage(page: number) {
+    if (page < 1 || page > this.totalPages) return;
+    this.currentPage = page;
+    this.applySearch();
   }
 
-  openNewService()
-  {
+  nextPage() {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+      this.applySearch();
+    }
+  }
+
+  prevPage() {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      this.applySearch();
+    }
+  }
+
+  goToFirstPage() {
+    this.currentPage = 1;
+    this.applySearch();
+  }
+
+  goToLastPage() {
+    this.currentPage = this.totalPages;
+    this.applySearch();
+  }
+
+  calculateStats() {
+    let totalTasksCount = 0;
+    const uniqueMembers = new Set<number>();
+
+    this.servicesInfo.completedTasks = 0;
+    this.servicesInfo.backloggedTasks = 0;
+    this.servicesInfo.activeTasks = 0;
+
+    this.servicesInfo.totalMembers = this.services.reduce((total, service) => {
+      const serviceUniqueMembers = new Set<number>();
+
+      if (service.chief) {
+        uniqueMembers.add(service.chief.id);
+        serviceUniqueMembers.add(service.chief.id);
+      }
+      if (service.projectManager) {
+        uniqueMembers.add(service.projectManager.id);
+        serviceUniqueMembers.add(service.projectManager.id);
+      }
+      if (service.assignedResources) {
+        service.assignedResources.forEach((r) => uniqueMembers.add(r.id));
+        service.assignedResources.forEach((r) => serviceUniqueMembers.add(r.id));
+      }
+      if (service.backup) {
+        service.backup.forEach((b) => uniqueMembers.add(b.id));
+        service.backup.forEach((b) => serviceUniqueMembers.add(b.id));
+      }
+
+      service.memberCount = serviceUniqueMembers.size;
+      service.completionRate = 0;
+
+      let serviceCompletedTasksCount = 0;
+      let serviceTotalTasksCount = 0;
+
+      if (service.taskBoard?.cards) {
+        service.taskBoard.cards.forEach((task) => {
+          totalTasksCount++;
+          serviceTotalTasksCount++;
+
+          if (task.column === 'new') {
+            this.servicesInfo.backloggedTasks++;
+          } else if (task.column === 'work') {
+            this.servicesInfo.activeTasks++;
+          } else if (task.column === 'done') {
+            serviceCompletedTasksCount++;
+            this.servicesInfo.completedTasks++;
+          }
+        });
+
+        service.completionRate =
+          serviceTotalTasksCount > 0
+            ? (serviceCompletedTasksCount / serviceTotalTasksCount) * 100
+            : 0;
+      }
+
+      return total + service.memberCount;
+    }, 0);
+
+    this.servicesInfo.totalMembers = uniqueMembers.size;
+    this.servicesInfo.completionRate =
+      totalTasksCount > 0
+        ? (this.servicesInfo.completedTasks / totalTasksCount) * 100
+        : 0;
+  }
+
+  onCardClick(s: Service) {
+    this.router.navigate([`services/${s.serviceID}/taskboard/${s.taskBoard?.id}`]);
+  }
+
+  openNewService() {
     this.showNewService = true;
   }
-  closeNewService()
-  {
+  closeNewService() {
     this.showNewService = false;
   }
 
-  openFilter()
-  {
-    this.showFilter = true;
-  }
-  closeFilter()
-  {
-    this.showFilter = false;
-  }
-
-  applyFilters() { }
-
-  matchesStatus(status?: string): boolean
-  {
-    if (!status) return false;
-    const s = status.toLowerCase();
-    if (this.selectedFilter !== 'all')
-    {
-      return (
-        (this.selectedFilter === 'active' && s === 'active') ||
-        (this.selectedFilter === 'in-review' && s === 'in review') ||
-        (this.selectedFilter === 'urgent' && s === 'urgent')
-      );
-    }
-    return (
-      (s === 'active' && this.filterState.active) ||
-      (s === 'in review' && this.filterState.inReview) ||
-      (s === 'urgent' && this.filterState.urgent)
-    );
-  }
-
-  formatDecimal(num: number): string
-  {
-    const roundedNum = Math.round(num * 10) / 10;
-    let result = String(roundedNum);
-    if (result.endsWith('.0'))
-    {
-      result = result.substring(0, result.length - 2);
-    }
-    return result;
-  }
-
-  getProgress(service: Service): string
-  {
-    return this.formatDecimal(service.completionRate!);
-  }
-
-  toggleMenu(id: number, event: Event)
-  {
+  toggleMenu(id: number, event: Event) {
     event.stopPropagation();
     this.openMenuId = this.openMenuId === id ? null : id;
   }
 
-  goToEdit(s: Service, event: Event)
-  {
+  goToEdit(s: Service, event: Event) {
     event.stopPropagation();
     window.scroll(0, 0);
     const projectId = this.projectId ?? this.route.snapshot.paramMap.get('projectId');
-    this.router.navigate([ `/projects/${projectId}/services/${s.serviceID}/edit` ]);
+    this.router.navigate([`/projects/${projectId}/services/${s.serviceID}/edit`]);
   }
 
-  async deleteService(s: Service)
-  {
-    try
-    {
-      const response = await this.http.delete(`${environment.apiUrl}/service/${s.serviceID}`).toPromise();
-
+  async deleteService(s: Service) {
+    try {
+      await this.http.delete(`${environment.apiUrl}/service/${s.serviceID}`).toPromise();
       this.loadServices();
-    }
-    catch (error)
-    {
+    } catch (error) {
       console.error('Error deleting service:', error);
     }
   }
 
-  ngAfterViewInit()
-  {
-    document.addEventListener('click', () =>
-    {
+  formatDecimal(num: number): string {
+    const roundedNum = Math.round(num * 10) / 10;
+    let result = String(roundedNum);
+    if (result.endsWith('.0')) result = result.substring(0, result.length - 2);
+    return result;
+  }
+
+  ngAfterViewInit() {
+    document.addEventListener('click', () => {
       this.openMenuId = null;
     });
   }
 
-  onServiceCreated()
-  {
+  onServiceCreated() {
     this.closeNewService();
     this.loadServices();
   }
 
-  getLimitedString(inputString: string, letterAmount: number): string
-  {
-    return inputString.slice(0, letterAmount) + "...";
+  getLimitedString(inputString: string, letterAmount: number): string {
+    return inputString.slice(0, letterAmount) + '...';
   }
 
-  goBack()
-  {
+  goBack() {
     this.location.back();
   }
 }

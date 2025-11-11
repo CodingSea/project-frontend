@@ -322,3 +322,29 @@ app-sidebar {
     padding: 1rem;
   }
 }
+/* ==== When the form is used inside the .pm-modal popup ==== */
+
+:host-context(.pm-modal) .layout-wrapper,
+:host-context(.pm-modal) .layout-body {
+  display: block;
+  width: 100%;
+}
+
+:host-context(.pm-modal) .content-area {
+  margin: 0;          /* remove sidebar/header gaps */
+  padding: 0;         /* let modal padding control spacing */
+  box-sizing: border-box;
+}
+
+:host-context(.pm-modal) .page {
+  min-height: auto;   /* no full-page height inside popup */
+}
+
+:host-context(.pm-modal) .card-frame {
+  max-width: 100%;
+  margin: 0;
+  padding: 24px;      /* inner padding only */
+  background: transparent;
+  border: none;
+  box-shadow: none;   /* use the modal's shadow, not another card */
+}

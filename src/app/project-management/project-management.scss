@@ -2675,3 +2675,1753 @@ app-sidebar {
     margin-top: 4px;
     display: block;
   }
+
+
+
+
+
+
+/* ===== Page Header + Controls (Projects) ===== */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+
+.page-header h1 {
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.search-box {
+  position: relative;
+}
+
+.search-box input {
+  padding: 0.5rem 2rem 0.5rem 2.2rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: #374151;
+  background-color: #ffffff;
+  transition: all 0.2s ease;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2371717a' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M21 21l-4.35-4.35m0 0A7.5 7.5 0 1010.5 18a7.5 7.5 0 006.15-3.35z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: 12px center;
+  background-size: 18px;
+}
+
+.controls select {
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  padding: 0.5rem 0.75rem;
+  background: #fff;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+/* ===== Fixed Pagination (always visible) ===== */
+.pagination {
+  position: fixed;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.75rem;
+  border-radius: 999px;
+  background: #ffffff;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.12);
+  z-index: 900;
+}
+
+.pagination button {
+  border: 1px solid #ccc;
+  background: #ffffff;
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 0.8rem;
+}
+
+.pagination button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.pagination .active {
+  background: #c21a25;
+  color: #ffffff;
+  border-color: #c21a25;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 900px) {
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .controls {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .controls .search-box input,
+  .controls select {
+    width: 100%;
+  }
+
+  .pagination {
+    bottom: 8px;
+  }
+}
+
+/* ===== Excel Importer + Search + Filter Alignment ===== */
+.import-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  max-width: 1120px; /* ✅ match your cards container width */
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Wrap the search + filter controls */
+.import-controls .controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-left: auto;
+}
+
+/* Search input styling */
+.import-controls .search-box input {
+  padding: 0.55rem 2.2rem 0.55rem 2.2rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: #374151;
+  background-color: #fff;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2371717a' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M21 21l-4.35-4.35m0 0A7.5 7.5 0 1010.5 18a7.5 7.5 0 006.15-3.35z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: 10px center;
+  background-size: 18px;
+  padding-left: 2.4rem;
+  transition: all 0.2s ease;
+  width: 240px; /* ✅ fixed width */
+}
+
+.import-controls .search-box input:focus {
+  border-color: #c21a25;
+  box-shadow: 0 0 0 3px rgba(194, 26, 37, 0.15);
+  outline: none;
+}
+
+/* Dropdown styling */
+.import-controls select {
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  padding: 0.55rem 0.75rem;
+  background: #fff;
+  font-size: 0.9rem;
+  cursor: pointer;
+  color: #374151;
+}
+
+/* Responsive layout */
+@media (max-width: 1200px) {
+  .import-controls {
+    max-width: 95%;
+  }
+}
+
+@media (max-width: 900px) {
+  .import-controls {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .import-controls .controls {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .import-controls .search-box input,
+  .import-controls select {
+    width: 100%;
+  }
+}
+/* ===== Import Controls (Top Bar) ===== */
+.import-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  max-width: 1000px; /* ✅ match with card grid below */
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Search + Filter alignment */
+.import-controls .controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-left: auto;
+}
+
+/* Search Input */
+.import-controls .search-box input {
+  padding: 0.55rem 2.2rem 0.55rem 2.2rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: #374151;
+  background-color: #fff;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2371717a' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M21 21l-4.35-4.35m0 0A7.5 7.5 0 1010.5 18a7.5 7.5 0 006.15-3.35z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: 10px center;
+  background-size: 18px;
+  padding-left: 2.4rem;
+  width: 220px;
+  transition: all 0.2s ease;
+}
+
+.import-controls .search-box input:focus {
+  border-color: #c21a25;
+  box-shadow: 0 0 0 3px rgba(194, 26, 37, 0.15);
+  outline: none;
+}
+
+/* Filter dropdown */
+.import-controls select {
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  padding: 0.55rem 0.75rem;
+  background: #fff;
+  font-size: 0.9rem;
+  cursor: pointer;
+  color: #374151;
+}
+
+/* ===== Project Cards Grid ===== */
+.pm-cards {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center; /* ✅ center the whole grid */
+  gap: 14px;
+  max-width: 1000px; /* ✅ same as import-controls */
+  margin: 0 auto; /* center horizontally */
+  align-content: start;
+}
+
+/* Smaller Card Size */
+.pm-card {
+  background: #fff;
+  border: 1px solid #f3f4f6;
+  border-radius: 12px;
+  padding: 14px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+
+  width: 15em;   /* ✅ smaller width */
+  height: 10em;  /* ✅ smaller height */
+  overflow: hidden;
+}
+
+.pm-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+}
+
+/* Add New Project Card */
+.pm-card.add-new {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  cursor: pointer;
+  height: 10em;   /* same height */
+  width: 15em;    /* same width */
+  border: 2px dashed #e5e7eb;
+  border-radius: 12px;
+  background: #fff;
+  color: #6b7280;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.pm-plus-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #f3f4f6;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+
+/* Responsive */
+@media (max-width: 1100px) {
+  .pm-cards {
+    max-width: 95%;
+    justify-content: center;
+  }
+  .pm-card {
+    width: 12em;
+    height: 9em;
+  }
+}
+
+@media (max-width: 700px) {
+  .pm-cards {
+    grid-template-columns: 1fr;
+    justify-content: center;
+  }
+  .pm-card {
+    width: 100%;
+  }
+}
+/* ===== Projects Page Layout Fix (Aligned with Choose File & Filter) ===== */
+.import-controls,
+.pm-cards {
+  max-width: 1180px; /* ✅ match the lines you drew */
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Top controls row */
+.import-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+
+/* Search + Filter controls alignment */
+.import-controls .controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* Search box */
+.import-controls .search-box input {
+  padding: 0.55rem 2.2rem 0.55rem 2.2rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: #374151;
+  background-color: #fff;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2371717a' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M21 21l-4.35-4.35m0 0A7.5 7.5 0 1010.5 18a7.5 7.5 0 006.15-3.35z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: 10px center;
+  background-size: 18px;
+  padding-left: 2.4rem;
+  width: 240px;
+}
+
+/* Filter dropdown */
+.import-controls select {
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  padding: 0.55rem 0.75rem;
+  background: #fff;
+  font-size: 0.9rem;
+  cursor: pointer;
+  color: #374151;
+}
+
+/* ===== Card Grid ===== */
+.pm-cards {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start; /* align left, matching the lines */
+  gap: 20px;
+  margin-top: 40px;
+}
+
+/* Card size (fits within red lines) */
+.pm-card {
+  background: #fff;
+  border: 1px solid #f3f4f6;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  width: 260px;  /* ✅ narrower cards to align perfectly */
+  height: 175px; /* ✅ balanced height */
+}
+
+.pm-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+/* Add new project card */
+.pm-card.add-new {
+  border: 2px dashed #e5e7eb;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  width: 260px;
+  height: 175px;
+}
+
+.pm-plus-circle {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #f3f4f6;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+/* ===== Responsive Fix ===== */
+@media (max-width: 1300px) {
+  .import-controls,
+  .pm-cards {
+    max-width: 1000px;
+  }
+}
+
+@media (max-width: 1100px) {
+  .pm-cards {
+    justify-content: center;
+  }
+  .pm-card {
+    width: 220px;
+    height: 160px;
+  }
+}
+
+@media (max-width: 700px) {
+  .pm-cards {
+    justify-content: center;
+  }
+  .pm-card {
+    width: 100%;
+    height: auto;
+  }
+}
+/* ===== Projects Top Bar (Choose File + Search + Filter) ===== */
+
+.import-controls {
+  max-width: 1180px;              /* shared width with cards */
+  margin: 0 auto 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+/* Right side: search + filter */
+.import-controls .controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.import-controls .search-box {
+  position: relative;
+}
+
+.import-controls .search-box input {
+  width: 260px;
+  padding: 0.55rem 2.2rem 0.55rem 2.4rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 0.9rem;
+  color: #374151;
+  background: #fff;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2371717a' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M21 21l-4.35-4.35m0 0A7.5 7.5 0 1010.5 18a7.5 7.5 0 006.15-3.35z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: 10px center;
+  background-size: 18px;
+}
+
+.import-controls .search-box input:focus {
+  border-color: #c21a25;
+  box-shadow: 0 0 0 3px rgba(194, 26, 37, 0.15);
+  outline: none;
+}
+
+.import-controls select {
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  padding: 0.55rem 0.75rem;
+  background: #fff;
+  font-size: 0.9rem;
+  cursor: pointer;
+  color: #374151;
+}
+
+/* ===== Project Cards Grid (aligned with filter edge) ===== */
+
+.pm-cards {
+  max-width: 1180px;              /* EXACT same as import-controls */
+  margin: 40px auto 80px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);  /* 4 equal columns */
+  gap: 20px;
+}
+
+/* Every column takes 1fr, so last card edge == filter edge */
+.pm-card {
+  background: #fff;
+  border: 1px solid #f3f4f6;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  height: 180px;                  /* adjust as you like; width is automatic */
+  overflow: hidden;
+}
+
+.pm-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.10);
+}
+
+/* Add New card matches grid exactly */
+.pm-card.add-new {
+  border: 2px dashed #e5e7eb;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.pm-plus-circle {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #f3f4f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .pm-cards {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .import-controls {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .import-controls .controls {
+    margin-left: 0;
+  }
+  .pm-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .pm-cards {
+    grid-template-columns: 1fr;
+  }
+}
+/* ===== Pagination (inline, same as home page style) ===== */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  background: transparent;
+  position: static;       /* ✅ not fixed anymore */
+  transform: none;        /* ✅ reset previous translation */
+  box-shadow: none;       /* ✅ no floating shadow */
+  padding: 0;
+}
+
+/* Pagination buttons */
+.pagination button {
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  color: #374151;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pagination button:hover {
+  background: #f3f4f6;
+}
+
+/* Active (current page) */
+.pagination .active {
+  background: #C21A25;
+  color: #ffffff;
+  border-color: #C21A25;
+}
+
+/* Disabled arrows */
+.pagination button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .pagination {
+    flex-wrap: wrap;
+    gap: 0.3rem;
+  }
+
+  .pagination button {
+    padding: 5px 10px;
+    font-size: 0.8rem;
+  }
+}
+/* ===== Pagination (inline, visible without scrolling) ===== */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 1.2rem;   /* ✅ reduced spacing above */
+  margin-bottom: 0.8rem; /* ✅ smaller bottom gap */
+  background: transparent;
+  position: static;
+  transform: none;
+  box-shadow: none;
+  padding: 0;
+}
+
+/* Pagination buttons */
+.pagination button {
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  color: #374151;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pagination button:hover {
+  background: #f3f4f6;
+}
+
+/* Active page */
+.pagination .active {
+  background: #C21A25;
+  color: #ffffff;
+  border-color: #C21A25;
+}
+
+/* Disabled arrows */
+.pagination button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ===== Compact grid to fit pagination without scroll ===== */
+.pm-cards {
+  margin-bottom: 0.5rem !important;  /* ✅ less empty space below cards */
+  row-gap: 14px !important;          /* ✅ tighten grid vertically */
+  grid-row-gap: 14px !important;
+}
+
+.pm-card {
+  height: 160px; /* ✅ slightly smaller cards to fit all above the fold */
+}
+
+/* Responsive tweak */
+@media (max-width: 900px) {
+  .pagination {
+    margin-top: 0.8rem;
+  }
+  .pm-card {
+    height: 140px;
+  }
+}
+/* ===== Projects Header Aligned Like Home Page ===== */
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1180px;
+  margin: 0 auto 1.5rem auto;
+  flex-wrap: wrap;
+}
+
+/* Left side: title + choose file */
+.page-header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.page-header-left h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+}
+
+/* Red choose file button */
+.page-header-left input[type="file"] {
+  display: none;
+}
+
+.page-header-left label {
+  background-color: #C21A25;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: background 0.2s ease;
+}
+
+.page-header-left label:hover {
+  background-color: #a01720;
+}
+
+/* Right side: search + filter dropdown */
+.page-header-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* Search bar */
+.page-header-right .search-box input {
+  width: 260px;
+  padding: 0.55rem 2.2rem 0.55rem 2.4rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: #374151;
+  background-color: #fff;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2371717a' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M21 21l-4.35-4.35m0 0A7.5 7.5 0 1010.5 18a7.5 7.5 0 006.15-3.35z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: 10px center;
+  background-size: 18px;
+}
+
+.page-header-right .search-box input:focus {
+  border-color: #C21A25;
+  box-shadow: 0 0 0 3px rgba(194, 26, 37, 0.15);
+  outline: none;
+}
+
+/* Dropdown filter */
+.page-header-right select {
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  padding: 0.55rem 0.75rem;
+  background: #fff;
+  font-size: 0.9rem;
+  color: #374151;
+  cursor: pointer;
+}
+
+/* Responsive layout */
+@media (max-width: 1000px) {
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .page-header-right {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}
+.pm-desc {
+  font-size: 14px;
+  color: #555;
+  line-height: 1.4;
+  margin: 8px 0 10px;
+  white-space: normal;
+  word-break: break-word;
+  overflow: visible;
+}
+
+
+
+
+
+
+/* Keep all existing code above unchanged */
+
+/* ===== Members Modal ===== */
+.members-table {
+  padding: 10px 20px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.members-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.members-table th,
+.members-table td {
+  text-align: left;
+  padding: 10px 15px;
+  border-bottom: 1px solid #eee;
+  font-size: 15px;
+}
+
+.members-table th {
+  font-weight: 600;
+  color: #333;
+}
+
+.member-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  color: #fff;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+
+.clickable {
+  color: #C21A25;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.clickable:hover {
+  text-decoration: underline;
+}
+.members-table .avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin-right: 8px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f3f4f6;
+}
+
+.members-table .avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+/* ===== Responsive Cards ===== */
+@media (max-width: 600px) {
+  .pm-cards {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ===== Pagination (inline, same as home page style) ===== */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  background: transparent;
+  position: static;
+  transform: none;
+  box-shadow: none;
+  padding: 0;
+}
+
+/* Pagination buttons */
+.pagination button {
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  color: #374151;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pagination button:hover {
+  background: #f3f4f6;
+}
+
+/* Active (current page) */
+.pagination .active {
+  background: #C21A25;
+  color: #ffffff;
+  border-color: #C21A25;
+}
+
+/* Disabled arrows */
+.pagination button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Responsive Pagination */
+@media (max-width: 768px) {
+  .pagination {
+    flex-wrap: wrap;
+    gap: 0.3rem;
+  }
+
+  .pagination button {
+    padding: 5px 10px;
+    font-size: 0.8rem;
+  }
+}
+
+/* ===== Compact Grid to Fit Pagination ===== */
+.pm-cards {
+  margin-bottom: 0.5rem !important;
+  row-gap: 14px !important;
+  grid-row-gap: 14px !important;
+}
+
+.pm-card {
+  height: 160px;
+}
+
+/* Responsive tweak */
+@media (max-width: 900px) {
+  .pagination {
+    margin-top: 0.8rem;
+  }
+  .pm-card {
+    height: 140px;
+  }
+}
+
+/* ===== Projects Header Aligned Like Home Page ===== */
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1180px;
+  margin: 0 auto 1.5rem auto;
+  flex-wrap: wrap;
+}
+
+/* Left side: title + choose file */
+.page-header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.page-header-left h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+}
+
+/* Right side: search + filter dropdown */
+.page-header-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* Search box */
+.page-header-right .search-box input {
+  width: 260px;
+  padding: 0.55rem 2.2rem 0.55rem 2.4rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: #374151;
+  background-color: #fff;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2371717a' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M21 21l-4.35-4.35m0 0A7.5 7.5 0 1010.5 18a7.5 7.5 0 006.15-3.35z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: 10px center;
+  background-size: 18px;
+}
+
+.page-header-right .search-box input:focus {
+  border-color: #C21A25;
+  box-shadow: 0 0 0 3px rgba(194, 26, 37, 0.15);
+  outline: none;
+}
+
+/* Dropdown filter */
+.page-header-right select {
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  padding: 0.55rem 0.75rem;
+  background: #fff;
+  font-size: 0.9rem;
+  color: #374151;
+  cursor: pointer;
+}
+
+/* Responsive Header */
+@media (max-width: 1000px) {
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .page-header-right {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}
+
+/* ===== Description Paragraph ===== */
+.pm-desc {
+  font-size: 14px;
+  color: #555;
+  line-height: 1.4;
+  margin: 8px 0 10px;
+  white-space: normal;
+  word-break: break-word;
+  overflow: visible;
+}
+
+/* ===== Members Modal Table ===== */
+.members-table {
+  padding: 10px 20px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.members-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.members-table th,
+.members-table td {
+  text-align: left;
+  padding: 10px 15px;
+  border-bottom: 1px solid #eee;
+  font-size: 15px;
+}
+
+.members-table th {
+  font-weight: 600;
+  color: #333;
+}
+
+.member-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  color: #fff;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+
+.clickable {
+  color: #C21A25;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.clickable:hover {
+  text-decoration: underline;
+}
+
+.members-table .avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin-right: 8px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f3f4f6;
+}
+
+.members-table .avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ✅ ===== Added Total Projects Text ===== */
+.total-projects-text {
+  margin: -10px 0 20px 10px;
+  font-size: 15px;
+  color: #444;
+  font-weight: 500;
+}
+
+/* ✅ ===== Added Services Modal Styling ===== */
+.pm-modal-header strong {
+  font-weight: 600;
+  color: #111;
+}
+
+.members-table table th:nth-child(1),
+.members-table table td:nth-child(1) {
+  width: 35%;
+}
+
+.members-table table th:nth-child(2),
+.members-table table td:nth-child(2) {
+  width: 20%;
+}
+
+.members-table table th:nth-child(3),
+.members-table table td:nth-child(3),
+.members-table table th:nth-child(4),
+.members-table table td:nth-child(4) {
+  width: 22%;
+}
+
+/* ===== Modal Header (Consistent Design) ===== */
+
+.pm-modal-header .pm-close {
+  background: transparent;
+  border: none;
+  font-size: 22px;
+  cursor: pointer;
+  color: #555;
+  transition: color 0.2s;
+}
+
+.pm-modal-header .pm-close:hover {
+  color: #C21A25;
+}
+/* ===== Reposition Total Projects Text (below header line) ===== */
+.total-projects-text {
+  display: block;
+  font-size: 15px;
+  color: #444;
+  font-weight: 500;
+  margin-top: 6px;       /* small gap below the header */
+  margin-left: 6px;      /* slight indent for balance */
+}
+
+/* Make sure header spacing stays clean */
+.page-header {
+  margin-bottom: 0.5rem; /* tighter to connect header and total count */
+}
+
+/* Optional: highlight number in theme color */
+.total-projects-text strong {
+  color: #C21A25;
+  font-weight: 600;
+}
+/* ===== Move Total Projects to Top Right (above cards) ===== */
+.total-projects-text {
+  position: relative;
+  float: right;
+  top: -10px;          /* raise it slightly above the cards */
+  right: 5px;          /* align near the card grid edge */
+  font-size: 13px;     /* smaller size */
+  color: #777;         /* soft grey */
+  font-weight: 500;
+  margin: 0;
+  padding: 0;
+}
+
+.pm-cards {
+  clear: both; /* ensure cards start below the total count */
+  margin-top: 5px;
+}
+/* 🎯 Final alignment for Total Projects */
+.total-projects-text {
+  position: relative;
+  display: inline-block;
+  float: right;
+  transform: translate(-50px, 10px); /* move left (-x) and down (+y) */
+  font-size: 13px;
+  color: #777;
+  font-weight: 500;
+  padding: 6px 0; /* add small top & bottom breathing space */
+}
+/* 🎯 Shift Search + Filter Bar Slightly Left (align above cards) */
+.page-header-right {
+  position: relative;
+  transform: translateX(60px); /* move left; adjust as needed */
+}
+
+/* Keep Total Projects in its aligned spot */
+.total-projects-text {
+  position: relative;
+  display: inline-block;
+  float: right;
+  transform: translate(-50px, 10px);
+  font-size: 13px;
+  color: #777;
+  font-weight: 500;
+  padding: 6px 0;
+}
+/* === Modal Text Color Fix === */
+.pm-modal table td,
+.pm-modal table th,
+.pm-modal table span,
+.pm-modal table p {
+  color: #000 !important; /* set all text to black */
+}
+
+/* Optional: make clickable links slightly darker on hover */
+.pm-modal table .clickable:hover {
+  color: #c21a25 !important; /* subtle red hover for links */
+  cursor: pointer;
+}
+/* ===== LOCK LAYOUT (SAME ON ALL SCREENS) ===== */
+
+/* Keep sidebar and header fixed as-is */
+app-sidebar {
+  width: 240px !important;
+  position: fixed !important;
+  top: 70px !important;
+  left: 0;
+  height: calc(100vh - 70px) !important;
+  border-right: 1px solid #eee;
+  background: #fff;
+  z-index: 100;
+}
+
+.pm-container {
+  margin-left: 240px !important;
+  margin-top: 70px !important;
+  padding: 20px !important;
+  width: calc(100vw - 240px) !important;
+  overflow-x: hidden;
+}
+
+/* Header row (Projects + Choose File + Search + Filter) */
+.page-header {
+  max-width: 1180px !important;
+  margin: 0 auto 1.5rem !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  flex-wrap: nowrap !important;
+}
+
+/* Project grid */
+.pm-cards {
+  max-width: 1180px !important;
+  margin: 40px auto !important;
+  display: grid !important;
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: 20px !important;
+  justify-content: center !important;
+}
+
+/* Each project card */
+.pm-card {
+  background: #fff !important;
+  border: 1px solid #f3f4f6 !important;
+  border-radius: 12px !important;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05) !important;
+  padding: 16px !important;
+  height: 180px !important;
+  width: auto !important;
+  transition: transform 0.2s, box-shadow 0.2s !important;
+}
+
+.pm-card:hover {
+  transform: translateY(-4px) !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+}
+
+/* Add New Project card */
+.pm-card.add-new {
+  border: 2px dashed #e5e7eb !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  text-align: center !important;
+}
+
+/* Keep top controls aligned */
+.import-controls {
+  max-width: 1180px !important;
+  margin: 0 auto 1.5rem !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+}
+
+/* Prevent layout changes on small screens */
+@media (max-width: 10000px) {
+  app-sidebar,
+  .pm-container,
+  .pm-cards,
+  .pm-card,
+  .import-controls,
+  .page-header {
+    all: unset;
+  }
+}
+/* ===== GRID ALIGNMENT TO MATCH CARDS ===== */
+.page-header,
+.total-projects-text,
+.pm-cards {
+  max-width: 1180px;
+  margin: 0 auto;
+  box-sizing: border-box;
+  padding: 0 12px;
+}
+
+/* Header Row */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+  flex-wrap: wrap;
+}
+
+/* Left side: Projects + Choose File */
+.page-header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* Title */
+.page-header-left h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+}
+
+/* Right side: Search + Filter */
+.page-header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Search box */
+.page-header-right .search-box {
+  display: flex;
+  align-items: center;
+}
+
+.page-header-right .search-box input {
+  width: 260px;
+  padding: 0.55rem 2.2rem 0.55rem 2.4rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: #374151;
+  background-color: #fff;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2371717a' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M21 21l-4.35-4.35m0 0A7.5 7.5 0 1010.5 18a7.5 7.5 0 006.15-3.35z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: 10px center;
+  background-size: 18px;
+}
+
+.page-header-right .search-box input:focus {
+  border-color: #C21A25;
+  box-shadow: 0 0 0 3px rgba(194, 26, 37, 0.15);
+  outline: none;
+}
+
+/* Dropdown Filter */
+.page-header-right select {
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  padding: 0.55rem 0.75rem;
+  background: #fff;
+  font-size: 0.9rem;
+  color: #374151;
+  cursor: pointer;
+  height: 38px;
+}
+
+/* ===== TOTAL PROJECTS (under header, right aligned to cards) ===== */
+.total-projects-text {
+  text-align: right;
+  font-size: 14px;
+  color: #555;
+  font-weight: 500;
+  margin-top: 4px;
+  margin-bottom: 16px;
+  padding-right: 12px; /* aligns with grid padding */
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1100px) {
+  .page-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .page-header-right {
+    justify-content: flex-start;
+  }
+
+  .total-projects-text {
+    text-align: left;
+    padding-right: 0;
+    margin-top: 8px;
+  }
+}
+
+@media (max-width: 700px) {
+  .page-header-right {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .page-header-right .search-box input,
+  .page-header-right select {
+    width: 100%;
+  }
+}
+/* === PERFECT ALIGNMENT BETWEEN HEADER AND CARD GRID === */
+
+/* Shared wrapper width for all top and grid sections */
+.page-header,
+.total-projects-text,
+.pm-cards {
+  width: 100%;
+  max-width: 1150px; /* ✅ matches your visible grid width */
+  margin: 0 auto;
+  padding: 0 10px;   /* ✅ same side spacing for both */
+  box-sizing: border-box;
+}
+
+/* Header row (Projects title + buttons + search + filter) */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+/* Left side of header */
+.page-header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.page-header-left h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+}
+
+/* Right side: search and filter controls */
+.page-header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Search box */
+.page-header-right .search-box input {
+  width: 260px;
+  padding: 0.55rem 2.2rem 0.55rem 2.4rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: #374151;
+  background-color: #fff;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2371717a' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M21 21l-4.35-4.35m0 0A7.5 7.5 0 1010.5 18a7.5 7.5 0 006.15-3.35z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: 10px center;
+  background-size: 18px;
+}
+
+.page-header-right .search-box input:focus {
+  border-color: #C21A25;
+  box-shadow: 0 0 0 3px rgba(194, 26, 37, 0.15);
+  outline: none;
+}
+
+/* Filter dropdown */
+.page-header-right select {
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  padding: 0.55rem 0.75rem;
+  background: #fff;
+  font-size: 0.9rem;
+  color: #374151;
+  cursor: pointer;
+}
+
+/* Total Projects text (right-aligned with the cards) */
+.total-projects-text {
+  text-align: right;
+  font-size: 14px;
+  color: #555;
+  font-weight: 500;
+  margin-top: 6px;
+  margin-bottom: 14px;
+  padding-right: 10px;
+}
+
+/* Card grid */
+.pm-cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  margin-bottom: 1rem;
+}
+
+/* Each card */
+.pm-card {
+  background: #fff;
+  border: 1px solid #f3f4f6;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s, box-shadow 0.2s;
+  height: 180px;
+}
+
+.pm-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* Add New Project card */
+.pm-card.add-new {
+  border: 2px dashed #e5e7eb;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+/* === Responsive alignment === */
+@media (max-width: 1200px) {
+  .pm-cards {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .pm-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .total-projects-text {
+    text-align: left;
+    padding-right: 0;
+  }
+}
+
+@media (max-width: 600px) {
+  .pm-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .page-header-right {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+  }
+
+  .page-header-right .search-box input,
+  .page-header-right select {
+    width: 100%;
+  }
+}
+/* 🎯 FINAL RIGHT EDGE ALIGNMENT */
+.page-header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transform: translateX(-25px); /* small left nudge to align with cards */
+  position: relative;
+}
+
+/* make dropdown and total text share the same right edge */
+.page-header-right select {
+  min-width: 140px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  padding: 0.55rem 0.75rem;
+  background: #fff;
+  font-size: 0.9rem;
+  color: #374151;
+  cursor: pointer;
+}
+
+/* Move total projects right below the dropdown filter, same edge */
+.total-projects-text {
+  position: absolute;
+  right: 0;          /* ✅ same right edge as dropdown */
+  top: 42px;         /* ✅ just under the filter */
+  font-size: 13px;
+  color: #777;
+  font-weight: 500;
+  margin: 0;
+}
+/* ===== Total Projects Alignment Fix ===== */
+.page-header-wrapper {
+  position: relative;
+  max-width: 1150px;
+  margin: 0 auto;
+  padding: 0 10px;
+  box-sizing: border-box;
+}
+
+/* Wrapper aligns with header and cards */
+.projects-summary {
+  display: flex;
+  justify-content: flex-end; /* aligns it to the same right edge as filter */
+  margin-top: 4px;
+  margin-bottom: 18px;       /* spacing before cards */
+  padding-right: 10px;       /* same horizontal padding as header */
+  box-sizing: border-box;
+}
+
+.total-projects-text {
+  font-size: 14px;
+  color: #555;
+  font-weight: 500;
+}
+
+/* Responsive behavior */
+@media (max-width: 900px) {
+  .projects-summary {
+    justify-content: flex-start; /* move left on small screens */
+    padding-right: 0;
+    margin-left: 5px;
+  }
+}
+/* 🎯 FIX: Prevent horizontal scroll and tighten layout */
+.page-header-wrapper,
+.projects-summary,
+.pm-cards {
+  max-width: 1120px !important; /* slightly smaller than before */
+  margin: 0 auto !important;
+  padding: 0 8px !important;
+  box-sizing: border-box;
+}
+
+/* Reduce gap between cards */
+.pm-cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px; /* reduced from 20px */
+  margin-bottom: 1rem;
+  overflow-x: hidden; /* prevent accidental scroll */
+}
+
+/* Make sure page wrapper never causes overflow */
+.pm-container {
+  overflow-x: hidden !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+  .pm-cards {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+}
+
+@media (max-width: 900px) {
+  .pm-cards {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+}
+
+@media (max-width: 600px) {
+  .pm-cards {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+}
+/* 🧩 Add space between "Total Projects" and the first row of cards */
+.projects-summary {
+  margin-bottom: 22px !important;  /* ⬆ increases distance from cards */
+}
+
+.total-projects-text {
+  font-size: 14px !important;
+  color: #555 !important;
+  font-weight: 500 !important;
+}
+
+/* Keep layout clean and no overlap */
+.pm-cards {
+  margin-top: 0 !important;
+}

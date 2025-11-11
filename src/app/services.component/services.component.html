@@ -1,6 +1,5 @@
 <div class="container">
-    <app-header></app-header>
-
+  <app-header></app-header>
   <app-sidebar />
 
   <div class="pm-container">
@@ -40,44 +39,31 @@
 
               <div class="header-actions">
                 <div class="filter-container">
-
+                  <div class="search-filter-row">
+                    <input
+                      type="text"
+                      placeholder="Search services..."
+                      [(ngModel)]="searchTerm"
+                      (input)="applySearch()"
+                      class="pm-input search-box"
+                    />
+                    <select
+                      [(ngModel)]="selectedStatus"
+                      (change)="applySearch()"
+                      class="pm-input filter-box"
+                    >
+                      <option value="">All Status</option>
+                      <option *ngFor="let s of statuses" [value]="s">{{ s }}</option>
+                    </select>
+                  </div>
                 </div>
+
                 <button class="back-btn" (click)="goBack()">Back</button>
               </div>
 
               <div class="div_33-138">
                 <div class="recent-services">
                   <span class="text-recent-projects">Recent Services:</span>
-
-                  <div *ngIf="showFilter">
-                    <div class="pm-filter-backdrop" (click)="closeFilter()"></div>
-                    <aside class="pm-filter-panel" role="dialog" aria-label="Filters">
-                      <div class="pm-filter-header">
-                        <strong>Filters</strong>
-                        <button class="pm-close" type="button" (click)="closeFilter()">×</button>
-                      </div>
-                      <div class="pm-filter-body">
-                        <div class="pm-row">
-                          <label>
-                            <input type="checkbox" [(ngModel)]="filterState.active" />
-                            Active
-                          </label>
-                        </div>
-                        <div class="pm-row">
-                          <label>
-                            <input type="checkbox" [(ngModel)]="filterState.inReview" />
-                            In Review
-                          </label>
-                        </div>
-                        <div class="pm-row">
-                          <label>
-                            <input type="checkbox" [(ngModel)]="filterState.urgent" />
-                            Urgent
-                          </label>
-                        </div>
-                      </div>
-                    </aside>
-                  </div>
                 </div>
 
                 <div class="pm-cards">
@@ -98,16 +84,13 @@
 
                   <article
                     class="pm-card"
-                    *ngFor="let p of services"
+                    *ngFor="let p of filteredServices"
                     (click)="onCardClick(p)"
                   >
                     <header class="pm-card-header">
-                      @if (p.name.length <= 15)
-                      {
+                      @if (p.name.length <= 15) {
                         <h3>{{ p.name }}</h3>
-                      }
-                      @else
-                      {
+                      } @else {
                         <h3>{{ getLimitedString(p.name, 15) }}</h3>
                       }
                       <span class="pm-pill" [attr.data-status]="p.status">
@@ -136,12 +119,9 @@
 
                     <footer class="pm-card-footer">
                       <span class="pm-due">Due: {{ p.deadline | date: 'MMM d' }}</span>
-                      @if(p.taskBoard?.cards?.length === 0)
-                      {
+                      @if(p.taskBoard?.cards?.length === 0) {
                         <span class="pm-progress-label">No Tasks</span>
-                      }
-                      @else
-                      {
+                      } @else {
                         <div class="pm-progress">
                           <div
                             class="pm-progress-fill"
@@ -153,6 +133,24 @@
                     </footer>
                   </article>
                 </div>
+
+                <!-- ✅ Pagination (Double Arrows Style Like Projects Page) -->
+<div class="pagination" *ngIf="totalPages > 1">
+  <button (click)="goToFirstPage()" [disabled]="currentPage === 1">&lt;&lt;</button>
+  <button (click)="prevPage()" [disabled]="currentPage === 1">&lt;</button>
+
+  <button
+    *ngFor="let page of pages"
+    [class.active]="currentPage === page"
+    (click)="goToPage(page)"
+  >
+    {{ page }}
+  </button>
+
+  <button (click)="nextPage()" [disabled]="currentPage === totalPages">&gt;</button>
+  <button (click)="goToLastPage()" [disabled]="currentPage === totalPages">&gt;&gt;</button>
+</div>
+
               </div>
             </div>
           </div>
@@ -160,17 +158,10 @@
       </div>
     </div>
 
-    <div
-      class="pm-modal-backdrop"
-      *ngIf="showNewService"
-      (click)="closeNewService()"
-    ></div>
+    <!-- ✅ Modal -->
+    <div class="pm-modal-backdrop" *ngIf="showNewService" (click)="closeNewService()"></div>
 
-    <div
-      class="pm-modal"
-      *ngIf="showNewService"
-      (click)="$event.stopPropagation()"
-    >
+    <div class="pm-modal" *ngIf="showNewService" (click)="$event.stopPropagation()">
       <header class="pm-modal-header">
         <strong>Create New Service</strong>
         <button class="pm-close" type="button" (click)="closeNewService()">×</button>

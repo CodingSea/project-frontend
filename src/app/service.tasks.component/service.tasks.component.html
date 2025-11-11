@@ -17,14 +17,17 @@
         <div class="board-title">
           <h2>{{ taskBoard?.service?.name }}</h2>
           <div class="subtext">
-            <span> Led by {{ taskBoard?.service?.chief?.first_name }} {{ taskBoard?.service?.chief?.last_name }}</span>
-
+            <span>
+              Led by {{ taskBoard?.service?.chief?.first_name }}
+              {{ taskBoard?.service?.chief?.last_name }}
+            </span>
 
             <hr>
 
             <span *ngIf="taskBoard?.service?.projectManager">
-              Project Manager: {{ taskBoard?.service?.projectManager?.first_name }} {{
-              taskBoard?.service?.projectManager?.last_name }}
+              Project Manager:
+              {{ taskBoard?.service?.projectManager?.first_name }}
+              {{ taskBoard?.service?.projectManager?.last_name }}
             </span>
           </div>
         </div>
@@ -53,8 +56,13 @@
 
     <!-- Kanban -->
     <div class="modern-kanban-board" *ngIf="showKanban && isTaskboardSelected">
-      <jqxKanban #kanbanReference *ngIf="columns && dataAdapter" [width]="'100%'" [columns]="columns"
-        [source]="dataAdapter" (onItemAttrClicked)="openEditModal($event.args.item)"
+      <jqxKanban
+        #kanbanReference
+        *ngIf="columns && dataAdapter"
+        [width]="'100%'"
+        [columns]="columns"
+        [source]="dataAdapter"
+        (onItemAttrClicked)="openEditModal($event.args.item)"
         (onItemMoved)="onItemMoved($event)">
       </jqxKanban>
     </div>
@@ -74,26 +82,52 @@
 
         <div class="form-group">
           <label>Title <span>*</span></label>
-          <input type="text" class="form-input" [(ngModel)]="createModel.title" name="title" placeholder="Task title…"
+          <input
+            type="text"
+            class="form-input"
+            [(ngModel)]="createModel.title"
+            name="title"
+            placeholder="Task title…"
             required />
         </div>
 
         <div class="form-group">
           <label>Description</label>
-          <textarea class="form-textarea" [(ngModel)]="createModel.description" name="description"
+          <textarea
+            class="form-textarea"
+            [(ngModel)]="createModel.description"
+            name="description"
             placeholder="Short description…"></textarea>
+        </div>
+
+        <!-- ✅ Assign To Dropdown -->
+        <div class="form-group">
+          <label>Assign To</label>
+          <select class="form-input" [(ngModel)]="createModel.assignedUserId" name="assignedUserId">
+            <option [ngValue]="null">-- Select User --</option>
+            <option *ngFor="let u of users" [ngValue]="u.id">
+              {{ u.first_name }} {{ u.last_name }}
+            </option>
+          </select>
         </div>
 
         <div class="form-2col">
           <div class="form-group">
             <label>Tags <span class="muted">(comma separated)</span></label>
-            <input type="text" class="form-input" [(ngModel)]="createModel.tags" name="tags"
+            <input
+              type="text"
+              class="form-input"
+              [(ngModel)]="createModel.tags"
+              name="tags"
               placeholder="UI, API, urgent" />
           </div>
 
           <div class="form-group">
             <label>Priority</label>
-            <select class="form-input" [(ngModel)]="createModel.priority" name="priority"
+            <select
+              class="form-input"
+              [(ngModel)]="createModel.priority"
+              name="priority"
               (change)="updatePriorityColor(createModel)">
               <option value="low">Low Priority</option>
               <option value="medium">Medium Priority</option>
@@ -125,24 +159,50 @@
 
         <div class="form-group">
           <label>Title <span>*</span></label>
-          <input type="text" class="form-input" [(ngModel)]="editModel.title" name="editTitle" required />
+          <input
+            type="text"
+            class="form-input"
+            [(ngModel)]="editModel.title"
+            name="editTitle"
+            required />
         </div>
 
         <div class="form-group">
           <label>Description</label>
-          <textarea class="form-textarea" [(ngModel)]="editModel.description" name="editDescription"></textarea>
+          <textarea
+            class="form-textarea"
+            [(ngModel)]="editModel.description"
+            name="editDescription"></textarea>
+        </div>
+
+        <!-- ✅ Assign To Dropdown -->
+        <div class="form-group">
+          <label>Assign To</label>
+          <select class="form-input" [(ngModel)]="editModel.assignedUserId" name="editAssignedUserId">
+            <option [ngValue]="null">-- Select User --</option>
+            <option *ngFor="let u of users" [ngValue]="u.id">
+              {{ u.first_name }} {{ u.last_name }}
+            </option>
+          </select>
         </div>
 
         <div class="form-2col">
 
           <div class="form-group">
             <label>Tags <span class="muted">(comma separated)</span></label>
-            <input type="text" class="form-input" [(ngModel)]="editModel.tags" name="editTags" />
+            <input
+              type="text"
+              class="form-input"
+              [(ngModel)]="editModel.tags"
+              name="editTags" />
           </div>
 
           <div class="form-group">
             <label>Priority</label>
-            <select class="form-input" [(ngModel)]="editModel.priority" name="editPriority"
+            <select
+              class="form-input"
+              [(ngModel)]="editModel.priority"
+              name="editPriority"
               (change)="updatePriorityColor(editModel)">
               <option value="low">Low Priority</option>
               <option value="medium">Medium Priority</option>
@@ -177,6 +237,6 @@
     </div>
 
     <app-issue-page-template #issuePage *ngIf="!isTaskboardSelected" />
-    
+
   </div>
 </div>
