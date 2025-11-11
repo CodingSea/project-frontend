@@ -47,6 +47,7 @@
                       (input)="applySearch()"
                       class="pm-input search-box"
                     />
+
                     <select
                       [(ngModel)]="selectedStatus"
                       (change)="applySearch()"
@@ -54,6 +55,17 @@
                     >
                       <option value="">All Status</option>
                       <option *ngFor="let s of statuses" [value]="s">{{ s }}</option>
+                    </select>
+
+                    <!-- 🟩 New Filter: Has Tasks -->
+                    <select
+                      [(ngModel)]="hasTasksFilter"
+                      (change)="applySearch()"
+                      class="pm-input filter-box"
+                    >
+                      <option value="">All Services</option>
+                      <option value="true">Has Tasks</option>
+                      <option value="false">No Tasks</option>
                     </select>
                   </div>
                 </div>
@@ -134,23 +146,22 @@
                   </article>
                 </div>
 
-                <!-- ✅ Pagination (Double Arrows Style Like Projects Page) -->
-<div class="pagination" *ngIf="totalPages > 1">
-  <button (click)="goToFirstPage()" [disabled]="currentPage === 1">&lt;&lt;</button>
-  <button (click)="prevPage()" [disabled]="currentPage === 1">&lt;</button>
+                <!-- Pagination -->
+                <div class="pagination" *ngIf="totalPages > 1">
+                  <button (click)="goToFirstPage()" [disabled]="currentPage === 1">&lt;&lt;</button>
+                  <button (click)="prevPage()" [disabled]="currentPage === 1">&lt;</button>
 
-  <button
-    *ngFor="let page of pages"
-    [class.active]="currentPage === page"
-    (click)="goToPage(page)"
-  >
-    {{ page }}
-  </button>
+                  <button
+                    *ngFor="let page of pages"
+                    [class.active]="currentPage === page"
+                    (click)="goToPage(page)"
+                  >
+                    {{ page }}
+                  </button>
 
-  <button (click)="nextPage()" [disabled]="currentPage === totalPages">&gt;</button>
-  <button (click)="goToLastPage()" [disabled]="currentPage === totalPages">&gt;&gt;</button>
-</div>
-
+                  <button (click)="nextPage()" [disabled]="currentPage === totalPages">&gt;</button>
+                  <button (click)="goToLastPage()" [disabled]="currentPage === totalPages">&gt;&gt;</button>
+                </div>
               </div>
             </div>
           </div>
@@ -158,7 +169,7 @@
       </div>
     </div>
 
-    <!-- ✅ Modal -->
+    <!-- Modal -->
     <div class="pm-modal-backdrop" *ngIf="showNewService" (click)="closeNewService()"></div>
 
     <div class="pm-modal" *ngIf="showNewService" (click)="$event.stopPropagation()">

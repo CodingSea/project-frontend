@@ -3,16 +3,14 @@
   <app-sidebar></app-sidebar>
 
   <div class="kanban-container">
-
     <!-- Tabs -->
     <div class="page-tabs">
       <div [class.active]="isTaskboardSelected" (click)="selectSection(true)">Board</div>
       <div [class.active]="!isTaskboardSelected" (click)="selectSection(false)">Discussion</div>
     </div>
 
-    <!-- ===================== Board View ===================== -->
+    <!-- ===================== Board Header ===================== -->
     <header class="board-header">
-
       <div class="board-info">
         <div class="board-title">
           <h2>{{ taskBoard?.service?.name }}</h2>
@@ -21,9 +19,7 @@
               Led by {{ taskBoard?.service?.chief?.first_name }}
               {{ taskBoard?.service?.chief?.last_name }}
             </span>
-
             <hr>
-
             <span *ngIf="taskBoard?.service?.projectManager">
               Project Manager:
               {{ taskBoard?.service?.projectManager?.first_name }}
@@ -51,7 +47,6 @@
         <button *ngIf="!isTaskboardSelected" class="btn-primary" (click)="toggleEdit()">Edit</button>
         <button class="btn-secondary" (click)="goBack()">Back</button>
       </div>
-
     </header>
 
     <!-- Kanban -->
@@ -70,7 +65,6 @@
     <!-- ===================== Create Task Modal ===================== -->
     <div class="modal-backdrop" *ngIf="showCreateModal" (click)="closeCreateModal()"></div>
     <div class="modal-container" *ngIf="showCreateModal">
-
       <div class="modal-header">
         <h2>Create Task</h2>
         <button class="close-btn" (click)="closeCreateModal()">✕</button>
@@ -82,53 +76,50 @@
 
         <div class="form-group">
           <label>Title <span>*</span></label>
-          <input
-            type="text"
-            class="form-input"
-            [(ngModel)]="createModel.title"
-            name="title"
-            placeholder="Task title…"
-            required />
+          <input type="text" class="form-input" [(ngModel)]="createModel.title" name="title" placeholder="Task title…" required />
         </div>
 
         <div class="form-group">
           <label>Description</label>
-          <textarea
-            class="form-textarea"
-            [(ngModel)]="createModel.description"
-            name="description"
-            placeholder="Short description…"></textarea>
+          <textarea class="form-textarea" [(ngModel)]="createModel.description" name="description" placeholder="Short description…"></textarea>
         </div>
 
         <!-- ✅ Assign To Dropdown -->
         <div class="form-group">
           <label>Assign To</label>
-          <select class="form-input" [(ngModel)]="createModel.assignedUserId" name="assignedUserId">
-            <option [ngValue]="null">-- Select User --</option>
-            <option *ngFor="let u of users" [ngValue]="u.id">
+          <div class="dropdown-select" (click)="toggleDropdown('create')">
+            <div class="dropdown-selected">Select user(s)</div>
+            <div class="dropdown-arrow">▼</div>
+          </div>
+
+          <div class="dropdown-list" *ngIf="dropdownOpenCreate">
+            <div
+              class="dropdown-item"
+              *ngFor="let u of users"
+              (click)="toggleUserSelection(u.id, 'create')"
+              [class.selected]="createModel.assignedUserIds.includes(u.id)">
               {{ u.first_name }} {{ u.last_name }}
-            </option>
-          </select>
+            </div>
+          </div>
+
+          <!-- Display Selected Users -->
+          <div class="selected-users" *ngIf="createModel.assignedUserIds.length > 0">
+            <div class="user-pill" *ngFor="let uid of createModel.assignedUserIds">
+              {{ getUserNameById(uid) }}
+              <span class="remove" (click)="removeUser(uid, 'create')">×</span>
+            </div>
+          </div>
         </div>
 
         <div class="form-2col">
           <div class="form-group">
             <label>Tags <span class="muted">(comma separated)</span></label>
-            <input
-              type="text"
-              class="form-input"
-              [(ngModel)]="createModel.tags"
-              name="tags"
-              placeholder="UI, API, urgent" />
+            <input type="text" class="form-input" [(ngModel)]="createModel.tags" name="tags" placeholder="UI, API, urgent" />
           </div>
 
           <div class="form-group">
             <label>Priority</label>
-            <select
-              class="form-input"
-              [(ngModel)]="createModel.priority"
-              name="priority"
-              (change)="updatePriorityColor(createModel)">
+            <select class="form-input" [(ngModel)]="createModel.priority" name="priority" (change)="updatePriorityColor(createModel)">
               <option value="low">Low Priority</option>
               <option value="medium">Medium Priority</option>
               <option value="high">High Priority</option>
@@ -140,14 +131,12 @@
           <button type="button" class="btn-secondary" (click)="closeCreateModal()">Cancel</button>
           <button type="submit" class="btn-primary" [disabled]="!createForm.form.valid">Create</button>
         </div>
-
       </form>
     </div>
 
     <!-- ===================== Edit Task Modal ===================== -->
     <div class="modal-backdrop" *ngIf="showEditModal" (click)="closeEditModal()"></div>
     <div class="modal-container" *ngIf="showEditModal">
-
       <div class="modal-header">
         <h2>Edit Task</h2>
         <button class="close-btn" (click)="closeEditModal()">✕</button>
@@ -156,63 +145,59 @@
       <p class="modal-subtitle">Update the task information</p>
 
       <form (ngSubmit)="submitEditTask()" #editForm="ngForm" class="modal-form">
-
         <div class="form-group">
           <label>Title <span>*</span></label>
-          <input
-            type="text"
-            class="form-input"
-            [(ngModel)]="editModel.title"
-            name="editTitle"
-            required />
+          <input type="text" class="form-input" [(ngModel)]="editModel.title" name="editTitle" required />
         </div>
 
         <div class="form-group">
           <label>Description</label>
-          <textarea
-            class="form-textarea"
-            [(ngModel)]="editModel.description"
-            name="editDescription"></textarea>
+          <textarea class="form-textarea" [(ngModel)]="editModel.description" name="editDescription"></textarea>
         </div>
 
         <!-- ✅ Assign To Dropdown -->
         <div class="form-group">
           <label>Assign To</label>
-          <select class="form-input" [(ngModel)]="editModel.assignedUserId" name="editAssignedUserId">
-            <option [ngValue]="null">-- Select User --</option>
-            <option *ngFor="let u of users" [ngValue]="u.id">
+          <div class="dropdown-select" (click)="toggleDropdown('edit')">
+            <div class="dropdown-selected">Select user(s)</div>
+            <div class="dropdown-arrow">▼</div>
+          </div>
+
+          <div class="dropdown-list" *ngIf="dropdownOpenEdit">
+            <div
+              class="dropdown-item"
+              *ngFor="let u of users"
+              (click)="toggleUserSelection(u.id, 'edit')"
+              [class.selected]="editModel.assignedUserIds.includes(u.id)">
               {{ u.first_name }} {{ u.last_name }}
-            </option>
-          </select>
+            </div>
+          </div>
+
+          <!-- Display Selected Users -->
+          <div class="selected-users" *ngIf="editModel.assignedUserIds.length > 0">
+            <div class="user-pill" *ngFor="let uid of editModel.assignedUserIds">
+              {{ getUserNameById(uid) }}
+              <span class="remove" (click)="removeUser(uid, 'edit')">×</span>
+            </div>
+          </div>
         </div>
 
         <div class="form-2col">
-
           <div class="form-group">
             <label>Tags <span class="muted">(comma separated)</span></label>
-            <input
-              type="text"
-              class="form-input"
-              [(ngModel)]="editModel.tags"
-              name="editTags" />
+            <input type="text" class="form-input" [(ngModel)]="editModel.tags" name="editTags" />
           </div>
 
           <div class="form-group">
             <label>Priority</label>
-            <select
-              class="form-input"
-              [(ngModel)]="editModel.priority"
-              name="editPriority"
-              (change)="updatePriorityColor(editModel)">
+            <select class="form-input" [(ngModel)]="editModel.priority" name="editPriority" (change)="updatePriorityColor(editModel)">
               <option value="low">Low Priority</option>
               <option value="medium">Medium Priority</option>
               <option value="high">High Priority</option>
             </select>
           </div>
-
         </div>
 
-        <!-- Column Above Danger Zone -->
         <div class="form-group">
           <label>Column</label>
           <select class="form-input" [(ngModel)]="editModel.column" name="editColumn">
@@ -222,7 +207,6 @@
           </select>
         </div>
 
-        <!-- Better Danger Layout -->
         <div class="danger-box">
           <div class="danger-label">Danger Zone</div>
           <button type="button" class="btn-danger-full" (click)="confirmDelete()">Delete Task</button>
@@ -232,11 +216,9 @@
           <button type="button" class="btn-secondary" (click)="closeEditModal()">Close</button>
           <button type="submit" class="btn-primary" [disabled]="!editForm.form.valid">Save</button>
         </div>
-
       </form>
     </div>
 
     <app-issue-page-template #issuePage *ngIf="!isTaskboardSelected" />
-
   </div>
 </div>

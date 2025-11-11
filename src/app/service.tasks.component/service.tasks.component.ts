@@ -1,5 +1,5 @@
 import { CommonModule, Location } from '@angular/common';
-import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, OnInit, ViewChild, HostListener } from '@angular/core';
 import { jqxKanbanComponent, jqxKanbanModule } from 'jqwidgets-ng/jqxkanban';
 import { jqxSplitterModule } from 'jqwidgets-ng/jqxsplitter';
 import { HttpClient } from '@angular/common/http';
@@ -19,7 +19,15 @@ import { UserService, User } from '@app/services/user.service';
   selector: 'app-service-tasks',
   templateUrl: './service.tasks.component.html',
   styleUrls: ['./service.tasks.component.css'],
-  imports: [jqxKanbanModule, jqxSplitterModule, CommonModule, FormsModule, Sidebar, HeaderComponent, IssuePageTemplate],
+  imports: [
+    jqxKanbanModule,
+    jqxSplitterModule,
+    CommonModule,
+    FormsModule,
+    Sidebar,
+    HeaderComponent,
+    IssuePageTemplate
+  ],
   standalone: true
 })
 export class ServiceTasksComponent implements OnInit, AfterViewInit {
@@ -38,7 +46,7 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit {
   showCreateModal = false;
   showEditModal = false;
 
-  // ✅ only assigned users for this service
+  // only assigned users for this service
   users: User[] = [];
 
   createModel = {
@@ -47,7 +55,7 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit {
     tags: '',
     priority: 'low' as 'low' | 'medium' | 'high',
     color: '#16a34a',
-    assignedUserId: null as number | null
+    assignedUserIds: [] as number[]
   };
 
   editModel = {
@@ -58,8 +66,31 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit {
     priority: 'low' as 'low' | 'medium' | 'high',
     color: '#16a34a',
     column: 'new' as 'new' | 'work' | 'done',
-    assignedUserId: null as number | null
+    assignedUserIds: [] as number[]
   };
+
+  constructor(
+    private http: HttpClient,
+    private route: ActivatedRoute,
+    private location: Location,
+    private router: Router,
+    private userService: UserService
+  ) {}
+
+  ngOnInit(): void {
+    window.scroll({ top: 0, left: 0 });
+    this.route.params.subscribe(params => {
+      this.serviceId = params['serviceId'];
+      this.taskBoardId = params['taskBoardId'];
+      this.initializeKanbanDataSource();
+      this.getCurrentServiceInfo();
+      this.loadAssignedUsers();
+    });
+  }
+
+  ngAfterViewInit() {}
+
+  /* ---------- Helpers ---------- */
 
   updatePriorityColor(task: { priority: 'low' | 'medium' | 'high'; color: string }) {
     if (!task) return;
@@ -70,9 +101,12 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit {
 
   private colorToPriority(color?: string): 'low' | 'medium' | 'high' {
     switch ((color || '').toLowerCase()) {
-      case '#dc2626': return 'high';
-      case '#eab308': return 'medium';
-      default: return 'low';
+      case '#dc2626':
+        return 'high';
+      case '#eab308':
+        return 'medium';
+      default:
+        return 'low';
     }
   }
 
@@ -91,32 +125,13 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit {
     { text: 'Done', dataField: 'done', minWidth: 150, collapsible: false }
   ];
 
-  constructor(
-    private http: HttpClient,
-    private route: ActivatedRoute,
-    private location: Location,
-    private router: Router,
-    private userService: UserService
-  ) {}
+  /* ---------- Load users for dropdown ---------- */
 
-  ngOnInit(): void {
-    window.scroll({ top: 0, left: 0 });
-
-    this.route.params.subscribe(params => {
-      this.serviceId = params['serviceId'];
-      this.taskBoardId = params['taskBoardId'];
-      this.initializeKanbanDataSource();
-      this.getCurrentServiceInfo();
-      this.loadAssignedUsers(); // ✅ load only assigned users
-    });
-  }
-
-  ngAfterViewInit() {}
-
-  // ✅ Load only users assigned to this specific service
   async loadAssignedUsers(): Promise<void> {
     try {
-      const service = await this.http.get<Service>(`${environment.apiUrl}/service/${this.serviceId}`).toPromise();
+      const service = await this.http
+        .get<Service>(`${environment.apiUrl}/service/${this.serviceId}`)
+        .toPromise();
 
       if (!service) {
         this.users = [];
@@ -125,18 +140,15 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit {
 
       const assigned: User[] = [];
 
-      if (service.chief) assigned.push(service.chief);
-      if (service.projectManager) assigned.push(service.projectManager);
-      if (Array.isArray(service.assignedResources)) {
-        assigned.push(...service.assignedResources);
+      if ((service as any).chief) assigned.push((service as any).chief);
+      if ((service as any).projectManager) assigned.push((service as any).projectManager);
+      if (Array.isArray((service as any).assignedResources)) {
+        assigned.push(...(service as any).assignedResources);
       }
-
-      // Optional backup users if exists
       if (Array.isArray((service as any).backup)) {
         assigned.push(...(service as any).backup);
       }
 
-      // remove duplicates by id
       const uniqueUsers = new Map<number, User>();
       assigned.forEach(u => {
         if (u && u.id) uniqueUsers.set(u.id, u);
@@ -149,19 +161,25 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit {
     }
   }
 
-  /* -------------------- Info / Progress -------------------- */
+  /* ---------- Service info / progress ---------- */
+
   async getCurrentServiceInfo(): Promise<void> {
     this.servicesInfo = {
-      totalServices: 0, backloggedTasks: 0, activeTasks: 0,
-      completedTasks: 0, totalMembers: 0, completionRate: 0.0
+      totalServices: 0,
+      backloggedTasks: 0,
+      activeTasks: 0,
+      completedTasks: 0,
+      totalMembers: 0,
+      completionRate: 0.0
     };
 
-    this.http.get<TaskBoard>(`${environment.apiUrl}/tasks/task-board/${this.taskBoardId}`)
+    this.http
+      .get<TaskBoard>(`${environment.apiUrl}/tasks/task-board/${this.taskBoardId}`)
       .subscribe((res) => {
         this.taskBoard = res;
         if (!this.taskBoard) return;
 
-        const service = this.taskBoard.service;
+        const service: any = this.taskBoard.service;
         if (!service) return;
 
         this.servicesInfo.totalServices = 1;
@@ -169,8 +187,8 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit {
         const uniqueMembers = new Set<number>();
         if (service.chief) uniqueMembers.add(service.chief.id);
         if (service.projectManager) uniqueMembers.add(service.projectManager.id);
-        service.assignedResources?.forEach(r => uniqueMembers.add(r.id));
-        service.backup?.forEach(b => uniqueMembers.add(b.id));
+        service.assignedResources?.forEach((r: any) => uniqueMembers.add(r.id));
+        service.backup?.forEach((b: any) => uniqueMembers.add(b.id));
 
         this.servicesInfo.totalMembers = uniqueMembers.size;
 
@@ -179,87 +197,91 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit {
         this.servicesInfo.activeTasks = 0;
         this.servicesInfo.completedTasks = 0;
 
-        this.taskBoard.cards?.forEach(t => {
+        this.taskBoard.cards?.forEach((t: any) => {
           total++;
           if (t.column === 'new') this.servicesInfo.backloggedTasks++;
           else if (t.column === 'work') this.servicesInfo.activeTasks++;
           else if (t.column === 'done') this.servicesInfo.completedTasks++;
         });
 
-        this.servicesInfo.completionRate = total > 0 ? (this.servicesInfo.completedTasks / total) * 100 : 0;
+        this.servicesInfo.completionRate =
+          total > 0 ? (this.servicesInfo.completedTasks / total) * 100 : 0;
       });
   }
-async checkServiceStatus()
-{
-  try
-  {
-    if (
-      !this.dataAdapter?.localData ||
-      this.dataAdapter.localData.length === 0 ||
-      this.dataAdapter.localData[0].status === 's'
-    )
-    {
-      await this.http
-        .patch<Service>(
-          `${environment.apiUrl}/service/${this.serviceId}/status`,
-          { status: ServiceStatus.New }
-        )
-        .toPromise();
-      return;
-    }
 
-    if (this.taskBoard?.service.status == 'On Hold') return;
+  async checkServiceStatus() {
+    try {
+      if (
+        !this.dataAdapter?.localData ||
+        this.dataAdapter.localData.length === 0 ||
+        this.dataAdapter.localData[0].status === 's'
+      ) {
+        await this.http
+          .patch<Service>(
+            `${environment.apiUrl}/service/${this.serviceId}/status`,
+            { status: ServiceStatus.New }
+          )
+          .toPromise();
+        return;
+      }
 
-    if (this.servicesInfo.completionRate === 100)
-    {
-      if (this.taskBoard?.service.status === 'Pending Approval') return;
+      if (this.taskBoard?.service.status == 'On Hold') return;
 
-      await this.http
-        .patch<Service>(
-          `${environment.apiUrl}/service/${this.serviceId}/status`,
-          { status: ServiceStatus.Completed }
-        )
-        .toPromise();
-    }
-    else
-    {
-      await this.http
-        .patch<Service>(
-          `${environment.apiUrl}/service/${this.serviceId}/status`,
-          { status: ServiceStatus.InProgress }
-        )
-        .toPromise();
+      if (this.servicesInfo.completionRate === 100) {
+        if (this.taskBoard?.service.status === 'Pending Approval') return;
+
+        await this.http
+          .patch<Service>(
+            `${environment.apiUrl}/service/${this.serviceId}/status`,
+            { status: ServiceStatus.Completed }
+          )
+          .toPromise();
+      } else {
+        await this.http
+          .patch<Service>(
+            `${environment.apiUrl}/service/${this.serviceId}/status`,
+            { status: ServiceStatus.InProgress }
+          )
+          .toPromise();
+      }
+    } catch (err) {
+      console.error('Error checking service status:', err);
     }
   }
-  catch (err)
-  {
-    console.error('Error checking service status:', err);
-  }
-}
+
+  /* ---------- Board data ---------- */
 
   async getBoardCards(): Promise<void> {
     try {
-      const response = await this.http.get<TaskCard[]>(`${environment.apiUrl}/service/${this.serviceId}/tasks`).toPromise();
+      const response = await this.http
+        .get<TaskCard[]>(`${environment.apiUrl}/service/${this.serviceId}/tasks`)
+        .toPromise();
 
       if (!response || response.length === 0) {
         this.data = [];
         return;
       }
 
-      this.data = response.map(task => ({
-        id: task.id,
-        status: task.column,
-        text: task.title,
-        tags: this.arrayToString(task.tags as string[]),
-        description: task.description || '',
-        color: task.color === null ? '#008000' : task.color,
-        assignedUserId: task.assignedUserId !== undefined && task.assignedUserId !== null
-          ? Number(task.assignedUserId)
-          : (task.assignedUser ? task.assignedUser.id : null)
-      })).map(t => ({
-        ...t,
-        tags: (typeof t.tags === 'string' && t.tags.trim() !== '') ? t.tags : ' '
-      }));
+      this.data = response.map(task => {
+        const assignedUserIds =
+          Array.isArray(task.users) && task.users.length
+            ? task.users.map(u => u.id)
+            : task.assignedUserIds && task.assignedUserIds.length
+              ? task.assignedUserIds
+              : task.assignedUserId
+                ? [Number(task.assignedUserId)]
+                : [];
+
+        return {
+          id: String(task.id),
+          status: task.column,
+          text: task.title,
+          tags: this.arrayToString(task.tags as any),
+          description: task.description || '',
+          color: task.color || '#16a34a',
+          assignedUserIds
+        };
+      });
     } catch (e) {
       console.error('Error fetching board cards:', e);
       this.data = [];
@@ -277,7 +299,8 @@ async checkServiceStatus()
         tags: 'ss',
         description: 'ssssee',
         assignee: 'John sp',
-        color: '#C21A25'
+        color: '#C21A25',
+        assignedUserIds: []
       }];
     }
 
@@ -292,7 +315,7 @@ async checkServiceStatus()
         { name: 'description', type: 'string' },
         { name: 'assignee', type: 'string' },
         { name: 'color', type: 'string' },
-        { name: 'assignedUserId', type: 'number' }
+        { name: 'assignedUserIds', type: 'array' }
       ]
     });
 
@@ -309,7 +332,21 @@ async checkServiceStatus()
     await this.getBoardCards();
 
     setTimeout(() => {
-      this.dataAdapter = new jqx.dataAdapter(this.data);
+      this.dataAdapter = new jqx.dataAdapter({
+        localData: this.data,
+        dataType: 'array',
+        dataFields: [
+          { name: 'id', type: 'string' },
+          { name: 'status', type: 'string' },
+          { name: 'text', type: 'string' },
+          { name: 'tags', type: 'string' },
+          { name: 'description', type: 'string' },
+          { name: 'assignee', type: 'string' },
+          { name: 'color', type: 'string' },
+          { name: 'assignedUserIds', type: 'array' }
+        ]
+      });
+
       this.showKanban = true;
 
       setTimeout(() => {
@@ -320,14 +357,16 @@ async checkServiceStatus()
     }, 0);
   }
 
-  textToArray(text: string): string[] {
+  textToArray(text: string | string[]): string[] {
+    if (Array.isArray(text)) return text;
     if (typeof text !== 'string') return [' '];
     return text.split(',').map(t => t.trim()).filter(t => t.length > 0);
   }
 
-  arrayToString(arr: string[]): string {
-    if (!arr || arr.length === 0) return '';
-    return arr.join(', ');
+  arrayToString(arr: string[] | string | undefined): string {
+    if (!arr) return '';
+    if (Array.isArray(arr)) return arr.join(', ');
+    return arr;
   }
 
   formatDecimal(num: number): string {
@@ -336,8 +375,17 @@ async checkServiceStatus()
     return s.endsWith('.0') ? s.slice(0, -2) : s;
   }
 
+  /* ---------- Modals ---------- */
+
   openCreateModal() {
-    this.createModel = { title: '', description: '', tags: '', priority: 'low', color: '#16a34a', assignedUserId: null };
+    this.createModel = {
+      title: '',
+      description: '',
+      tags: '',
+      priority: 'low',
+      color: '#16a34a',
+      assignedUserIds: []
+    };
     this.showCreateModal = true;
   }
 
@@ -346,10 +394,14 @@ async checkServiceStatus()
   }
 
   openEditModal(item: any) {
-    const t = this.data.find(x => x.id === item.id);
+    const t = this.data.find(x => String(x.id) === String(item.id));
     if (!t) return;
 
     const priority = this.colorToPriority(t.color);
+    const assignedUserIds: number[] =
+      (t.assignedUserIds && t.assignedUserIds.length
+        ? t.assignedUserIds
+        : []) as number[];
 
     this.editModel = {
       id: Number(t.id),
@@ -359,8 +411,9 @@ async checkServiceStatus()
       priority,
       color: t.color || '#16a34a',
       column: (t.status as 'new' | 'work' | 'done') || 'new',
-      assignedUserId: Number(t.assignedUserId) || null
+      assignedUserIds
     };
+
     this.showEditModal = true;
   }
 
@@ -370,28 +423,30 @@ async checkServiceStatus()
 
   async submitCreateTask() {
     this.updatePriorityColor(this.createModel);
+
     await this.createTask(
       this.createModel.title,
       'new',
       this.createModel.tags,
       this.createModel.description,
       this.createModel.color,
-      this.createModel.assignedUserId
+      this.createModel.assignedUserIds
     );
+
     this.closeCreateModal();
   }
 
   async submitEditTask() {
     this.updatePriorityColor(this.editModel);
 
-    const payload = {
+    const payload: any = {
       id: this.editModel.id,
       status: this.editModel.column,
       text: this.editModel.title,
       description: this.editModel.description,
       tags: this.editModel.tags,
       color: this.editModel.color,
-      assignedUserId: this.editModel.assignedUserId,
+      assignedUserIds: this.editModel.assignedUserIds || [],
       order: this.data.findIndex(d => Number(d.id) === this.editModel.id)
     };
 
@@ -408,12 +463,14 @@ async checkServiceStatus()
     this.closeEditModal();
   }
 
+  /* ---------- Drag & drop ---------- */
+
   async onItemMoved(event: any): Promise<void> {
     const movedTask = event.args.itemData;
     if (!movedTask) return;
 
     const newStatus = event.args.newColumn.dataField;
-    const t = this.data.find(task => task.id === movedTask.id);
+    const t = this.data.find(task => String(task.id) === String(movedTask.id));
 
     if (t) {
       t.status = newStatus;
@@ -433,7 +490,16 @@ async checkServiceStatus()
     }
   }
 
-  async createTask(taskText: string, column: string, tagsText: string, description: string, color: string, assignedUserId: number | null): Promise<void> {
+  /* ---------- CRUD ---------- */
+
+  async createTask(
+    taskText: string,
+    column: string,
+    tagsText: string,
+    description: string,
+    color: string,
+    assignedUserIds: number[]
+  ): Promise<void> {
     const formattedTags = tagsText.length === 0 ? [' '] : this.textToArray(tagsText);
     const newTaskOrder = this.data.filter(task => task.status === 'new').length;
 
@@ -444,19 +510,26 @@ async checkServiceStatus()
       tags: formattedTags,
       order: newTaskOrder,
       color,
-      assignedUserId
+      users: assignedUserIds
     };
 
     try {
       const response = await this.http.post<TaskCard>(
         `${environment.apiUrl}/service/${this.taskBoardId}/cards`,
-        newTask, { headers: { 'Content-Type': 'application/json' } }
+        newTask,
+        { headers: { 'Content-Type': 'application/json' } }
       ).toPromise();
 
       const created = response!;
       this.data.push({
-        id: created?.id, status: column, text: taskText, description,
-        tags: formattedTags, order: newTaskOrder, color, assignedUserId
+        id: String(created?.id),
+        status: column,
+        text: taskText,
+        description,
+        tags: formattedTags,
+        order: newTaskOrder,
+        color,
+        assignedUserIds
       });
 
       this.dataAdapter.localData = this.data;
@@ -470,23 +543,24 @@ async checkServiceStatus()
   async updateTask(task: any): Promise<void> {
     if (!task || !task.id) return;
 
-    const payload = {
+    const payload: any = {
       column: task.status,
       title: task.text,
       description: task.description || '',
       tags: Array.isArray(task.tags) ? task.tags : this.textToArray(task.tags) || [],
       order: task.order,
-      color: task.color === null ? '#008000' : task.color,
-      assignedUserId: task.assignedUserId || null
+      color: task.color || '#16a34a',
+      users: task.assignedUserIds
     };
 
     try {
       await this.http.patch<TaskCard>(
         `${environment.apiUrl}/service/${this.taskBoardId}/tasks/${task.id}`,
-        payload, { headers: { 'Content-Type': 'application/json' } }
+        payload,
+        { headers: { 'Content-Type': 'application/json' } }
       ).toPromise();
 
-      const idx = this.data.findIndex(x => x.id === task.id);
+      const idx = this.data.findIndex(x => String(x.id) === String(task.id));
       if (idx !== -1) {
         this.data[idx] = { ...this.data[idx], ...payload };
       }
@@ -499,8 +573,9 @@ async checkServiceStatus()
 
   async deleteTask(taskId: number): Promise<void> {
     try {
-      const url = `${environment.apiUrl}/service/${this.taskBoardId}/tasks/${taskId}`;
-      await this.http.delete(url).toPromise();
+      await this.http.delete(
+        `${environment.apiUrl}/service/${this.taskBoardId}/tasks/${taskId}`
+      ).toPromise();
 
       this.data = this.data.filter(task => Number(task.id) !== Number(taskId));
       this.dataAdapter.localData = this.data;
@@ -511,6 +586,8 @@ async checkServiceStatus()
       console.error('Error deleting task:', error);
     }
   }
+
+  /* ---------- Navigation ---------- */
 
   goBack() {
     this.location.back();
@@ -527,9 +604,16 @@ async checkServiceStatus()
     ]);
   }
 
-  kanbanItemRenderer = (element: any, item: any, resource: any) => {
+  /* ---------- Kanban renderer ---------- */
+
+  kanbanItemRenderer = (element: any, item: any) => {
     const tags = (item.tags || '').split(',').filter((x: string) => x.trim());
-    const priority = item.color === '#dc2626' ? 'high' : item.color === '#eab308' ? 'medium' : 'low';
+    const priority =
+      item.color === '#dc2626'
+        ? 'high'
+        : item.color === '#eab308'
+          ? 'medium'
+          : 'low';
 
     element.innerHTML =
       `<div class="kanban-card">
@@ -543,4 +627,51 @@ async checkServiceStatus()
         </div>
       </div>`;
   };
+
+  // === Dropdowns ===
+  dropdownOpenCreate = false;
+  dropdownOpenEdit = false;
+
+  @HostListener('document:click', ['$event'])
+  handleClickOutside(event: Event) {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.dropdown-select') && !target.closest('.dropdown-list')) {
+      this.dropdownOpenCreate = false;
+      this.dropdownOpenEdit = false;
+    }
+  }
+
+  toggleDropdown(mode: 'create' | 'edit') {
+    if (mode === 'create') {
+      this.dropdownOpenCreate = !this.dropdownOpenCreate;
+      this.dropdownOpenEdit = false;
+    } else {
+      this.dropdownOpenEdit = !this.dropdownOpenEdit;
+      this.dropdownOpenCreate = false;
+    }
+  }
+
+  toggleUserSelection(userId: number, mode: 'create' | 'edit') {
+    const model = mode === 'create' ? this.createModel : this.editModel;
+    const index = model.assignedUserIds.indexOf(userId);
+    if (index === -1) model.assignedUserIds.push(userId);
+    else model.assignedUserIds.splice(index, 1);
+  }
+
+  removeUser(userId: number, mode: 'create' | 'edit') {
+    const model = mode === 'create' ? this.createModel : this.editModel;
+    model.assignedUserIds = model.assignedUserIds.filter(id => id !== userId);
+  }
+
+  getSelectedNames(ids: number[]): string {
+    return this.users
+      .filter(u => ids.includes(u.id))
+      .map(u => `${u.first_name} ${u.last_name}`)
+      .join(', ');
+  }
+
+  getUserNameById(id: number): string {
+    const user = this.users.find(u => u.id === id);
+    return user ? `${user.first_name} ${user.last_name}` : 'Unknown';
+  }
 }

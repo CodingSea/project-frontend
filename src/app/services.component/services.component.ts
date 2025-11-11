@@ -41,6 +41,7 @@ export class ServicesComponent implements OnInit, AfterViewInit {
 
   searchTerm = '';
   selectedStatus = '';
+  hasTasksFilter = ''; // 🟩 NEW FILTER
   statuses: string[] = [
     'Not Started Yet',
     'Pending Approval',
@@ -51,7 +52,6 @@ export class ServicesComponent implements OnInit, AfterViewInit {
     'Overdue',
   ];
 
-  // ✅ Pagination
   currentPage = 1;
   pageSize = 7;
   totalPages = 1;
@@ -73,23 +73,19 @@ export class ServicesComponent implements OnInit, AfterViewInit {
     });
   }
 
-loadServices() {
-  if (!this.projectId) return;
+  loadServices() {
+    if (!this.projectId) return;
 
-  this.http.get<Project>(`${environment.apiUrl}/project/${this.projectId}`).subscribe(
-    (res) => {
-      this.services = res.services ?? [];
-
-      // ✅ FIX: update total services count
-      this.servicesInfo.totalServices = this.services.length;
-
-      this.applySearch();
-      this.calculateStats();
-    },
-    (error) => console.error('❌ Failed to load project services:', error)
-  );
-}
-
+    this.http.get<Project>(`${environment.apiUrl}/project/${this.projectId}`).subscribe(
+      (res) => {
+        this.services = res.services ?? [];
+        this.servicesInfo.totalServices = this.services.length;
+        this.applySearch();
+        this.calculateStats();
+      },
+      (error) => console.error('❌ Failed to load project services:', error)
+    );
+  }
 
   applySearch() {
     let filtered = this.services;
@@ -107,6 +103,13 @@ loadServices() {
       filtered = filtered.filter((s) => s.status === this.selectedStatus);
     }
 
+    // 🟩 NEW: Filter by has tasks
+    if (this.hasTasksFilter === 'true') {
+      filtered = filtered.filter((s) => s.taskBoard?.cards && s.taskBoard.cards.length > 0);
+    } else if (this.hasTasksFilter === 'false') {
+      filtered = filtered.filter((s) => !s.taskBoard?.cards || s.taskBoard.cards.length === 0);
+    }
+
     this.totalPages = Math.ceil(filtered.length / this.pageSize);
     this.pages = Array.from({ length: this.totalPages }, (_, i) => i + 1);
 
@@ -115,7 +118,6 @@ loadServices() {
     this.filteredServices = filtered.slice(start, end);
   }
 
-  // ✅ Pagination Controls
   goToPage(page: number) {
     if (page < 1 || page > this.totalPages) return;
     this.currentPage = page;
