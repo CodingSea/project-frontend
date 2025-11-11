@@ -16,6 +16,8 @@ export interface TaskCard
     last_name?: string;
     email?: string;
   } | null;
+
+  users?: number[];
 }
 
 export interface TaskCardDisplayed

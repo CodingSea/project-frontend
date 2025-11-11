@@ -50,7 +50,7 @@
                 </div>
             </div>
 
-            <p class="total-developers-text">Total Projects: {{ developers.length }}</p>
+            <p class="total-developers-text">Total Projects: {{ developers?.length }}</p>
 
             <!-- Developers Grid -->
             <div class="developers-grid">
@@ -58,19 +58,29 @@
                     <div class="dev-header">
                         <img [src]="dev.profileImage || 'images/user.png'" alt="Profile" />
                         <h3>{{ dev.first_name }} {{ dev.last_name }}</h3>
-                        <p class="role">{{ dev.role }}</p>
+                        <!-- <p class="role">{{ dev.role }}</p> -->
                     </div>
 
                     <div class="dev-skills">
                         <span class="skill" *ngFor="let skill of dev.skills">{{ skill }}</span>
                     </div>
 
+                    <!-- Services Section -->
+                    <!-- <div class="dev-tasks" *ngIf="dev.services && dev.services.length > 0">
+                        <h4>Services:</h4>
+                        <ul>
+                            <li *ngFor="let service of dev.services">
+                                {{ service.name }}
+                            </li>
+                        </ul>
+                    </div> -->
+
                     <!-- Tasks Section -->
-                    <div class="dev-tasks" *ngIf="dev.tasks && dev.tasks.length > 0">
+                    <div class="dev-tasks" *ngIf="dev.cards && dev.cards.length > 0">
                         <h4>Tasks:</h4>
                         <ul>
-                            <li *ngFor="let task of dev.tasks">
-                                {{ task.title }} - <span></span>
+                            <li *ngFor="let task of dev.cards">
+                                {{ task.title }} <span></span>
                             </li>
                         </ul>
                     </div>
