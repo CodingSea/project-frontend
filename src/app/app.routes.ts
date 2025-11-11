@@ -17,12 +17,14 @@ import { IssuePage } from './issue-page/issue-page';
 import { IssueCreateComponent } from './issue-create/issue-create';
 import { ExcelImporter } from './excel-importer/excel-importer';
 import { ExcelDeveloperImporter } from './excel-developer-importer/excel-developer-importer';
+import { DevelopersDashboard } from './developers-dashboard/developers-dashboard';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'auth/signup', pathMatch: 'full' },
   { path: 'projects', component: ProjectManagement, canActivate: [AuthGuard], data: { onlyAdmin: true } },
   { path: 'projects/:projectId/services', component: ServicesComponent, canActivate: [AuthGuard], data: { onlyAdmin: true } },
   { path: 'projects/:projectId/services/new', component: ServiceFormComponent, canActivate: [AuthGuard], data: { onlyAdmin: true } },
+  { path: 'developer-dashboard', component: DevelopersDashboard, canActivate: [AuthGuard], data: { onlyAdmin: true } },
   { path: 'projects/:projectId/services/:serviceId/edit', component: ServiceFormComponent, canActivate: [AuthGuard], data: { onlyAdmin: true } },
   { path: 'auth/:mode', component: UserComponent },
   { path: 'dashboard', component: Dashboard, canActivate: [AuthGuard], data: { onlyAdmin: true } },

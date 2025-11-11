@@ -62,6 +62,10 @@ export class Sidebar implements OnInit
     {
       this.activeLink = 'home';
     }
+    else if (url.startsWith('/developer-dashboard'))
+    {
+      this.activeLink = 'developerDashboard';
+    }
     else
     {
       this.activeLink = '';

@@ -53,7 +53,7 @@ export class ProfileEditComponent
           )
 
           this.clearSkills();
-          this.currentUser.skills.forEach(skill => this.addSkill(skill));
+          this.currentUser.skills?.forEach(skill => this.addSkill(skill));
         },
         (error) =>
         {

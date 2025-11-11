@@ -1,76 +1,82 @@
 @if (isAdmin)
 {
-  <aside class="sidebar">
-    <nav>
-      <a routerLink="/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
-        <svg viewBox="0 0 24 24" width="40" height="40" fill="currentColor">
-          <rect x="2" y="2" width="20" height="20" rx="3" fill="none" stroke="currentColor" stroke-width="2"/>
-          <rect x="6" y="10" width="3" height="10" fill="currentColor"/>
-          <rect x="11" y="5" width="3" height="15" fill="currentColor"/>
-          <rect x="16" y="12" width="3" height="8" fill="currentColor"/>
-        </svg>
-        Dashboard
-      </a>
-
-      <a routerLink="/projects"
-        [class.active]="activeLink === 'projectManagement'">
-              <svg viewBox="0 0 24 24">
-                <path d="M4 5h16v2H4zm0 6h10v2H4zm0 6h6v2H4z" />
-              </svg>
-              Project Management
-            </a>
-
-      <a routerLink="/profile"
-        [class.active]="activeLink === 'profile'">
-              <svg viewBox="0 0 24 24">
-                <circle cx="10" cy="7" r="4" />
-                <path d="M4 20v-1a6 6 0 0112 0v1z" />
-              </svg>
-              Profile
-            </a>
-
-<a routerLink="/home" [class.active]="activeLink === 'home'">
-        <svg viewBox="0 0 24 24">
-          <path d="M3 9.5L12 3l9 6.5v11a2 2 0 01-2 2h-4a2 2 0 01-2-2v-5H9v5a2 2 0 01-2 2H3a2 2 0 01-2-2v-11z" />
-        </svg>
-        Developer Home
-      </a>
-    </nav>
-
-    <div class="logout" (click)="logout()">
-      <svg viewBox="0 0 24 24">
-        <path d="M16 17l5-5-5-5M20 12H8" />
+<aside class="sidebar">
+  <nav>
+    <a routerLink="/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+      <svg viewBox="0 0 24 24" width="40" height="40" fill="currentColor">
+        <rect x="2" y="2" width="20" height="20" rx="3" fill="none" stroke="currentColor" stroke-width="2" />
+        <rect x="6" y="10" width="3" height="10" fill="currentColor" />
+        <rect x="11" y="5" width="3" height="15" fill="currentColor" />
+        <rect x="16" y="12" width="3" height="8" fill="currentColor" />
       </svg>
-      Logout
-    </div>
-  </aside>
+      Dashboard
+    </a>
+
+    <a routerLink="/projects" [class.active]="activeLink === 'projectManagement'">
+      <svg viewBox="0 0 24 24">
+        <path d="M4 5h16v2H4zm0 6h10v2H4zm0 6h6v2H4z" />
+      </svg>
+      Project Management
+    </a>
+
+    <a routerLink="/developer-dashboard" [class.active]="activeLink === 'developerDashboard'">
+      <svg viewBox="0 0 24 24">
+        <circle cx="10" cy="7" r="4" />
+        <path d="M4 20v-1a6 6 0 0112 0v1z" />
+      </svg>
+      Developer Dashboard
+    </a>
+
+    <a routerLink="/profile" [class.active]="activeLink === 'profile'">
+      <svg viewBox="0 0 24 24">
+        <circle cx="10" cy="7" r="4" />
+        <path d="M4 20v-1a6 6 0 0112 0v1z" />
+      </svg>
+      Profile
+    </a>
+
+    <a routerLink="/home" [class.active]="activeLink === 'home'">
+      <svg viewBox="0 0 24 24">
+        <path d="M3 9.5L12 3l9 6.5v11a2 2 0 01-2 2h-4a2 2 0 01-2-2v-5H9v5a2 2 0 01-2 2H3a2 2 0 01-2-2v-11z" />
+      </svg>
+      Developer Home
+    </a>
+  </nav>
+
+  <div class="logout" (click)="logout()">
+    <svg viewBox="0 0 24 24">
+      <path d="M16 17l5-5-5-5M20 12H8" />
+    </svg>
+    Logout
+  </div>
+</aside>
 }
 @else
 {
-  <aside class="sidebar">
+<aside class="sidebar">
 
-    <nav>
-      <a routerLink="/home" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
-        <svg viewBox="0 0 24 24">
-          <path d="M3 9.5L12 3l9 6.5v11a2 2 0 01-2 2h-4a2 2 0 01-2-2v-5H9v5a2 2 0 01-2 2H3a2 2 0 01-2-2v-11z" />
-        </svg>
-        Home
-      </a>
-
-      <a routerLink="/profile" routerLinkActive="active">
-        <svg viewBox="0 0 24 24">
-          <circle cx="10" cy="7" r="4" />
-          <path d="M4 20v-1a6 6 0 0112 0v1z" />
-        </svg>
-        Profile
-      </a>
-    </nav>
-
-    <div class="logout" (click)="logout()">
+  <nav>
+    <a routerLink="/home" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
       <svg viewBox="0 0 24 24">
-        <path d="M16 17l5-5-5-5M20 12H8" />
+        <path d="M3 9.5L12 3l9 6.5v11a2 2 0 01-2 2h-4a2 2 0 01-2-2v-5H9v5a2 2 0 01-2 2H3a2 2 0 01-2-2v-11z" />
       </svg>
-      Logout
-    </div>
-  </aside>
+      Home
+    </a>
+
+    <a routerLink="/profile" routerLinkActive="active">
+      <svg viewBox="0 0 24 24">
+        <circle cx="10" cy="7" r="4" />
+        <path d="M4 20v-1a6 6 0 0112 0v1z" />
+      </svg>
+      Profile
+    </a>
+  </nav>
+
+  <div class="logout" (click)="logout()">
+    <svg viewBox="0 0 24 24">
+      <path d="M16 17l5-5-5-5M20 12H8" />
+    </svg>
+    Logout
+  </div>
+</aside>
 }
