@@ -3,6 +3,7 @@
   <app-sidebar></app-sidebar>
 
   <div class="kanban-container">
+
     <!-- Tabs -->
     <div class="page-tabs">
       <div [class.active]="isTaskboardSelected" (click)="selectSection(true)">Board</div>
@@ -42,14 +43,23 @@
         <span class="progress-percent">{{ formatDecimal(servicesInfo.completionRate) }}%</span>
       </div>
 
+      <!-- ✅ Actions Row -->
       <div class="actions-row">
-        <button *ngIf="isTaskboardSelected" class="btn-primary" (click)="openCreateModal()">+ Add Task</button>
-        <button *ngIf="!isTaskboardSelected" class="btn-primary" (click)="toggleEdit()">Edit</button>
+        <!-- Add Task: Chief / Manager / Resource / Admin -->
+        <button
+          *ngIf="isTaskboardSelected && (isChief || isManager || isResource || isAdmin)"
+          class="btn-primary"
+          (click)="openCreateModal()">
+          + Add Task
+        </button>
+
+
+
         <button class="btn-secondary" (click)="goBack()">Back</button>
       </div>
     </header>
 
-    <!-- Kanban -->
+    <!-- ===================== Kanban Board ===================== -->
     <div class="modern-kanban-board" *ngIf="showKanban && isTaskboardSelected">
       <jqxKanban
         #kanbanReference
@@ -57,7 +67,7 @@
         [width]="'100%'"
         [columns]="columns"
         [source]="dataAdapter"
-        (onItemAttrClicked)="openEditModal($event.args.item)"
+        (onItemAttrClicked)="(isChief || isAdmin) ? openEditModal($event.args.item) : null"
         (onItemMoved)="onItemMoved($event)">
       </jqxKanban>
     </div>
@@ -102,7 +112,6 @@
             </div>
           </div>
 
-          <!-- Display Selected Users -->
           <div class="selected-users" *ngIf="createModel.assignedUserIds.length > 0">
             <div class="user-pill" *ngFor="let uid of createModel.assignedUserIds">
               {{ getUserNameById(uid) }}
@@ -147,23 +156,23 @@
       <form (ngSubmit)="submitEditTask()" #editForm="ngForm" class="modal-form">
         <div class="form-group">
           <label>Title <span>*</span></label>
-          <input type="text" class="form-input" [(ngModel)]="editModel.title" name="editTitle" required />
+          <input type="text" class="form-input" [(ngModel)]="editModel.title" name="editTitle" required [readonly]="!isChief && !isAdmin"/>
         </div>
 
         <div class="form-group">
           <label>Description</label>
-          <textarea class="form-textarea" [(ngModel)]="editModel.description" name="editDescription"></textarea>
+          <textarea class="form-textarea" [(ngModel)]="editModel.description" name="editDescription" [readonly]="!isChief && !isAdmin"></textarea>
         </div>
 
         <!-- ✅ Assign To Dropdown -->
         <div class="form-group">
           <label>Assign To</label>
-          <div class="dropdown-select" (click)="toggleDropdown('edit')">
+          <div class="dropdown-select" (click)="(isChief || isAdmin) && toggleDropdown('edit')">
             <div class="dropdown-selected">Select user(s)</div>
             <div class="dropdown-arrow">▼</div>
           </div>
 
-          <div class="dropdown-list" *ngIf="dropdownOpenEdit">
+          <div class="dropdown-list" *ngIf="dropdownOpenEdit && (isChief || isAdmin)">
             <div
               class="dropdown-item"
               *ngFor="let u of users"
@@ -173,11 +182,10 @@
             </div>
           </div>
 
-          <!-- Display Selected Users -->
           <div class="selected-users" *ngIf="editModel.assignedUserIds.length > 0">
             <div class="user-pill" *ngFor="let uid of editModel.assignedUserIds">
               {{ getUserNameById(uid) }}
-              <span class="remove" (click)="removeUser(uid, 'edit')">×</span>
+              <span class="remove" *ngIf="isChief || isAdmin" (click)="removeUser(uid, 'edit')">×</span>
             </div>
           </div>
         </div>
@@ -185,12 +193,13 @@
         <div class="form-2col">
           <div class="form-group">
             <label>Tags <span class="muted">(comma separated)</span></label>
-            <input type="text" class="form-input" [(ngModel)]="editModel.tags" name="editTags" />
+            <input type="text" class="form-input" [(ngModel)]="editModel.tags" name="editTags" [readonly]="!isChief && !isAdmin" />
           </div>
 
           <div class="form-group">
             <label>Priority</label>
-            <select class="form-input" [(ngModel)]="editModel.priority" name="editPriority" (change)="updatePriorityColor(editModel)">
+            <select class="form-input" [(ngModel)]="editModel.priority" name="editPriority"
+              (change)="updatePriorityColor(editModel)" [disabled]="!isChief && !isAdmin">
               <option value="low">Low Priority</option>
               <option value="medium">Medium Priority</option>
               <option value="high">High Priority</option>
@@ -200,25 +209,26 @@
 
         <div class="form-group">
           <label>Column</label>
-          <select class="form-input" [(ngModel)]="editModel.column" name="editColumn">
+          <select class="form-input" [(ngModel)]="editModel.column" name="editColumn" [disabled]="!isChief && !isAdmin">
             <option value="new">Backlog</option>
             <option value="work">In Progress</option>
             <option value="done">Done</option>
           </select>
         </div>
 
-        <div class="danger-box">
+        <div class="danger-box" *ngIf="isChief || isAdmin">
           <div class="danger-label">Danger Zone</div>
           <button type="button" class="btn-danger-full" (click)="confirmDelete()">Delete Task</button>
         </div>
 
         <div class="modal-buttons">
           <button type="button" class="btn-secondary" (click)="closeEditModal()">Close</button>
-          <button type="submit" class="btn-primary" [disabled]="!editForm.form.valid">Save</button>
+          <button type="submit" class="btn-primary" [disabled]="!editForm.form.valid || (!isChief && !isAdmin)">Save</button>
         </div>
       </form>
     </div>
 
-    <app-issue-page-template #issuePage *ngIf="!isTaskboardSelected" />
+    <!-- Discussion -->
+    <app-issue-page-template #issuePage *ngIf="!isTaskboardSelected"></app-issue-page-template>
   </div>
 </div>

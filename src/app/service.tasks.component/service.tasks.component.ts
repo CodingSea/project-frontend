@@ -13,7 +13,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Sidebar } from '@app/sidebar/sidebar';
 import { HeaderComponent } from '@app/header/header';
 import { IssuePageTemplate } from '@app/issue-page/issue-page-template';
-import { UserService, User } from '@app/services/user.service';
+import { User, UserService } from '@app/services/user.service';
 
 @Component({
   selector: 'app-service-tasks',
@@ -49,6 +49,13 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit {
   // only assigned users for this service
   users: User[] = [];
 
+  // Role flags
+  currentUser: User | null | undefined = null;
+  isChief = false;
+  isManager = false;
+  isResource = false;
+  isAdmin = false;
+
   createModel = {
     title: '',
     description: '',
@@ -69,20 +76,42 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit {
     assignedUserIds: [] as number[]
   };
 
+  // Dropdown flags
+  dropdownOpenCreate = false;
+  dropdownOpenEdit = false;
+
+  servicesInfo: ServiceInfo = {
+    totalServices: 0,
+    backloggedTasks: 0,
+    activeTasks: 0,
+    completedTasks: 0,
+    totalMembers: 0,
+    completionRate: 0.0
+  };
+
+  columns: any[] = [
+    { text: 'Backlog', dataField: 'new', minWidth: 150, collapsible: false },
+    { text: 'In Progress', dataField: 'work', minWidth: 150, collapsible: false },
+    { text: 'Done', dataField: 'done', minWidth: 150, collapsible: false }
+  ];
+
   constructor(
     private http: HttpClient,
     private route: ActivatedRoute,
     private location: Location,
     private router: Router,
-    private userService: UserService
+    private userService: UserService // still injected if you need it elsewhere
   ) {}
 
   ngOnInit(): void {
     window.scroll({ top: 0, left: 0 });
-    this.route.params.subscribe(params => {
+
+    this.route.params.subscribe(async params => {
       this.serviceId = params['serviceId'];
       this.taskBoardId = params['taskBoardId'];
-      this.initializeKanbanDataSource();
+
+      await this.loadCurrentUserAndRoles();
+      await this.initializeKanbanDataSource();
       this.getCurrentServiceInfo();
       this.loadAssignedUsers();
     });
@@ -90,7 +119,98 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit() {}
 
-  /* ---------- Helpers ---------- */
+  // ==================== AUTH / ROLES ====================
+
+  private getUserFromToken(): User | null {
+    try {
+      const token =
+        localStorage.getItem('access_token') ||
+        localStorage.getItem('token') ||
+        localStorage.getItem('jwt');
+
+      if (!token) {
+        console.warn('No JWT token found in localStorage');
+        return null;
+      }
+
+      const parts = token.split('.');
+      if (parts.length !== 3) {
+        console.error('Invalid JWT token format');
+        return null;
+      }
+
+      const payloadJson = atob(parts[1].replace(/-/g, '+').replace(/_/g, '/'));
+      const payload: any = JSON.parse(payloadJson);
+
+      const user: User = {
+        id: Number(payload.id || payload.userId || payload.sub),
+        first_name: payload.first_name || payload.firstName || '',
+        last_name: payload.last_name || payload.lastName || '',
+        email: payload.email || '',
+        role: payload.role || payload.userType || '',
+        skills: []
+      };
+
+      if (!user.id) {
+        console.warn('JWT payload did not contain a valid user id');
+        return null;
+      }
+
+      return user;
+    } catch (e) {
+      console.error('Failed to decode JWT token', e);
+      return null;
+    }
+  }
+
+  async loadCurrentUserAndRoles(): Promise<void> {
+    try {
+      this.currentUser = this.getUserFromToken();
+      console.log('🟢 currentUser from JWT:', this.currentUser);
+
+      if (!this.currentUser) {
+        this.isAdmin = this.isChief = this.isManager = this.isResource = false;
+        return;
+      }
+
+      const service = await this.http
+        .get<Service>(`${environment.apiUrl}/service/${this.serviceId}`)
+        .toPromise();
+
+      console.log('🟣 full service object:', service);
+
+      if (!service) {
+        this.isAdmin = this.isChief = this.isManager = this.isResource = false;
+        return;
+      }
+
+      const userId = Number(this.currentUser.id);
+      const role = (this.currentUser.role || '').toLowerCase();
+
+      this.isAdmin = role === 'admin';
+
+      this.isChief = !!service.chief && Number(service.chief.id) === userId;
+
+      this.isManager =
+        !!service.projectManager && Number(service.projectManager.id) === userId;
+
+      this.isResource =
+        Array.isArray(service.assignedResources) &&
+        service.assignedResources.some((r: any) => Number(r.id) === userId);
+
+      console.log('Role flags:', {
+        isAdmin: this.isAdmin,
+        isChief: this.isChief,
+        isManager: this.isManager,
+        isResource: this.isResource
+      });
+    } catch (err) {
+      console.error('❌ loadCurrentUserAndRoles error:', err);
+      this.isAdmin = this.isChief = this.isManager = this.isResource = false;
+    }
+  }
+
+  // ==================== HELPERS ====================
 
   updatePriorityColor(task: { priority: 'low' | 'medium' | 'high'; color: string }) {
     if (!task) return;
@@ -110,22 +230,28 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit {
     }
   }
 
-  servicesInfo: ServiceInfo = {
-    totalServices: 0,
-    backloggedTasks: 0,
-    activeTasks: 0,
-    completedTasks: 0,
-    totalMembers: 0,
-    completionRate: 0.0
-  };
+  textToArray(text: string | string[]): string[] {
+    if (Array.isArray(text)) return text;
+    if (typeof text !== 'string') return [' '];
+    return text
+      .split(',')
+      .map(t => t.trim())
+      .filter(t => t.length > 0);
+  }
 
-  columns: any[] = [
-    { text: 'Backlog', dataField: 'new', minWidth: 150, collapsible: false },
-    { text: 'In Progress', dataField: 'work', minWidth: 150, collapsible: false },
-    { text: 'Done', dataField: 'done', minWidth: 150, collapsible: false }
-  ];
+  arrayToString(arr: string[] | string | undefined): string {
+    if (!arr) return '';
+    if (Array.isArray(arr)) return arr.join(', ');
+    return arr;
+  }
 
-  /* ---------- Load users for dropdown ---------- */
+  formatDecimal(num: number): string {
+    const r = Math.round(num * 10) / 10;
+    const s = String(r);
+    return s.endsWith('.0') ? s.slice(0, -2) : s;
+    }
+
+  // ==================== LOAD ASSIGNED USERS ====================
 
   async loadAssignedUsers(): Promise<void> {
     try {
@@ -161,7 +287,7 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit {
     }
   }
 
-  /* ---------- Service info / progress ---------- */
+  // ==================== SERVICE INFO / PROGRESS ====================
 
   async getCurrentServiceInfo(): Promise<void> {
     this.servicesInfo = {
@@ -175,7 +301,7 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit {
 
     this.http
       .get<TaskBoard>(`${environment.apiUrl}/tasks/task-board/${this.taskBoardId}`)
-      .subscribe((res) => {
+      .subscribe(res => {
         this.taskBoard = res;
         if (!this.taskBoard) return;
 
@@ -217,10 +343,9 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit {
         this.dataAdapter.localData[0].status === 's'
       ) {
         await this.http
-          .patch<Service>(
-            `${environment.apiUrl}/service/${this.serviceId}/status`,
-            { status: ServiceStatus.New }
-          )
+          .patch<Service>(`${environment.apiUrl}/service/${this.serviceId}/status`, {
+            status: ServiceStatus.New
+          })
           .toPromise();
         return;
       }
@@ -231,17 +356,15 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit {
         if (this.taskBoard?.service.status === 'Pending Approval') return;
 
         await this.http
-          .patch<Service>(
-            `${environment.apiUrl}/service/${this.serviceId}/status`,
-            { status: ServiceStatus.Completed }
-          )
+          .patch<Service>(`${environment.apiUrl}/service/${this.serviceId}/status`, {
+            status: ServiceStatus.Completed
+          })
           .toPromise();
       } else {
         await this.http
-          .patch<Service>(
-            `${environment.apiUrl}/service/${this.serviceId}/status`,
-            { status: ServiceStatus.InProgress }
-          )
+          .patch<Service>(`${environment.apiUrl}/service/${this.serviceId}/status`, {
+            status: ServiceStatus.InProgress
+          })
           .toPromise();
       }
     } catch (err) {
@@ -249,7 +372,7 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit {
     }
   }
 
-  /* ---------- Board data ---------- */
+  // ==================== BOARD DATA (TASKS) ====================
 
   async getBoardCards(): Promise<void> {
     try {
@@ -267,10 +390,10 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit {
           Array.isArray(task.users) && task.users.length
             ? task.users.map(u => u.id)
             : task.assignedUserIds && task.assignedUserIds.length
-              ? task.assignedUserIds
-              : task.assignedUserId
-                ? [Number(task.assignedUserId)]
-                : [];
+            ? task.assignedUserIds
+            : task.assignedUserId
+            ? [Number(task.assignedUserId)]
+            : [];
 
         return {
           id: String(task.id),
@@ -292,19 +415,21 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit {
     await this.getBoardCards();
 
     if (this.data.length === 0) {
-      this.data = [{
-        id: '1',
-        status: 's',
-        text: 'eee',
-        tags: 'ss',
-        description: 'ssssee',
-        assignee: 'John sp',
-        color: '#C21A25',
-        assignedUserIds: []
-      }];
+      this.data = [
+        {
+          id: '1',
+          status: 's',
+          text: 'eee',
+          tags: 'ss',
+          description: 'ssssee',
+          assignee: 'John sp',
+          color: '#C21A25',
+          assignedUserIds: []
+        }
+      ];
     }
 
-    this.dataAdapter = new jqx.dataAdapter({
+    this.dataAdapter = new (window as any).jqx.dataAdapter({
       localData: this.data,
       dataType: 'array',
       dataFields: [
@@ -332,7 +457,7 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit {
     await this.getBoardCards();
 
     setTimeout(() => {
-      this.dataAdapter = new jqx.dataAdapter({
+      this.dataAdapter = new (window as any).jqx.dataAdapter({
         localData: this.data,
         dataType: 'array',
         dataFields: [
@@ -357,25 +482,7 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit {
     }, 0);
   }
 
-  textToArray(text: string | string[]): string[] {
-    if (Array.isArray(text)) return text;
-    if (typeof text !== 'string') return [' '];
-    return text.split(',').map(t => t.trim()).filter(t => t.length > 0);
-  }
-
-  arrayToString(arr: string[] | string | undefined): string {
-    if (!arr) return '';
-    if (Array.isArray(arr)) return arr.join(', ');
-    return arr;
-  }
-
-  formatDecimal(num: number): string {
-    const r = Math.round(num * 10) / 10;
-    const s = String(r);
-    return s.endsWith('.0') ? s.slice(0, -2) : s;
-  }
-
-  /* ---------- Modals ---------- */
+  // ==================== MODALS ====================
 
   openCreateModal() {
     this.createModel = {
@@ -394,14 +501,15 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit {
   }
 
   openEditModal(item: any) {
+    if (!this.isChief && !this.isAdmin) return;
+
     const t = this.data.find(x => String(x.id) === String(item.id));
     if (!t) return;
 
     const priority = this.colorToPriority(t.color);
-    const assignedUserIds: number[] =
-      (t.assignedUserIds && t.assignedUserIds.length
-        ? t.assignedUserIds
-        : []) as number[];
+    const assignedUserIds: number[] = t.assignedUserIds && t.assignedUserIds.length
+      ? t.assignedUserIds
+      : [];
 
     this.editModel = {
       id: Number(t.id),
@@ -421,7 +529,11 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit {
     this.showEditModal = false;
   }
 
+  // ==================== CREATE / UPDATE / DELETE ====================
+
   async submitCreateTask() {
+    if (!(this.isChief || this.isManager || this.isResource || this.isAdmin)) return;
+
     this.updatePriorityColor(this.createModel);
 
     await this.createTask(
@@ -437,6 +549,8 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit {
   }
 
   async submitEditTask() {
+    if (!(this.isChief || this.isAdmin)) return;
+
     this.updatePriorityColor(this.editModel);
 
     const payload: any = {
@@ -458,39 +572,10 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit {
   }
 
   confirmDelete() {
-    if (!this.editModel?.id) return;
+    if (!this.editModel?.id || !(this.isChief || this.isAdmin)) return;
     this.deleteTask(this.editModel.id);
     this.closeEditModal();
   }
-
-  /* ---------- Drag & drop ---------- */
-
-  async onItemMoved(event: any): Promise<void> {
-    const movedTask = event.args.itemData;
-    if (!movedTask) return;
-
-    const newStatus = event.args.newColumn.dataField;
-    const t = this.data.find(task => String(task.id) === String(movedTask.id));
-
-    if (t) {
-      t.status = newStatus;
-      await this.updateTaskOrder(newStatus);
-      await this.updateTask(t);
-      await this.getCurrentServiceInfo();
-      await this.checkServiceStatus();
-    }
-  }
-
-  private async updateTaskOrder(column: string): Promise<void> {
-    const tasksInColumn = this.data.filter(task => task.status === column);
-    for (let i = 0; i < tasksInColumn.length; i++) {
-      const task = tasksInColumn[i];
-      (task as any).order = i;
-      await this.updateTask(task);
-    }
-  }
-
-  /* ---------- CRUD ---------- */
 
   async createTask(
     taskText: string,
@@ -514,11 +599,13 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit {
     };
 
     try {
-      const response = await this.http.post<TaskCard>(
-        `${environment.apiUrl}/service/${this.taskBoardId}/cards`,
-        newTask,
-        { headers: { 'Content-Type': 'application/json' } }
-      ).toPromise();
+      const response = await this.http
+        .post<TaskCard>(
+          `${environment.apiUrl}/service/${this.taskBoardId}/cards`,
+          newTask,
+          { headers: { 'Content-Type': 'application/json' } }
+        )
+        .toPromise();
 
       const created = response!;
       this.data.push({
@@ -547,18 +634,22 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit {
       column: task.status,
       title: task.text,
       description: task.description || '',
-      tags: Array.isArray(task.tags) ? task.tags : this.textToArray(task.tags) || [],
+      tags: Array.isArray(task.tags)
+        ? task.tags
+        : this.textToArray(task.tags) || [],
       order: task.order,
       color: task.color || '#16a34a',
       users: task.assignedUserIds
     };
 
     try {
-      await this.http.patch<TaskCard>(
-        `${environment.apiUrl}/service/${this.taskBoardId}/tasks/${task.id}`,
-        payload,
-        { headers: { 'Content-Type': 'application/json' } }
-      ).toPromise();
+      await this.http
+        .patch<TaskCard>(
+          `${environment.apiUrl}/service/${this.taskBoardId}/tasks/${task.id}`,
+          payload,
+          { headers: { 'Content-Type': 'application/json' } }
+        )
+        .toPromise();
 
       const idx = this.data.findIndex(x => String(x.id) === String(task.id));
       if (idx !== -1) {
@@ -573,9 +664,9 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit {
 
   async deleteTask(taskId: number): Promise<void> {
     try {
-      await this.http.delete(
-        `${environment.apiUrl}/service/${this.taskBoardId}/tasks/${taskId}`
-      ).toPromise();
+      await this.http
+        .delete(`${environment.apiUrl}/service/${this.taskBoardId}/tasks/${taskId}`)
+        .toPromise();
 
       this.data = this.data.filter(task => Number(task.id) !== Number(taskId));
       this.dataAdapter.localData = this.data;
@@ -587,7 +678,34 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit {
     }
   }
 
-  /* ---------- Navigation ---------- */
+  // ==================== DRAG & DROP ====================
+
+  async onItemMoved(event: any): Promise<void> {
+    const movedTask = event.args.itemData;
+    if (!movedTask) return;
+
+    const newStatus = event.args.newColumn.dataField;
+    const t = this.data.find(task => String(task.id) === String(movedTask.id));
+
+    if (t) {
+      t.status = newStatus;
+      await this.updateTaskOrder(newStatus);
+      await this.updateTask(t);
+      await this.getCurrentServiceInfo();
+      await this.checkServiceStatus();
+    }
+  }
+
+  private async updateTaskOrder(column: string): Promise<void> {
+    const tasksInColumn = this.data.filter(task => task.status === column);
+    for (let i = 0; i < tasksInColumn.length; i++) {
+      const task = tasksInColumn[i];
+      (task as any).order = i;
+      await this.updateTask(task);
+    }
+  }
+
+  // ==================== NAVIGATION ====================
 
   goBack() {
     this.location.back();
@@ -604,7 +722,7 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit {
     ]);
   }
 
-  /* ---------- Kanban renderer ---------- */
+  // ==================== KANBAN RENDERER ====================
 
   kanbanItemRenderer = (element: any, item: any) => {
     const tags = (item.tags || '').split(',').filter((x: string) => x.trim());
@@ -612,30 +730,33 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit {
       item.color === '#dc2626'
         ? 'high'
         : item.color === '#eab308'
-          ? 'medium'
-          : 'low';
+        ? 'medium'
+        : 'low';
 
-    element.innerHTML =
-      `<div class="kanban-card">
+    element.innerHTML = `
+      <div class="kanban-card">
         <div class="k-card-top">
           <span class="k-card-title">${item.text}</span>
           <span class="k-priority ${priority}">${priority}</span>
         </div>
         <div class="k-card-desc">${item.description || ''}</div>
         <div class="k-tags">
-          ${tags.map((t: string) => `<span class="k-tag">${t.trim()}</span>`).join('')}
+          ${tags
+            .map((t: string) => `<span class="k-tag">${t.trim()}</span>`)
+            .join('')}
         </div>
       </div>`;
   };
 
-  // === Dropdowns ===
-  dropdownOpenCreate = false;
-  dropdownOpenEdit = false;
+  // ==================== DROPDOWNS ====================
 
   @HostListener('document:click', ['$event'])
   handleClickOutside(event: Event) {
     const target = event.target as HTMLElement;
-    if (!target.closest('.dropdown-select') && !target.closest('.dropdown-list')) {
+    if (
+      !target.closest('.dropdown-select') &&
+      !target.closest('.dropdown-list')
+    ) {
       this.dropdownOpenCreate = false;
       this.dropdownOpenEdit = false;
     }
@@ -672,6 +793,8 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit {
 
   getUserNameById(id: number): string {
     const user = this.users.find(u => u.id === id);
-    return user ? `${user.first_name} ${user.last_name}` : 'Unknown';
+    return user
+      ? `${user.first_name} ${user.last_name}`
+      : 'Unknown';
   }
 }
