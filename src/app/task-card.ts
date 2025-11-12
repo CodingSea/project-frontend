@@ -1,4 +1,7 @@
-export interface TaskCard {
+import { TaskBoard } from "./task-board";
+
+export interface TaskCard
+{
   id: number;
   title: string;
   column: string;
@@ -6,6 +9,7 @@ export interface TaskCard {
   tags?: string[] | string;
   order?: number;
   color?: string;
+  taskBoard?: TaskBoard;
 
   assignedUserId?: number | null;
   assignedUser?: {
@@ -15,23 +19,11 @@ export interface TaskCard {
     email?: string;
   } | null;
 
-  assignedUserIds?: number[] | null;
-  assignedUsers?: {
-    id: number;
-    first_name?: string;
-    last_name?: string;
-    email?: string;
-  }[] | null;
-
-  users?: {
-    id: number;
-    first_name?: string;
-    last_name?: string;
-    email?: string;
-  }[] | null;
+  users?: number[];
 }
 
-export interface TaskCardDisplayed {
+export interface TaskCardDisplayed
+{
   id?: number;
   column: string;
   title: string;
@@ -41,4 +33,11 @@ export interface TaskCardDisplayed {
   tags?: string;
   order: number;
   color?: string;
+}
+
+export interface DeveloperTask
+{
+  userId: number;
+  taskId: number;
+  title: string;
 }

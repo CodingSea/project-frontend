@@ -11,13 +11,38 @@
               <div class="main_div">
 
                 <!-- ===== Page Header Section (aligned with cards) ===== -->
-                <div class="page-header-wrapper">
-                  <header class="page-header">
-                    <div class="page-header-left">
-                      <h1>Projects</h1>
-                      <app-excel-importer></app-excel-importer>
-                      <input type="file" id="fileUpload" (change)="onFileSelected($event)" hidden />
-                    </div>
+<div class="page-header-wrapper">
+  <header class="page-header">
+    <div class="page-header-left">
+      <h1>Projects</h1>
+      <app-excel-importer></app-excel-importer>
+      <!-- Keeping both: one visible, one commented for reference -->
+      <!-- <input type="file" id="fileUpload" (change)="onFileSelected($event)" hidden /> -->
+      <input type="file" id="fileUpload" (change)="onFileSelected($event)" hidden />
+    </div>
+
+    <div class="page-header-right">
+      <div class="search-box">
+        <input
+          type="text"
+          [(ngModel)]="searchQuery"
+          (input)="onFilterChange()"
+          placeholder="Search projects..."
+        />
+      </div>
+      <select [(ngModel)]="selectedFilter" (change)="onFilterChange()">
+        <option value="all">All Projects</option>
+        <option value="active">Active</option>
+        <option value="on hold">On Hold</option>
+      </select>
+    </div>
+  </header>
+
+  <div class="projects-summary">
+    <p class="total-projects-text">Total Projects: {{ totalProjects }}</p>
+  </div>
+</div>
+
 
                     <div class="page-header-right">
                       <div class="search-box">

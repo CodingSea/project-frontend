@@ -12,6 +12,10 @@ button:hover {
   filter: brightness(0.8);
 }
 
+button:active {
+  filter: brightness(0.6);
+}
+
 /* ==========================
    Elegant Code Block Style
 ==========================*/

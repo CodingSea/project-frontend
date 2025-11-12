@@ -52,7 +52,13 @@ export class Sidebar implements OnInit {
       this.activeLink = 'profile';
     } else if (url.startsWith('/home') || url.startsWith('/issues')) {
       this.activeLink = 'home';
-    } else {
+    }
+    else if (url.startsWith('/developer-dashboard'))
+    {
+      this.activeLink = 'developerDashboard';
+    }
+    else
+    {
       this.activeLink = '';
     }
   }

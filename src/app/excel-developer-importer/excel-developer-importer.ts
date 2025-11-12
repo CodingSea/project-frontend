@@ -1,24 +1,29 @@
 import { HttpClient } from '@angular/common/http';
-import { Component } from '@angular/core';
-import { User } from '@app/user';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { environment } from '@environments/environment';
 import * as XLSX from 'xlsx';
+import { firstValueFrom } from 'rxjs'; // ✅ recommended over .toPromise()
+import { DevelopersDashboard } from '@app/developers-dashboard/developers-dashboard';
+import { CommonModule } from '@angular/common';
 
 @Component({
+  imports: [ CommonModule ],
   selector: 'app-excel-developer-importer',
   templateUrl: './excel-developer-importer.html',
-  styleUrls: [ './excel-developer-importer.css' ] // Fixed styleUrls property
+  styleUrls: [ './excel-developer-importer.css' ]
 })
 export class ExcelDeveloperImporter
 {
   constructor(private http: HttpClient) { }
 
+  @Output() importComplete = new EventEmitter<void>();
+
   excelData: any[] = [];
-  groupedData: { firstName: string, lastName: string, email: string, password: string }[] = [];
+  groupedData: { firstName: string; lastName: string; email: string; password: string }[] = [];
 
   onFileChange(event: any)
   {
-    const target: DataTransfer = <DataTransfer>(event.target);
+    const target: DataTransfer = <DataTransfer>event.target;
     if (target.files.length !== 1)
     {
       throw new Error('Cannot use multiple files');
@@ -33,21 +38,13 @@ export class ExcelDeveloperImporter
       const wsname: string = wb.SheetNames[ 0 ];
       const ws: XLSX.WorkSheet = wb.Sheets[ wsname ];
 
-      // Convert the worksheet data to a JSON array using the first row as headers
       this.excelData = XLSX.utils.sheet_to_json(ws, { header: 1 });
-
-      // Extract headers from the first row
       const headers = this.excelData[ 0 ] as string[];
-
-      // Initialize the groupedData array
       this.groupedData = [];
 
-      // Iterate through the rows starting from the second row
       for (let i = 1; i < this.excelData.length; i++)
       {
         const row = this.excelData[ i ];
-
-        // Map the columns by header names
         const firstName = row[ headers.indexOf('First Name') ];
         const lastName = row[ headers.indexOf('Last Name') ];
         const email = row[ headers.indexOf('Email') ];
@@ -55,15 +52,12 @@ export class ExcelDeveloperImporter
 
         if (firstName && lastName && email && password)
         {
-          // Add user data to groupedData
           this.groupedData.push({ firstName, lastName, email, password });
         }
       }
 
-      console.log(this.groupedData);
-
-      // Call the method to import data into the database
       this.ImportInDB();
+      
     };
 
     reader.readAsBinaryString(target.files[ 0 ]);
@@ -73,19 +67,40 @@ export class ExcelDeveloperImporter
   {
     try
     {
-      let users: {first_name: String, last_name: String, email: String, password: String}[] = [];
-      this.groupedData.forEach(element => 
+      // ✅ Convert to API user format
+      const users = this.groupedData.map((element) => ({
+        first_name: element.firstName,
+        last_name: element.lastName,
+        email: element.email,
+        password: element.password
+      }));
+
+      // ✅ Fetch all existing users (you can optimize this endpoint)
+      const existingUsers: any[] = await firstValueFrom(
+        this.http.get<any[]>(`${environment.apiUrl}/user`)
+      );
+
+      // ✅ Build a set of existing emails for faster lookup
+      const existingEmails = new Set(existingUsers.map((u) => u.email.toLowerCase()));
+
+      // ✅ Filter out duplicates
+      const newUsers = users.filter((u) => !existingEmails.has(u.email.toLowerCase()));
+
+      if (newUsers.length === 0)
       {
-        users.push({first_name: element.firstName, last_name: element.lastName, email: element.email, password: element.password});
-      });
+        console.warn('All users already exist — nothing to import.');
+        return;
+      }
+
+      // ✅ Send only new users to the backend
+      const imported = await firstValueFrom(
+        await this.http.post(`${environment.apiUrl}/user/import`, newUsers)
+      ).finally(() => {this.importComplete.emit()});
+
       
-      const newDevelopers = await this.http.post(`${environment.apiUrl}/user/import`, users).toPromise();
-      console.log('Import successful', newDevelopers);
-    }
-    catch (err)
+    } catch (err)
     {
-      console.log(err);
-      return;
+      console.error('❌ Import failed:', err);
     }
   }
 }
