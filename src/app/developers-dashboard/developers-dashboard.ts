@@ -8,6 +8,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { environment } from '@environments/environment';
 import { TaskCard } from '@app/task-card';
 import { Sidebar } from "@app/sidebar/sidebar";
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-developers-dashboard',
@@ -18,7 +19,7 @@ import { Sidebar } from "@app/sidebar/sidebar";
 })
 export class DevelopersDashboard implements OnInit
 {
-  constructor(private http: HttpClient, private cdr: ChangeDetectorRef) { }
+  constructor(private http: HttpClient, private cdr: ChangeDetectorRef, private router: Router) { }
 
   @ViewChild(ExcelDeveloperImporter) importer!: ExcelDeveloperImporter;
 
@@ -216,5 +217,10 @@ export class DevelopersDashboard implements OnInit
   {
     const file = event.target.files[ 0 ];
     if (file) this.selectedFile = file;
+  }
+
+  viewProfile(id: number)
+  {
+    this.router.navigate([`/profile/user/${id}`])
   }
 }
