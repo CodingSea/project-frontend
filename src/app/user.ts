@@ -1,5 +1,6 @@
 import { Certificate } from "./certificate";
 import { Service } from "./service";
+import { TaskBoard } from "./task-board";
 import { DeveloperTask, TaskCard } from "./task-card";
 
 export interface User 

@@ -62,6 +62,24 @@ export class DevelopersDashboard implements OnInit
       // Fetch developers based on advanced filters
       this.developers = await this.http.get<DeveloperCard[]>(`${environment.apiUrl}/user/developers-card?${params.toString()}`).toPromise() || [];
 
+      this.developers.forEach((d) =>
+      {
+        d.services = [];
+        d.cards?.forEach((task) =>
+        {
+          const service = task.taskBoard?.service;
+          if (!service) return; // skip if null or undefined
+
+          // Check if the service already exists (by id or name)
+          const alreadyExists = d.services?.some(s => s.serviceID === service.serviceID);
+
+          // Push only if not already in array
+          if (!alreadyExists)
+          {
+            d.services?.push(service);
+          }
+        });
+      });
 
       const countParams = new URLSearchParams();
       countParams.append('name', this.advName);
@@ -72,7 +90,7 @@ export class DevelopersDashboard implements OnInit
       // Fetch total developers count using the developers-count endpoint
       this.totalDevelopers = await this.http.get<number>(`${environment.apiUrl}/user/developers-count?${countParams.toString()}`).toPromise() || 0;
 
-      this.populateDeveloperTasks();
+      // this.populateDeveloperTasks();
       this.updatePageNumbers();
     } catch (err)
     {

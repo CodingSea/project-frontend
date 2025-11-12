@@ -64,6 +64,13 @@
                         <span class="skill" *ngFor="let skill of dev.skills">{{ skill }}</span>
                     </div>
 
+                    <div class="dev-tasks" *ngIf="dev.services && dev.services.length > 0">
+                        <h4>Services:</h4>
+                        <ul>
+                            <li *ngFor="let service of dev.services">{{ service.name }}</li>
+                        </ul>
+                    </div>
+
                     <div class="dev-tasks" *ngIf="dev.cards && dev.cards.length > 0">
                         <h4>Tasks:</h4>
                         <ul>
