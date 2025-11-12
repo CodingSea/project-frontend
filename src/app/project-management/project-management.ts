@@ -1,24 +1,30 @@
 import { AfterViewInit, Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
-import { ProjectService } from '@app/services/project.service';
-import { Sidebar } from '@app/sidebar/sidebar';
 import { Router } from '@angular/router';
-import { Project } from '@app/project';
 import { HttpClient } from '@angular/common/http';
-import { environment } from '@environments/environment';
+import { ProjectService } from '@app/services/project.service';
+import { Project } from '@app/project';
+import { Sidebar } from '@app/sidebar/sidebar';
 import { ExcelImporter } from '@app/excel-importer/excel-importer';
 import { HeaderComponent } from '@app/header/header';
+import { environment } from '@environments/environment';
 
 @Component({
   selector: 'app-project-management',
   standalone: true,
-  imports: [ CommonModule, FormsModule, Sidebar, ExcelImporter, HeaderComponent ],
+  imports: [
+    CommonModule,
+    FormsModule,
+    Sidebar,
+    ExcelImporter,
+    HeaderComponent
+  ],
   templateUrl: './project-management.html',
-  styleUrls: [ './project-management.scss' ],
+  styleUrls: ['./project-management.scss'],
 })
-export class ProjectManagement implements OnInit, AfterViewInit
-{
+export class ProjectManagement implements OnInit, AfterViewInit {
+
   projects: Project[] = [];
   currentPage = 1;
   pageSize = 11;
@@ -40,11 +46,9 @@ export class ProjectManagement implements OnInit, AfterViewInit
   showMembersModal = false;
   selectedMembers: { id?: number; name: string; role: string; image: string }[] = [];
 
-  // ✅ Services modal
   showServicesModal = false;
   selectedServices: any[] = [];
 
-  // ✅ Role-based variables
   currentUser: any = null;
   isAdmin = false;
   userId: number | null = null;
@@ -66,7 +70,7 @@ export class ProjectManagement implements OnInit, AfterViewInit
     this.loadProjects();
   }
 
-  /** ✅ Decode JWT to get current user and role */
+  /** ===== Decode JWT and get user info ===== */
   private loadCurrentUser(): void {
     try {
       const token =
@@ -91,11 +95,10 @@ export class ProjectManagement implements OnInit, AfterViewInit
     if (file) this.selectedFile = file;
   }
 
-  /** ===== Load Projects (merged version) ===== */
+  /** ===== Load Projects ===== */
   loadProjects(): void {
     const options = this.buildQueryOptions();
 
-    // 🔹 Admin users — backend handles pagination & count
     if (this.isAdmin) {
       this.projectService
         .getProjectsCount({ status: options.status, search: options.search })
@@ -111,7 +114,6 @@ export class ProjectManagement implements OnInit, AfterViewInit
       return;
     }
 
-    // 🔹 Non-admin users — local filtering and pagination
     this.projectService
       .getProjects({ ...options, page: 1, limit: 9999 })
       .subscribe((data) => {
@@ -137,7 +139,7 @@ export class ProjectManagement implements OnInit, AfterViewInit
       });
   }
 
-  /** ===== Helper for per-project calculations ===== */
+  /** ===== Transform project ===== */
   private transformProject(p: any): any {
     let totalCardsCount = 0;
     let completedCardsCount = 0;
@@ -235,7 +237,7 @@ export class ProjectManagement implements OnInit, AfterViewInit
 
   /** ===== New Project ===== */
   openNewProject(): void {
-    if (!this.isAdmin) return; // 🔒 Admin only
+    if (!this.isAdmin) return;
     this.showNewProject = true;
     this.newProject = this.blankNewProject();
   }
@@ -396,7 +398,7 @@ export class ProjectManagement implements OnInit, AfterViewInit
     this.showServicesModal = false;
   }
 
-  /** ✅ Navigation (same behavior as profile.component) */
+  /** ===== Navigation ===== */
   goToUserProfile(userId?: number): void {
     if (!userId) return;
     this.closeMembersModal();
@@ -405,15 +407,9 @@ export class ProjectManagement implements OnInit, AfterViewInit
   }
 
   goToService(service: any): void {
-    console.log('Navigating to service:', service);
     const serviceId = service.id || service.serviceID || service.serviceId;
     const taskBoardId = service.taskBoardId || service.taskboard_id || service.taskBoard?.id;
-
-    if (!serviceId || !taskBoardId) {
-      console.warn('⚠️ Missing serviceId or taskBoardId', service);
-      return;
-    }
-
+    if (!serviceId || !taskBoardId) return;
     this.closeServicesModal();
     this.router.navigate([`/services/${serviceId}/taskboard/${taskBoardId}`]);
     window.scrollTo(0, 0);

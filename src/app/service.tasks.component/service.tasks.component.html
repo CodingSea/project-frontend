@@ -46,12 +46,12 @@
       <!-- ✅ Actions Row -->
       <div class="actions-row">
         <!-- Add Task: Chief / Manager / Resource / Admin -->
-        <button
-          *ngIf="isTaskboardSelected && (isChief || isManager || isResource || isAdmin)"
-          class="btn-primary"
-          (click)="openCreateModal()">
-          + Add Task
-        </button>
+<button
+  *ngIf="isTaskboardSelected && (isAdmin || isChief || isManager)"
+  class="btn-primary"
+  (click)="openCreateModal()">
+  + Add Task
+</button>
 
 
 

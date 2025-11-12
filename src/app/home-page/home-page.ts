@@ -29,7 +29,7 @@ export class HomePage implements OnInit
 
   issues: Issue[] = [];
   currentPage: number = 1;
-  pageSize: number = 8;
+  pageSize: number = 6;
   totalIssues: number = 0;
   pageNumbers: number[] = [];
   searchQuery: string = '';

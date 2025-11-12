@@ -1,7 +1,6 @@
 import { TaskBoard } from "./task-board";
 
-export interface TaskCard
-{
+export interface TaskCard {
   id: number;
   title: string;
   column: string;
@@ -11,27 +10,15 @@ export interface TaskCard
   color?: string;
   taskBoard?: TaskBoard;
 
-  assignedUserId?: number | null;
-  assignedUser?: {
+  users?: (number | {
     id: number;
     first_name?: string;
     last_name?: string;
     email?: string;
-  } | null;
-
-  assignedUserIds?: number[] | null;
-  assignedUsers?: {
-    id: number;
-    first_name?: string;
-    last_name?: string;
-    email?: string;
-  }[] | null;
-
-  users?: number[];
+  })[];
 }
 
-export interface TaskCardDisplayed
-{
+export interface TaskCardDisplayed {
   id?: number;
   column: string;
   title: string;
@@ -43,8 +30,7 @@ export interface TaskCardDisplayed
   color?: string;
 }
 
-export interface DeveloperTask
-{
+export interface DeveloperTask {
   userId: number;
   taskId: number;
   title: string;
