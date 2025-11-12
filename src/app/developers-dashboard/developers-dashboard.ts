@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HeaderComponent } from "@app/header/header";
 import { DeveloperCard } from '@app/user';
@@ -19,6 +19,8 @@ import { Sidebar } from "@app/sidebar/sidebar";
 export class DevelopersDashboard implements OnInit
 {
   constructor(private http: HttpClient, private cdr: ChangeDetectorRef) { }
+
+  @ViewChild(ExcelDeveloperImporter) importer!: ExcelDeveloperImporter;
 
   searchTerm: string = '';
   showAdvancedSearch: boolean = false;
@@ -81,24 +83,26 @@ export class DevelopersDashboard implements OnInit
   private async populateDeveloperTasks()
   {
     const developerIds: number[] = this.developers.map(user => user.id) || [];
-    await this.http.post<TaskCard[]>(`${environment.apiUrl}/developers-task`, developerIds).subscribe((res) =>
-    {
-      res.forEach((task) =>
-      {
-        task.users?.forEach((userId) =>
-        {
-          const developer = this.developers.find(developer => developer.id === userId);
-          if (developer)
-          {
-            developer.cards = developer.cards || [];
-            developer.cards.push(task);
-          }
-        });
-      });
-    }, (err) =>
-    {
-      console.log(err);
-    });
+    // await this.http.post<TaskCard[]>(`${environment.apiUrl}/user/developers-task`, developerIds).subscribe((res) =>
+    // {
+    //   res.forEach((task) =>
+    //   {
+    //     task.users?.forEach((userId) =>
+    //     {
+    //       const developer = this.developers.find(developer => developer.id === userId);
+    //       if (developer)
+    //       {
+    //         developer.cards = developer.cards || [];
+    //         developer.cards.push(task);
+    //       }
+    //     });
+    //   });
+    // }, (err) =>
+    // {
+    //   console.log(err);
+    // });
+
+    console.log(this.developers);
   }
 
   updateFilteredDevelopers()

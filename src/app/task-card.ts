@@ -1,3 +1,5 @@
+import { TaskBoard } from "./task-board";
+
 export interface TaskCard
 {
   id: number;
@@ -7,6 +9,7 @@ export interface TaskCard
   tags?: string[] | string;
   order?: number;
   color?: string;
+  taskBoard?: TaskBoard;
 
   // ✅ Add these two lines:
   assignedUserId?: number | null;
