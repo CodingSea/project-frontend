@@ -67,14 +67,16 @@
                     <div class="dev-tasks" *ngIf="dev.services && dev.services.length > 0">
                         <h4>Services:</h4>
                         <ul>
-                            <li *ngFor="let service of dev.services">{{ service.name }}</li>
+                            <li *ngFor="let service of dev.services" [routerLink]="`/projects/${service.project.projectID}/services`" class="dev-link">{{ service.name }}</li>
                         </ul>
                     </div>
 
                     <div class="dev-tasks" *ngIf="dev.cards && dev.cards.length > 0">
                         <h4>Tasks:</h4>
                         <ul>
-                            <li *ngFor="let task of dev.cards">{{ task.title }}</li>
+                            <li *ngFor="let task of dev.cards" 
+                            [routerLink]="`/services/${task.taskBoard?.service?.serviceID}/taskboard/${task.taskBoard?.id}`"
+                             class="dev-link">{{ task.title }}</li>
                         </ul>
                     </div>
 

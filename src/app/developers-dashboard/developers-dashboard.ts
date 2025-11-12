@@ -8,12 +8,12 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { environment } from '@environments/environment';
 import { TaskCard } from '@app/task-card';
 import { Sidebar } from "@app/sidebar/sidebar";
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-developers-dashboard',
   standalone: true,
-  imports: [HeaderComponent, CommonModule, FormsModule, ExcelDeveloperImporter, Sidebar],
+  imports: [HeaderComponent, CommonModule, FormsModule, ExcelDeveloperImporter, Sidebar, RouterLink],
   templateUrl: './developers-dashboard.html',
   styleUrls: ['./developers-dashboard.css']
 })
