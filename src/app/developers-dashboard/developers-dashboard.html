@@ -13,8 +13,8 @@
             <!-- Search Section -->
             <div class="search-section">
                 <div class="search-bar">
-                    <input type="text" placeholder="Search developers by name, skills, or role..."
-                        [(ngModel)]="searchTerm" (input)="updateFilteredDevelopers()" />
+                    <input type="text" placeholder="Search developers by name"
+                        [(ngModel)]="searchTerm" (keyup.enter)="getDevelopersFromDB()" [disabled]="showAdvancedSearch" />
                     <button (click)="toggleAdvancedSearch()">
                         <i class="icon">⚙️</i> Advanced Search
                     </button>
@@ -23,25 +23,25 @@
                 <div class="advanced-search" *ngIf="showAdvancedSearch">
                     <div class="advanced-field">
                         <label>Name:</label>
-                        <input type="text" [(ngModel)]="advName" (input)="getDevelopersFromDB()"
+                        <input type="text" [(ngModel)]="advName" (keyup.enter)="getDevelopersFromDB()"
                             placeholder="Enter developer name" />
                     </div>
 
                     <div class="advanced-field">
                         <label>Skills:</label>
-                        <input type="text" [(ngModel)]="advSkills" (input)="getDevelopersFromDB()"
+                        <input type="text" [(ngModel)]="advSkills" (keyup.enter)="getDevelopersFromDB()"
                             placeholder="Enter developer skills" />
                     </div>
 
                     <div class="advanced-field">
                         <label>Services:</label>
-                        <input type="text" [(ngModel)]="advServices" (input)="getDevelopersFromDB()"
+                        <input type="text" [(ngModel)]="advServices" (keyup.enter)="getDevelopersFromDB()"
                             placeholder="Enter related services" />
                     </div>
 
                     <div class="advanced-field">
                         <label>Tasks:</label>
-                        <input type="text" [(ngModel)]="advTasks" (input)="getDevelopersFromDB()"
+                        <input type="text" [(ngModel)]="advTasks" (keyup.enter)="getDevelopersFromDB()"
                             placeholder="Enter related tasks" />
                     </div>
 

@@ -13,9 +13,9 @@ import { Router } from '@angular/router';
 @Component({
   selector: 'app-developers-dashboard',
   standalone: true,
-  imports: [ HeaderComponent, CommonModule, FormsModule, ExcelDeveloperImporter, Sidebar ],
+  imports: [HeaderComponent, CommonModule, FormsModule, ExcelDeveloperImporter, Sidebar],
   templateUrl: './developers-dashboard.html',
-  styleUrls: [ './developers-dashboard.css' ]
+  styleUrls: ['./developers-dashboard.css']
 })
 export class DevelopersDashboard implements OnInit
 {
@@ -55,10 +55,17 @@ export class DevelopersDashboard implements OnInit
       const params = new URLSearchParams();
       params.append('page', this.currentPage.toString());
       params.append('limit', this.pageSize.toString());
-      params.append('name', this.advName);
-      params.append('skills', this.advSkills);
-      params.append('services', this.advServices);
-      params.append('tasks', this.advTasks);
+      if (this.showAdvancedSearch)
+      {
+        params.append('name', this.advName);
+        params.append('skills', this.advSkills);
+        params.append('services', this.advServices);
+        params.append('tasks', this.advTasks);
+      }
+      else
+      {
+        params.append('name', this.searchTerm);
+      }
 
       // Fetch developers based on advanced filters
       this.developers = await this.http.get<DeveloperCard[]>(`${environment.apiUrl}/user/developers-card?${params.toString()}`).toPromise() || [];
@@ -97,31 +104,6 @@ export class DevelopersDashboard implements OnInit
     {
       console.log(err);
     }
-  }
-
-  private async populateDeveloperTasks()
-  {
-    const developerIds: number[] = this.developers.map(user => user.id) || [];
-    // await this.http.post<TaskCard[]>(`${environment.apiUrl}/user/developers-task`, developerIds).subscribe((res) =>
-    // {
-    //   res.forEach((task) =>
-    //   {
-    //     task.users?.forEach((userId) =>
-    //     {
-    //       const developer = this.developers.find(developer => developer.id === userId);
-    //       if (developer)
-    //       {
-    //         developer.cards = developer.cards || [];
-    //         developer.cards.push(task);
-    //       }
-    //     });
-    //   });
-    // }, (err) =>
-    // {
-    //   console.log(err);
-    // });
-
-    console.log(this.developers);
   }
 
   updateFilteredDevelopers()
@@ -215,7 +197,7 @@ export class DevelopersDashboard implements OnInit
 
   onFileSelected(event: any): void
   {
-    const file = event.target.files[ 0 ];
+    const file = event.target.files[0];
     if (file) this.selectedFile = file;
   }
 
