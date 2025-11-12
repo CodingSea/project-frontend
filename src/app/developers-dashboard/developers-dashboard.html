@@ -12,76 +12,62 @@
 
             <!-- Search Section -->
             <div class="search-section">
-                <!-- Main Search Bar -->
                 <div class="search-bar">
                     <input type="text" placeholder="Search developers by name, skills, or role..."
-                        [(ngModel)]="searchTerm" />
+                        [(ngModel)]="searchTerm" (input)="updateFilteredDevelopers()" />
                     <button (click)="toggleAdvancedSearch()">
                         <i class="icon">⚙️</i> Advanced Search
                     </button>
                 </div>
 
-                <!-- Advanced Search Section -->
                 <div class="advanced-search" *ngIf="showAdvancedSearch">
                     <div class="advanced-field">
                         <label>Name:</label>
-                        <input type="text" [(ngModel)]="advName" placeholder="Enter developer name" />
+                        <input type="text" [(ngModel)]="advName" (input)="getDevelopersFromDB()"
+                            placeholder="Enter developer name" />
                     </div>
 
                     <div class="advanced-field">
                         <label>Skills:</label>
-                        <input type="text" [(ngModel)]="advSkills" placeholder="Enter developer skills" />
+                        <input type="text" [(ngModel)]="advSkills" (input)="getDevelopersFromDB()"
+                            placeholder="Enter developer skills" />
                     </div>
 
                     <div class="advanced-field">
                         <label>Services:</label>
-                        <input type="text" [(ngModel)]="advServices" placeholder="Enter related services" />
+                        <input type="text" [(ngModel)]="advServices" (input)="getDevelopersFromDB()"
+                            placeholder="Enter related services" />
                     </div>
 
                     <div class="advanced-field">
                         <label>Tasks:</label>
-                        <input type="text" [(ngModel)]="advTasks" placeholder="Enter related tasks" />
+                        <input type="text" [(ngModel)]="advTasks" (input)="getDevelopersFromDB()"
+                            placeholder="Enter related tasks" />
                     </div>
 
-                    <!-- Reset Button -->
                     <div class="reset-container">
                         <button class="reset-btn" (click)="resetAdvanced()">Reset Filters</button>
                     </div>
                 </div>
             </div>
 
-            <p class="total-developers-text">Total Projects: {{ developers?.length }}</p>
+            <p class="total-developers-text">Total Developers: {{ totalDevelopers }}</p>
 
             <!-- Developers Grid -->
             <div class="developers-grid">
-                <div class="dev-card" *ngFor="let dev of filteredDevelopers">
+                <div class="dev-card" *ngFor="let dev of developers">
                     <div class="dev-header">
                         <img [src]="dev.profileImage || 'images/user.png'" alt="Profile" />
                         <h3>{{ dev.first_name }} {{ dev.last_name }}</h3>
-                        <!-- <p class="role">{{ dev.role }}</p> -->
                     </div>
-
                     <div class="dev-skills">
                         <span class="skill" *ngFor="let skill of dev.skills">{{ skill }}</span>
                     </div>
 
-                    <!-- Services Section -->
-                    <!-- <div class="dev-tasks" *ngIf="dev.services && dev.services.length > 0">
-                        <h4>Services:</h4>
-                        <ul>
-                            <li *ngFor="let service of dev.services">
-                                {{ service.name }}
-                            </li>
-                        </ul>
-                    </div> -->
-
-                    <!-- Tasks Section -->
                     <div class="dev-tasks" *ngIf="dev.cards && dev.cards.length > 0">
                         <h4>Tasks:</h4>
                         <ul>
-                            <li *ngFor="let task of dev.cards">
-                                {{ task.title }} <span></span>
-                            </li>
+                            <li *ngFor="let task of dev.cards">{{ task.title }}</li>
                         </ul>
                     </div>
 
@@ -91,13 +77,16 @@
 
             <!-- Pagination -->
             <div class="pagination">
-                <button class="page-btn">&lt;</button>
-                <button class="page-btn active">1</button>
-                <button class="page-btn">2</button>
-                <button class="page-btn">3</button>
-                <span>...</span>
-                <button class="page-btn">12</button>
-                <button class="page-btn">&gt;</button>
+                <button (click)="jumpToPage(true)" [disabled]="currentPage === 1">&lt;&lt;</button>
+                <button (click)="changePage(currentPage - 1)" [disabled]="currentPage === 1">&lt;</button>
+
+                <button *ngFor="let page of pageNumbers" (click)="changePage(page)"
+                    [class.active]="currentPage === page">
+                    {{ page }}
+                </button>
+
+                <button (click)="changePage(currentPage + 1)" [disabled]="currentPage >= getTotalPages()">&gt;</button>
+                <button (click)="jumpToPage(false)" [disabled]="currentPage >= getTotalPages()">&gt;&gt;</button>
             </div>
         </div>
     </div>

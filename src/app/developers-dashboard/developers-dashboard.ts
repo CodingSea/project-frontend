@@ -2,21 +2,19 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HeaderComponent } from "@app/header/header";
-import { Project } from '@app/project';
-import { Service } from '@app/service';
-import { Sidebar } from "@app/sidebar/sidebar";
-import { DeveloperCard, User } from '@app/user';
+import { DeveloperCard } from '@app/user';
 import { ExcelDeveloperImporter } from "@app/excel-developer-importer/excel-developer-importer";
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { environment } from '@environments/environment';
 import { TaskCard } from '@app/task-card';
+import { Sidebar } from "@app/sidebar/sidebar";
 
 @Component({
   selector: 'app-developers-dashboard',
   standalone: true,
-  imports: [HeaderComponent, Sidebar, CommonModule, FormsModule, ExcelDeveloperImporter],
+  imports: [ HeaderComponent, CommonModule, FormsModule, ExcelDeveloperImporter, Sidebar ],
   templateUrl: './developers-dashboard.html',
-  styleUrls: ['./developers-dashboard.css']
+  styleUrls: [ './developers-dashboard.css' ]
 })
 export class DevelopersDashboard implements OnInit
 {
@@ -33,8 +31,14 @@ export class DevelopersDashboard implements OnInit
 
   selectedFile: File | null = null;
 
-  // Fake developers array
-  developers: DeveloperCard[] | undefined = [];
+  developers: DeveloperCard[] = [];
+  filteredDevelopers: DeveloperCard[] = [];
+
+  // Pagination
+  totalDevelopers: number = 0; // Total count from API
+  pageSize: number = 8; // Developers per page
+  currentPage: number = 1;
+  pageNumbers: number[] = [];
 
   ngOnInit(): void
   {
@@ -45,53 +49,63 @@ export class DevelopersDashboard implements OnInit
   {
     try
     {
-      this.developers = await this.http.get<DeveloperCard[]>(`${environment.apiUrl}/user/developers-card`).toPromise();
+      const params = new URLSearchParams();
+      params.append('page', this.currentPage.toString());
+      params.append('limit', this.pageSize.toString());
+      params.append('name', this.advName);
+      params.append('skills', this.advSkills);
+      params.append('services', this.advServices);
+      params.append('tasks', this.advTasks);
 
-      const developerIds: number[] = this.developers?.map(user => user.id) || [];
+      // Fetch developers based on advanced filters
+      this.developers = await this.http.get<DeveloperCard[]>(`${environment.apiUrl}/user/developers-card?${params.toString()}`).toPromise() || [];
 
-      await this.http.post<TaskCard[]>(`${environment.apiUrl}/user/developers-task`, developerIds).subscribe(
-        (res) =>
-        {
-          res.forEach((task) =>
-          {
-            // Check each developer to see if they are involved in the task
-            task.users?.forEach((userId) =>
-            {
-              const developer = this.developers?.find(developer => developer.id === userId);
 
-              if (developer)
-              {
-                // Initialize tasks array if it doesn't exist
-                developer.cards = developer.cards || [];
-                // Add the task to the developer's tasks
-                developer.cards.push(task);
-              }
-            });
-          });
-        },
-        (err) =>
-        {
-          console.log(err);
-        }
-      )
+      const countParams = new URLSearchParams();
+      countParams.append('name', this.advName);
+      countParams.append('skills', this.advSkills);
+      countParams.append('services', this.advServices);
+      countParams.append('tasks', this.advTasks);
 
-      console.log(this.developers);
+      // Fetch total developers count using the developers-count endpoint
+      this.totalDevelopers = await this.http.get<number>(`${environment.apiUrl}/user/developers-count?${countParams.toString()}`).toPromise() || 0;
 
-      this.cdr.markForCheck();
-
-    }
-    catch (err)
+      this.populateDeveloperTasks();
+      this.updatePageNumbers();
+    } catch (err)
     {
       console.log(err);
     }
   }
 
-  // Computed filtered developers
-  get filteredDevelopers(): DeveloperCard[]
+  private async populateDeveloperTasks()
+  {
+    const developerIds: number[] = this.developers.map(user => user.id) || [];
+    await this.http.post<TaskCard[]>(`${environment.apiUrl}/developers-task`, developerIds).subscribe((res) =>
+    {
+      res.forEach((task) =>
+      {
+        task.users?.forEach((userId) =>
+        {
+          const developer = this.developers.find(developer => developer.id === userId);
+          if (developer)
+          {
+            developer.cards = developer.cards || [];
+            developer.cards.push(task);
+          }
+        });
+      });
+    }, (err) =>
+    {
+      console.log(err);
+    });
+  }
+
+  updateFilteredDevelopers()
   {
     const term = this.searchTerm.toLowerCase();
 
-    return this.developers!.filter(dev =>
+    this.filteredDevelopers = this.developers.filter(dev =>
     {
       const matchesMain =
         dev.first_name.toLowerCase().includes(term) ||
@@ -103,25 +117,63 @@ export class DevelopersDashboard implements OnInit
         : true;
 
       const matchesAdvSkills = this.advSkills
-        ? dev.skills.some(skill =>
-          skill.toLowerCase().includes(this.advSkills.toLowerCase())
-        )
+        ? dev.skills.some(skill => skill.toLowerCase().includes(this.advSkills.toLowerCase()))
         : true;
 
       const matchesAdvServices = this.advServices
-        ? dev.services?.some(service =>
-          service.name.toLowerCase().includes(this.advServices.toLowerCase())
-        )
+        ? dev.services?.some(service => service.name.toLowerCase().includes(this.advServices.toLowerCase()))
         : true;
 
       const matchesAdvTasks = this.advTasks
-        ? dev.cards?.some(task =>
-          task.title.toLowerCase().includes(this.advTasks.toLowerCase())
-        )
+        ? dev.cards?.some(task => task.title.toLowerCase().includes(this.advTasks.toLowerCase()))
         : true;
 
       return matchesMain && matchesAdvName && matchesAdvSkills && matchesAdvServices && matchesAdvTasks;
     });
+
+    this.updatePageNumbers();
+  }
+
+  updatePageNumbers(): void
+  {
+    const total = this.getTotalPages(); // Total number of pages based on count
+    const curr = this.currentPage;
+    this.pageNumbers = [];
+
+    let start = Math.max(1, curr - 2);
+    let end = Math.min(total, curr + 2);
+
+    if (end - start < 4)
+    {
+      if (curr <= 3) end = Math.min(5, total);
+      else start = Math.max(1, end - 4);
+    }
+
+    for (let i = start; i <= end; i++) this.pageNumbers.push(i);
+  }
+
+  getTotalPages(): number
+  {
+    return Math.ceil(this.totalDevelopers / this.pageSize) || 1; // Calculates total pages
+  }
+
+  changePage(page: number): void
+  {
+    if (page < 1 || page > this.getTotalPages()) return;
+    this.currentPage = page;
+    this.getDevelopersFromDB(); // Fetch data for the new page
+  }
+
+  jumpToPage(firstPage: boolean): void
+  {
+    this.currentPage = firstPage ? 1 : this.getTotalPages();
+    this.getDevelopersFromDB(); // Fetch data for the new page
+  }
+
+  get paginatedDevelopers(): DeveloperCard[]
+  {
+    const startIndex = (this.currentPage - 1) * this.pageSize;
+    return this.filteredDevelopers.slice(startIndex, startIndex + this.pageSize);
   }
 
   toggleAdvancedSearch(): void
@@ -135,11 +187,12 @@ export class DevelopersDashboard implements OnInit
     this.advSkills = '';
     this.advServices = '';
     this.advTasks = '';
+    this.getDevelopersFromDB(); // Re-fetch data without filters
   }
 
   onFileSelected(event: any): void
   {
-    const file = event.target.files[0];
+    const file = event.target.files[ 0 ];
     if (file) this.selectedFile = file;
   }
 }
