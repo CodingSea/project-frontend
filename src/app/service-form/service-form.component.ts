@@ -84,7 +84,7 @@ name: [
   '',
   [
     Validators.required,
-    Validators.pattern(/^[A-Za-z\u0600-\u06FF0-9 \-]{3,50}$/),
+Validators.pattern(/^[A-Za-z\u0600-\u06FF0-9 ()\-]{3,50}$/)
   ],
 ],
   deadline: [ '', Validators.required ],
