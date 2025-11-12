@@ -11,7 +11,6 @@ export interface TaskCard
   color?: string;
   taskBoard?: TaskBoard;
 
-  // ✅ Add these two lines:
   assignedUserId?: number | null;
   assignedUser?: {
     id: number;

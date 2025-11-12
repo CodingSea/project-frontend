@@ -41,6 +41,7 @@ export class ServicesComponent implements OnInit, AfterViewInit {
 
   searchTerm = '';
   selectedStatus = '';
+  hasTasksFilter = ''; // 🟩 NEW FILTER
   statuses: string[] = [
     'Not Started Yet',
     'Pending Approval',
@@ -51,11 +52,15 @@ export class ServicesComponent implements OnInit, AfterViewInit {
     'Overdue',
   ];
 
-  // ✅ Pagination
   currentPage = 1;
   pageSize = 7;
   totalPages = 1;
   pages: number[] = [];
+
+  // 🟩 Role control
+  currentUser: any = null;
+  isAdmin = false;
+  userId: number | null = null;
 
   constructor(
     private http: HttpClient,
@@ -66,6 +71,7 @@ export class ServicesComponent implements OnInit, AfterViewInit {
   ) {}
 
   ngOnInit() {
+    this.loadCurrentUser();
     this.route.paramMap.subscribe((params) => {
       this.projectId = params.get('projectId');
       this.projectIdNum = this.projectId ? +this.projectId : undefined;
@@ -73,24 +79,41 @@ export class ServicesComponent implements OnInit, AfterViewInit {
     });
   }
 
-loadServices() {
-  if (!this.projectId) return;
+  /** ✅ Decode token and set user info */
+  private loadCurrentUser(): void {
+    try {
+      const token =
+        localStorage.getItem('access_token') ||
+        localStorage.getItem('token') ||
+        localStorage.getItem('jwt');
+      if (!token) return;
 
-  this.http.get<Project>(`${environment.apiUrl}/project/${this.projectId}`).subscribe(
-    (res) => {
-      this.services = res.services ?? [];
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      this.userId = Number(payload.id || payload.userId || payload.sub);
+      const role = (payload.role || payload.userType || '').toLowerCase();
+      this.isAdmin = role === 'admin';
+      this.currentUser = payload;
+    } catch (e) {
+      console.warn('⚠️ Failed to decode user token', e);
+    }
+  }
 
-      // ✅ FIX: update total services count
-      this.servicesInfo.totalServices = this.services.length;
+  /** ===== Load services and compute stats ===== */
+  loadServices() {
+    if (!this.projectId) return;
 
-      this.applySearch();
-      this.calculateStats();
-    },
-    (error) => console.error('❌ Failed to load project services:', error)
-  );
-}
+    this.http.get<Project>(`${environment.apiUrl}/project/${this.projectId}`).subscribe(
+      (res) => {
+        this.services = res.services ?? [];
+        this.servicesInfo.totalServices = this.services.length;
+        this.applySearch();
+        this.calculateStats();
+      },
+      (error) => console.error('❌ Failed to load project services:', error)
+    );
+  }
 
-
+  /** ===== Filtering ===== */
   applySearch() {
     let filtered = this.services;
 
@@ -107,6 +130,12 @@ loadServices() {
       filtered = filtered.filter((s) => s.status === this.selectedStatus);
     }
 
+    if (this.hasTasksFilter === 'true') {
+      filtered = filtered.filter((s) => s.taskBoard?.cards && s.taskBoard.cards.length > 0);
+    } else if (this.hasTasksFilter === 'false') {
+      filtered = filtered.filter((s) => !s.taskBoard?.cards || s.taskBoard.cards.length === 0);
+    }
+
     this.totalPages = Math.ceil(filtered.length / this.pageSize);
     this.pages = Array.from({ length: this.totalPages }, (_, i) => i + 1);
 
@@ -115,37 +144,33 @@ loadServices() {
     this.filteredServices = filtered.slice(start, end);
   }
 
-  // ✅ Pagination Controls
   goToPage(page: number) {
     if (page < 1 || page > this.totalPages) return;
     this.currentPage = page;
     this.applySearch();
   }
-
   nextPage() {
     if (this.currentPage < this.totalPages) {
       this.currentPage++;
       this.applySearch();
     }
   }
-
   prevPage() {
     if (this.currentPage > 1) {
       this.currentPage--;
       this.applySearch();
     }
   }
-
   goToFirstPage() {
     this.currentPage = 1;
     this.applySearch();
   }
-
   goToLastPage() {
     this.currentPage = this.totalPages;
     this.applySearch();
   }
 
+  /** ===== Stats ===== */
   calculateStats() {
     let totalTasksCount = 0;
     const uniqueMembers = new Set<number>();
@@ -211,11 +236,13 @@ loadServices() {
         : 0;
   }
 
+  /** ===== UI actions ===== */
   onCardClick(s: Service) {
     this.router.navigate([`services/${s.serviceID}/taskboard/${s.taskBoard?.id}`]);
   }
 
   openNewService() {
+    if (!this.isAdmin) return; // 🔒 Only admin can add
     this.showNewService = true;
   }
   closeNewService() {
@@ -227,7 +254,21 @@ loadServices() {
     this.openMenuId = this.openMenuId === id ? null : id;
   }
 
+  /** ===== Permission logic for Edit/Delete ===== */
+  canEditService(service: Service): boolean {
+    // Admins always can
+    if (this.isAdmin) return true;
+    // Chief of that service can edit
+    return service.chief && Number(service.chief.id) === this.userId;
+  }
+
+  canDeleteService(): boolean {
+    // Delete only for admin
+    return this.isAdmin;
+  }
+
   goToEdit(s: Service, event: Event) {
+    if (!this.canEditService(s)) return; // 🔒 Check permission
     event.stopPropagation();
     window.scroll(0, 0);
     const projectId = this.projectId ?? this.route.snapshot.paramMap.get('projectId');
@@ -235,6 +276,7 @@ loadServices() {
   }
 
   async deleteService(s: Service) {
+    if (!this.canDeleteService()) return; // 🔒 Admin only
     try {
       await this.http.delete(`${environment.apiUrl}/service/${s.serviceID}`).toPromise();
       this.loadServices();

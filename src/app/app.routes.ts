@@ -21,11 +21,11 @@ import { DevelopersDashboard } from './developers-dashboard/developers-dashboard
 
 export const routes: Routes = [
   { path: '', redirectTo: 'auth/signup', pathMatch: 'full' },
-  { path: 'projects', component: ProjectManagement, canActivate: [AuthGuard], data: { onlyAdmin: true } },
-  { path: 'projects/:projectId/services', component: ServicesComponent, canActivate: [AuthGuard], data: { onlyAdmin: true } },
+  { path: 'projects', component: ProjectManagement, canActivate: [AuthGuard] },
+  { path: 'projects/:projectId/services', component: ServicesComponent, canActivate: [AuthGuard], },
   { path: 'projects/:projectId/services/new', component: ServiceFormComponent, canActivate: [AuthGuard], data: { onlyAdmin: true } },
   { path: 'developer-dashboard', component: DevelopersDashboard, canActivate: [AuthGuard], data: { onlyAdmin: true } },
-  { path: 'projects/:projectId/services/:serviceId/edit', component: ServiceFormComponent, canActivate: [AuthGuard], data: { onlyAdmin: true } },
+  { path: 'projects/:projectId/services/:serviceId/edit', component: ServiceFormComponent, canActivate: [AuthGuard], },
   { path: 'auth/:mode', component: UserComponent },
   { path: 'dashboard', component: Dashboard, canActivate: [AuthGuard], data: { onlyAdmin: true } },
   { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard] },
@@ -35,7 +35,7 @@ export const routes: Routes = [
   { path: 'certificate/edit/:id', component: CertificateCreateComponent, canActivate: [AuthGuard] },
   { path: 'developers', component: DevelopersSearchComponent, canActivate: [AuthGuard], data: { onlyAdmin: true } },
   { path: 'services/:serviceId/taskboard/:taskBoardId', component: ServiceTasksComponent, canActivate: [AuthGuard] },
-  
+
   { path: 'issues/create', component: IssueCreateComponent, canActivate: [AuthGuard] },
   { path: 'issues/:id', component: IssuePage , canActivate: [AuthGuard]},
   { path: 'issues', redirectTo: 'home', pathMatch: 'full' },
