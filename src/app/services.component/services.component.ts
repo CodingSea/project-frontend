@@ -57,6 +57,11 @@ export class ServicesComponent implements OnInit, AfterViewInit {
   totalPages = 1;
   pages: number[] = [];
 
+  // 🟩 Role control
+  currentUser: any = null;
+  isAdmin = false;
+  userId: number | null = null;
+
   constructor(
     private http: HttpClient,
     private route: ActivatedRoute,
@@ -66,6 +71,7 @@ export class ServicesComponent implements OnInit, AfterViewInit {
   ) {}
 
   ngOnInit() {
+    this.loadCurrentUser();
     this.route.paramMap.subscribe((params) => {
       this.projectId = params.get('projectId');
       this.projectIdNum = this.projectId ? +this.projectId : undefined;
@@ -73,6 +79,26 @@ export class ServicesComponent implements OnInit, AfterViewInit {
     });
   }
 
+  /** ✅ Decode token and set user info */
+  private loadCurrentUser(): void {
+    try {
+      const token =
+        localStorage.getItem('access_token') ||
+        localStorage.getItem('token') ||
+        localStorage.getItem('jwt');
+      if (!token) return;
+
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      this.userId = Number(payload.id || payload.userId || payload.sub);
+      const role = (payload.role || payload.userType || '').toLowerCase();
+      this.isAdmin = role === 'admin';
+      this.currentUser = payload;
+    } catch (e) {
+      console.warn('⚠️ Failed to decode user token', e);
+    }
+  }
+
+  /** ===== Load services and compute stats ===== */
   loadServices() {
     if (!this.projectId) return;
 
@@ -87,6 +113,7 @@ export class ServicesComponent implements OnInit, AfterViewInit {
     );
   }
 
+  /** ===== Filtering ===== */
   applySearch() {
     let filtered = this.services;
 
@@ -103,7 +130,6 @@ export class ServicesComponent implements OnInit, AfterViewInit {
       filtered = filtered.filter((s) => s.status === this.selectedStatus);
     }
 
-    // 🟩 NEW: Filter by has tasks
     if (this.hasTasksFilter === 'true') {
       filtered = filtered.filter((s) => s.taskBoard?.cards && s.taskBoard.cards.length > 0);
     } else if (this.hasTasksFilter === 'false') {
@@ -123,31 +149,28 @@ export class ServicesComponent implements OnInit, AfterViewInit {
     this.currentPage = page;
     this.applySearch();
   }
-
   nextPage() {
     if (this.currentPage < this.totalPages) {
       this.currentPage++;
       this.applySearch();
     }
   }
-
   prevPage() {
     if (this.currentPage > 1) {
       this.currentPage--;
       this.applySearch();
     }
   }
-
   goToFirstPage() {
     this.currentPage = 1;
     this.applySearch();
   }
-
   goToLastPage() {
     this.currentPage = this.totalPages;
     this.applySearch();
   }
 
+  /** ===== Stats ===== */
   calculateStats() {
     let totalTasksCount = 0;
     const uniqueMembers = new Set<number>();
@@ -213,11 +236,13 @@ export class ServicesComponent implements OnInit, AfterViewInit {
         : 0;
   }
 
+  /** ===== UI actions ===== */
   onCardClick(s: Service) {
     this.router.navigate([`services/${s.serviceID}/taskboard/${s.taskBoard?.id}`]);
   }
 
   openNewService() {
+    if (!this.isAdmin) return; // 🔒 Only admin can add
     this.showNewService = true;
   }
   closeNewService() {
@@ -229,7 +254,21 @@ export class ServicesComponent implements OnInit, AfterViewInit {
     this.openMenuId = this.openMenuId === id ? null : id;
   }
 
+  /** ===== Permission logic for Edit/Delete ===== */
+  canEditService(service: Service): boolean {
+    // Admins always can
+    if (this.isAdmin) return true;
+    // Chief of that service can edit
+    return service.chief && Number(service.chief.id) === this.userId;
+  }
+
+  canDeleteService(): boolean {
+    // Delete only for admin
+    return this.isAdmin;
+  }
+
   goToEdit(s: Service, event: Event) {
+    if (!this.canEditService(s)) return; // 🔒 Check permission
     event.stopPropagation();
     window.scroll(0, 0);
     const projectId = this.projectId ?? this.route.snapshot.paramMap.get('projectId');
@@ -237,6 +276,7 @@ export class ServicesComponent implements OnInit, AfterViewInit {
   }
 
   async deleteService(s: Service) {
+    if (!this.canDeleteService()) return; // 🔒 Admin only
     try {
       await this.http.delete(`${environment.apiUrl}/service/${s.serviceID}`).toPromise();
       this.loadServices();

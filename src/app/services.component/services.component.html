@@ -9,6 +9,7 @@
           <div class="main_33-71">
             <div class="div_33-96">
               <div class="main-div">
+                <!-- ===== Stats ===== -->
                 <ul class="stats-list">
                   <li class="stat-item">
                     <span class="text-total-projects">Total Services</span>
@@ -47,29 +48,17 @@
                       (input)="applySearch()"
                       class="pm-input search-box"
                     />
-
-                    <select
-                      [(ngModel)]="selectedStatus"
-                      (change)="applySearch()"
-                      class="pm-input filter-box"
-                    >
+                    <select [(ngModel)]="selectedStatus" (change)="applySearch()" class="pm-input filter-box">
                       <option value="">All Status</option>
                       <option *ngFor="let s of statuses" [value]="s">{{ s }}</option>
                     </select>
-
-                    <!-- 🟩 New Filter: Has Tasks -->
-                    <select
-                      [(ngModel)]="hasTasksFilter"
-                      (change)="applySearch()"
-                      class="pm-input filter-box"
-                    >
+                    <select [(ngModel)]="hasTasksFilter" (change)="applySearch()" class="pm-input filter-box">
                       <option value="">All Services</option>
                       <option value="true">Has Tasks</option>
                       <option value="false">No Tasks</option>
                     </select>
                   </div>
                 </div>
-
                 <button class="back-btn" (click)="goBack()">Back</button>
               </div>
 
@@ -79,7 +68,8 @@
                 </div>
 
                 <div class="pm-cards">
-                  <article class="pm-card add-new" (click)="openNewService()">
+                  <!-- Add new (admin only) -->
+                  <article class="pm-card add-new" *ngIf="isAdmin" (click)="openNewService()">
                     <div class="pm-plus-circle">
                       <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
                         <path
@@ -94,6 +84,7 @@
                     <p>Start a new service and invite your team members</p>
                   </article>
 
+                  <!-- Dynamic service cards -->
                   <article
                     class="pm-card"
                     *ngFor="let p of filteredServices"
@@ -109,21 +100,24 @@
                         {{ p.status }}
                       </span>
 
-                      <div class="pm-card-menu" (click)="$event.stopPropagation()">
-                        <button
-                          class="dots"
-                          type="button"
-                          aria-label="Options"
-                          (click)="toggleMenu(p.serviceID, $event)"
-                        >
-                          ⋮
-                        </button>
+<!-- Menu (hidden visually if no actions available) -->
+<div class="pm-card-menu" (click)="$event.stopPropagation()">
+  <button
+    class="dots"
+    type="button"
+    aria-label="Options"
+    (click)="toggleMenu(p.serviceID, $event)"
+    [style.visibility]="(canEditService(p) || canDeleteService()) ? 'visible' : 'hidden'"
+  >
+    ⋮
+  </button>
 
-                        <ul class="menu" *ngIf="openMenuId === p.serviceID">
-                          <li (click)="goToEdit(p, $event)">Edit</li>
-                          <li (click)="deleteService(p)">Delete</li>
-                        </ul>
-                      </div>
+  <ul class="menu" *ngIf="openMenuId === p.serviceID">
+    <li *ngIf="canEditService(p)" (click)="goToEdit(p, $event)">Edit</li>
+    <li *ngIf="canDeleteService()" (click)="deleteService(p)">Delete</li>
+  </ul>
+</div>
+
                     </header>
 
                     <p class="pm-desc">{{ p.description }}</p>
@@ -150,7 +144,6 @@
                 <div class="pagination" *ngIf="totalPages > 1">
                   <button (click)="goToFirstPage()" [disabled]="currentPage === 1">&lt;&lt;</button>
                   <button (click)="prevPage()" [disabled]="currentPage === 1">&lt;</button>
-
                   <button
                     *ngFor="let page of pages"
                     [class.active]="currentPage === page"
@@ -158,7 +151,6 @@
                   >
                     {{ page }}
                   </button>
-
                   <button (click)="nextPage()" [disabled]="currentPage === totalPages">&gt;</button>
                   <button (click)="goToLastPage()" [disabled]="currentPage === totalPages">&gt;&gt;</button>
                 </div>

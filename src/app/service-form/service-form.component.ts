@@ -80,8 +80,13 @@ export class ServiceFormComponent implements OnInit, OnDestroy
   {
 this.form = this.fb.group({
   // ✅ Allow Arabic + English letters, numbers, and spaces (3–50 chars)
-  name: [ '', [ Validators.required, Validators.pattern(/^[A-Za-z\u0600-\u06FF0-9 ]{3,50}$/) ] ],
-
+name: [
+  '',
+  [
+    Validators.required,
+    Validators.pattern(/^[A-Za-z\u0600-\u06FF0-9 \-]{3,50}$/),
+  ],
+],
   deadline: [ '', Validators.required ],
 
   // ✅ Allow Arabic + English, punctuation, numbers, and spaces

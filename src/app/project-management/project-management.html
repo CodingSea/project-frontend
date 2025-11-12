@@ -10,44 +10,45 @@
             <div class="div_33-96">
               <div class="main_div">
 
-<!-- ===== Page Header Section (aligned with cards) ===== -->
-<div class="page-header-wrapper">
-  <header class="page-header">
-    <div class="page-header-left">
-      <h1>Projects</h1>
-      <app-excel-importer></app-excel-importer>
-      <input type="file" id="fileUpload" (change)="onFileSelected($event)" hidden />
-    </div>
+                <!-- ===== Page Header Section (aligned with cards) ===== -->
+                <div class="page-header-wrapper">
+                  <header class="page-header">
+                    <div class="page-header-left">
+                      <h1>Projects</h1>
+                      <app-excel-importer></app-excel-importer>
+                      <input type="file" id="fileUpload" (change)="onFileSelected($event)" hidden />
+                    </div>
 
-    <div class="page-header-right">
-      <div class="search-box">
-        <input
-          type="text"
-          [(ngModel)]="searchQuery"
-          (input)="onFilterChange()"
-          placeholder="Search projects..."
-        />
-      </div>
-      <select [(ngModel)]="selectedFilter" (change)="onFilterChange()">
-        <option value="all">All Projects</option>
-        <option value="active">Active</option>
-        <option value="on hold">On Hold</option>
-      </select>
-    </div>
-  </header>
+                    <div class="page-header-right">
+                      <div class="search-box">
+                        <input
+                          type="text"
+                          [(ngModel)]="searchQuery"
+                          (input)="onFilterChange()"
+                          placeholder="Search projects..."
+                        />
+                      </div>
+                      <select [(ngModel)]="selectedFilter" (change)="onFilterChange()">
+                        <option value="all">All Projects</option>
+                        <option value="active">Active</option>
+                        <option value="on hold">On Hold</option>
+                      </select>
+                    </div>
+                  </header>
 
-<div class="projects-summary">
-  <p class="total-projects-text">Total Projects: {{ totalProjects }}</p>
-</div>
-</div>
-
-
-                <!-- ✅ Total Projects Counter -->
+                  <div class="projects-summary">
+                    <p class="total-projects-text">Total Projects: {{ totalProjects }}</p>
+                  </div>
+                </div>
 
                 <!-- ===== Project Cards ===== -->
                 <div class="pm-cards">
-                  <!-- Add New Project -->
-                  <article class="pm-card add-new" (click)="openNewProject()">
+                  <!-- Add New Project (Admin only) -->
+                  <article
+                    class="pm-card add-new"
+                    *ngIf="isAdmin"
+                    (click)="openNewProject()"
+                  >
                     <div class="pm-plus-circle">
                       <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
                         <path
@@ -75,7 +76,12 @@
                         {{ p.status || 'Unknown' }}
                       </span>
 
-                      <div class="pm-card-menu" (click)="$event.stopPropagation()">
+                      <!-- Menu visible only for Admin -->
+                      <div
+                        class="pm-card-menu"
+                        *ngIf="isAdmin"
+                        (click)="$event.stopPropagation()"
+                      >
                         <button
                           class="dots"
                           type="button"
@@ -122,9 +128,10 @@
                 </div>
 
                 <!-- ===== Pagination ===== -->
-                <div class="pagination" *ngIf="getTotalPages() > 1">
-                  <button (click)="jumpToPage(true)" [disabled]="currentPage === 1">&lt;&lt;</button>
-                  <button (click)="changePage(currentPage - 1)" [disabled]="currentPage === 1">&lt;</button>
+                <div class="pagination" *ngIf="projects.length">
+                  <button (click)="jumpToPage(true)" [disabled]="currentPage === 1">«</button>
+                  <button (click)="changePage(currentPage - 1)" [disabled]="currentPage === 1">‹</button>
+
                   <button
                     *ngFor="let page of pageNumbers"
                     (click)="changePage(page)"
@@ -132,14 +139,17 @@
                   >
                     {{ page }}
                   </button>
+
                   <button
                     (click)="changePage(currentPage + 1)"
                     [disabled]="currentPage >= getTotalPages()"
-                  >&gt;</button>
+                  >›</button>
                   <button
                     (click)="jumpToPage(false)"
                     [disabled]="currentPage >= getTotalPages()"
-                  >&gt;&gt;</button>
+                  >»</button>
+
+
                 </div>
 
                 <!-- ===== Members Modal ===== -->

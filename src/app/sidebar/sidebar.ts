@@ -12,66 +12,53 @@ import { CommonModule } from '@angular/common';
   templateUrl: './sidebar.html',
   styleUrl: './sidebar.css'
 })
-export class Sidebar implements OnInit
-{
+export class Sidebar implements OnInit {
   activeLink: string = '';
 
   isAdmin: boolean = false;
+  isDeveloper: boolean = false;
   decodedToken: any;
 
-  constructor(private auth: AuthService, private router: Router) { }
+  constructor(private auth: AuthService, private router: Router) {}
 
-  ngOnInit()
-  {
+  ngOnInit() {
     this.setActiveLink(this.router.url);
 
-    const token: string | null = localStorage.getItem("token");
-    if (token)
-    {
+    const token: string | null = localStorage.getItem('token');
+    if (token) {
       this.decodedToken = jwtDecode(token);
+      const role = (this.decodedToken.role || '').toLowerCase();
 
-      if(this.decodedToken.role == "admin")
-      {
+      if (role === 'admin') {
         this.isAdmin = true;
+      } else if (role === 'developer') {
+        this.isDeveloper = true;
       }
     }
-    this.router.events.subscribe(event =>
-    {
-      if (event instanceof NavigationEnd)
-      {
+
+    this.router.events.subscribe(event => {
+      if (event instanceof NavigationEnd) {
         this.setActiveLink(event.url);
       }
     });
   }
 
-  setActiveLink(url: string)
-  {
-    if (url.startsWith('/dashboard'))
-    {
+  setActiveLink(url: string) {
+    if (url.startsWith('/dashboard')) {
       this.activeLink = 'dashboard';
-    }
-    else if (url.startsWith('/projects') || url.startsWith('/services'))
-    {
+    } else if (url.startsWith('/projects') || url.startsWith('/services')) {
       this.activeLink = 'projectManagement';
-    }
-    else if (url.startsWith('/profile') || url.startsWith('/certificate'))
-    {
+    } else if (url.startsWith('/profile') || url.startsWith('/certificate')) {
       this.activeLink = 'profile';
-    }
-    else if (url.startsWith('/home') || url.startsWith('/issues'))
-    {
+    } else if (url.startsWith('/home') || url.startsWith('/issues')) {
       this.activeLink = 'home';
-    }
-    else
-    {
+    } else {
       this.activeLink = '';
     }
   }
 
-
-  logout()
-  {
+  logout() {
     this.auth.logout();
-    this.router.navigate([ '/auth/login' ]);
+    this.router.navigate(['/auth/login']);
   }
 }
