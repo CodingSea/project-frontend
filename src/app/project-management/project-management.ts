@@ -43,6 +43,11 @@ export class ProjectManagement implements OnInit, AfterViewInit {
   showServicesModal = false;
   selectedServices: any[] = [];
 
+  // ✅ Role-based variables
+  currentUser: any = null;
+  isAdmin = false;
+  userId: number | null = null;
+
   constructor(
     private projectService: ProjectService,
     private router: Router,
@@ -56,7 +61,27 @@ export class ProjectManagement implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     window.scrollTo(0, 0);
+    this.loadCurrentUser();
     this.loadProjects();
+  }
+
+  /** ✅ Decode JWT to get current user and role */
+  private loadCurrentUser(): void {
+    try {
+      const token =
+        localStorage.getItem('access_token') ||
+        localStorage.getItem('token') ||
+        localStorage.getItem('jwt');
+      if (!token) return;
+
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      this.userId = Number(payload.id || payload.userId || payload.sub);
+      const role = (payload.role || payload.userType || '').toLowerCase();
+      this.isAdmin = role === 'admin';
+      this.currentUser = payload;
+    } catch (e) {
+      console.warn('Failed to decode token', e);
+    }
   }
 
   /** ===== Excel Upload ===== */
@@ -65,9 +90,12 @@ export class ProjectManagement implements OnInit, AfterViewInit {
     if (file) this.selectedFile = file;
   }
 
-  /** ===== Load Projects ===== */
-  loadProjects(): void {
-    const options = this.buildQueryOptions();
+/** ===== Load Projects (role-based with correct pagination) ===== */
+loadProjects(): void {
+  const options = this.buildQueryOptions();
+
+  // Admin: backend handles pagination & count
+  if (this.isAdmin) {
     this.projectService
       .getProjectsCount({ status: options.status, search: options.search })
       .subscribe((count) => {
@@ -76,44 +104,84 @@ export class ProjectManagement implements OnInit, AfterViewInit {
         this.updatePageNumbers();
 
         this.projectService.getProjects(options).subscribe((data) => {
-          this.projects = data.map((p) => {
-            let totalCardsCount = 0;
-            let completedCardsCount = 0;
-            const uniqueMembers = new Set<number>();
-            let closestDeadline: Date | null = null;
-
-            (p.services || []).forEach((s: any) => {
-              if (s.chief) uniqueMembers.add(s.chief.id);
-              if (s.projectManager) uniqueMembers.add(s.projectManager.id);
-              (s.assignedResources || []).forEach((r: any) => uniqueMembers.add(r.id));
-              (s.backup || []).forEach((b: any) => uniqueMembers.add(b.id));
-
-              if (s.taskBoard?.cards) {
-                totalCardsCount += s.taskBoard.cards.length;
-                completedCardsCount += s.taskBoard.cards.filter(
-                  (card: any) => card.column === 'done'
-                ).length;
-              }
-
-              if (s.deadline) {
-                const d = new Date(s.deadline);
-                if (!closestDeadline || d < closestDeadline) closestDeadline = d;
-              }
-            });
-
-            const progress =
-              totalCardsCount > 0 ? (completedCardsCount / totalCardsCount) * 100 : 0;
-
-            return {
-              ...p,
-              members: uniqueMembers.size,
-              deadline: closestDeadline || null,
-              progress,
-            } as any;
-          });
+          this.projects = data.map((p) => this.transformProject(p));
         });
       });
+    return;
   }
+
+  // Non-admin: load all, filter locally, then paginate manually
+  this.projectService
+    .getProjects({ ...options, page: 1, limit: 9999 })
+    .subscribe((data) => {
+      // 1️⃣ Filter only assigned projects
+      const filtered = data.filter((p) =>
+        (p.services || []).some((s: any) =>
+          (s.assignedResources || []).some((r: any) => Number(r.id) === this.userId) ||
+          (s.backup || []).some((b: any) => Number(b.id) === this.userId) ||
+          (s.chief && Number(s.chief.id) === this.userId) ||
+          (s.projectManager && Number(s.projectManager.id) === this.userId)
+        )
+      );
+
+      // 2️⃣ Calculate total count & pages for pagination
+      this.totalProjects = filtered.length;
+      this.projectsInfo.totalProjects = filtered.length;
+
+      const start = (this.currentPage - 1) * this.pageSize;
+      const end = start + this.pageSize;
+      const paginated = filtered.slice(start, end);
+
+      // 3️⃣ Transform only paginated subset for display
+      this.projects = paginated.map((p) => this.transformProject(p));
+
+      this.updatePageNumbers();
+    });
+}
+
+/** ===== Helper for per-project calculations ===== */
+private transformProject(p: any): any {
+  let totalCardsCount = 0;
+  let completedCardsCount = 0;
+  const uniqueMembers = new Set<number>();
+  let closestDeadline: Date | null = null;
+
+  (p.services || []).forEach((s: any) => {
+    if (s.chief) uniqueMembers.add(s.chief.id);
+    if (s.projectManager) uniqueMembers.add(s.projectManager.id);
+    (s.assignedResources || []).forEach((r: any) => uniqueMembers.add(r.id));
+    (s.backup || []).forEach((b: any) => uniqueMembers.add(b.id));
+
+    if (s.taskBoard?.cards) {
+      totalCardsCount += s.taskBoard.cards.length;
+      completedCardsCount += s.taskBoard.cards.filter(
+        (card: any) => card.column === 'done'
+      ).length;
+    }
+
+    if (s.deadline) {
+      const d = new Date(s.deadline);
+      if (!closestDeadline || d < closestDeadline) closestDeadline = d;
+    }
+  });
+
+  const progress = totalCardsCount > 0 ? (completedCardsCount / totalCardsCount) * 100 : 0;
+
+  return {
+    ...p,
+    members: uniqueMembers.size,
+    deadline: closestDeadline || null,
+    progress,
+  } as any;
+}
+
+/** ===== Query Options ===== */
+private buildQueryOptions() {
+  const status = this.getSelectedStatusForApi();
+  const search = this.searchQuery?.trim() || undefined;
+  return { page: this.currentPage, limit: this.pageSize, status, search };
+}
+
 
   private getSelectedStatusForApi(): string {
     switch (this.selectedFilter) {
@@ -126,12 +194,6 @@ export class ProjectManagement implements OnInit, AfterViewInit {
     }
   }
 
-  private buildQueryOptions() {
-    const status = this.getSelectedStatusForApi();
-    const search =
-      this.searchQuery && this.searchQuery.trim().length ? this.searchQuery.trim() : undefined;
-    return { page: this.currentPage, limit: this.pageSize, status, search };
-  }
 
   /** ===== Pagination ===== */
   onFilterChange(): void {
@@ -176,6 +238,7 @@ export class ProjectManagement implements OnInit, AfterViewInit {
 
   /** ===== New Project ===== */
   openNewProject(): void {
+    if (!this.isAdmin) return; // 🔒 Non-admin users can't open modal
     this.showNewProject = true;
     this.newProject = this.blankNewProject();
   }
@@ -189,7 +252,7 @@ export class ProjectManagement implements OnInit, AfterViewInit {
   }
 
   saveNewProject(form: NgForm): void {
-    if (form.invalid) return;
+    if (form.invalid || !this.isAdmin) return; // 🔒 Admin only
     this.projectService.createProject(this.newProject).subscribe(() => {
       this.closeNewProject();
       this.currentPage = 1;
@@ -198,6 +261,7 @@ export class ProjectManagement implements OnInit, AfterViewInit {
   }
 
   openEditProject(): void {
+    if (!this.isAdmin) return; // 🔒 Admin only
     this.showEditProject = true;
     this.editProject = this.blankNewProject();
   }
@@ -209,11 +273,13 @@ export class ProjectManagement implements OnInit, AfterViewInit {
   }
 
   toggleMenu(id: number, event: Event): void {
+    if (!this.isAdmin) return; // 🔒 Hide menu for non-admins
     event.stopPropagation();
     this.openMenuId = this.openMenuId === id ? null : id;
   }
 
   goToEdit(p: Project, event: Event): void {
+    if (!this.isAdmin) return; // 🔒 Admin only
     event.stopPropagation();
     this.lastEditProject = { ...p };
     this.openEditProject();
@@ -221,7 +287,7 @@ export class ProjectManagement implements OnInit, AfterViewInit {
   }
 
   updateProject(form: NgForm): void {
-    if (!this.editProject.projectID) return;
+    if (!this.isAdmin || !this.editProject.projectID) return; // 🔒 Admin only
     const payload: Partial<Project> = {
       name: this.editProject.name,
       description: this.editProject.description,
@@ -237,7 +303,7 @@ export class ProjectManagement implements OnInit, AfterViewInit {
   }
 
   deleteProject(p: Project): void {
-    if (!p.projectID) return;
+    if (!this.isAdmin || !p.projectID) return; // 🔒 Admin only
     this.http
       .delete(`${environment.apiUrl}/project/${p.projectID}`)
       .subscribe(() => this.loadProjects(), (err) => console.error(err));

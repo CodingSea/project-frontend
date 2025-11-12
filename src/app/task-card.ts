@@ -7,7 +7,6 @@ export interface TaskCard {
   order?: number;
   color?: string;
 
-  // ✅ Add these two lines:
   assignedUserId?: number | null;
   assignedUser?: {
     id: number;
@@ -15,17 +14,31 @@ export interface TaskCard {
     last_name?: string;
     email?: string;
   } | null;
+
+  assignedUserIds?: number[] | null;
+  assignedUsers?: {
+    id: number;
+    first_name?: string;
+    last_name?: string;
+    email?: string;
+  }[] | null;
+
+  users?: {
+    id: number;
+    first_name?: string;
+    last_name?: string;
+    email?: string;
+  }[] | null;
 }
 
-export interface TaskCardDisplayed
-{
-    id?: number;
-    column: string;
-    title: string;
-    description?: string;
-    taskBoardId?: number;
-    comments?: Comment[];
-    tags?: string;
-    order: number;
-    color?: string;
+export interface TaskCardDisplayed {
+  id?: number;
+  column: string;
+  title: string;
+  description?: string;
+  taskBoardId?: number;
+  comments?: Comment[];
+  tags?: string;
+  order: number;
+  color?: string;
 }
