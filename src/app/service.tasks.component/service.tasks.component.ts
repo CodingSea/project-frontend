@@ -436,6 +436,7 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
       await this.updateTaskOrder(newStatus);
       await this.updateTask(t);
       await this.getCurrentServiceInfo();
+      await this.checkServiceStatus();
     }
   }
 
