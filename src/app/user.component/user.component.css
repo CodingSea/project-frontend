@@ -47,9 +47,13 @@ label {
 input {
     width: 100%;
     padding: 10px;
-    margin-bottom: 20px;
     border: 1px solid #ccc;
     border-radius: 4px;
+}
+
+.input
+{
+    margin-bottom: 20px;
 }
 
 .options {
@@ -110,3 +114,8 @@ input {
     text-decoration: none;
 }
 
+.error-message {
+    color: red;
+    margin-top: 10px;
+    font-weight: bold;
+}

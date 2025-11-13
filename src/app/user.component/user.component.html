@@ -8,19 +8,44 @@
 
         <form [formGroup]="signupForm" (ngSubmit)="signup()">
 
-            <label for="first_name">First Name: </label>
-            <input type="text" formControlName="first_name" id="first_name" placeholder="Enter your first name">
+            <div class="input">
+                <label for="first_name">First Name: </label>
+                <input type="text" formControlName="first_name" id="first_name" placeholder="Enter your first name">
+            </div>
 
-            <label for="last_name">Last name: </label>
-            <input type="text" formControlName="last_name" id="last_name" placeholder="Enter your last name">
+            <div class="input">
+                <label for="last_name">Last name: </label>
+                <input type="text" formControlName="last_name" id="last_name" placeholder="Enter your last name">
+            </div>
 
-            <label for="email">Email: </label>
-            <input type="text" formControlName="email" id="email" placeholder="Enter your email">
+            <div class="input">
+                <label for="email">Email: </label>
+                <input type="email" formControlName="email" id="email" placeholder="Enter your email">
 
-            <label for="password">Password: </label>
-            <input type="password" formControlName="password" id="password" placeholder="Enter your password" minlength="5">
+                <div *ngIf="signupForm.get('email')?.invalid && (signupForm.get('email')?.touched || signupForm.get('email')?.dirty)"
+                    class="error-message">
+                    <div *ngIf="signupForm.get('email')?.errors?.['required']">Email is required.</div>
+                    <div *ngIf="signupForm.get('email')?.errors?.['email']">Invalid email format.</div>
+                </div>
+            </div>
+
+            <div class="input">
+                <label for="password">Password: </label>
+                <input type="password" formControlName="password" id="password" placeholder="Enter your password"
+                    minlength="5">
+
+                <div *ngIf="signupForm.get('password')?.invalid && (signupForm.get('password')?.touched || signupForm.get('password')?.dirty)"
+                    class="error-message">
+                    <div *ngIf="signupForm.get('password')?.errors?.['required']">Password is required.</div>
+                    <div *ngIf="signupForm.get('password')?.errors?.['minlength']">Password must be at least 5
+                        characters
+                        long.</div>
+                </div>
+            </div>
 
             <button type="submit" class="signin-button">Signup</button>
+
+            <p *ngIf="signupError" class="error-message">{{ signupError }}</p>
 
             <p class="signup">Have an account? <a routerLink="/auth/login">Login page</a></p>
         </form>
@@ -36,13 +61,21 @@
         <h2>Login to DevHub</h2>
 
         <form [formGroup]="loginForm" (ngSubmit)="login()">
-            <label for="email">Email: </label>
-            <input type="email" formControlName="email" id="email" placeholder="Enter your email" required>
+            <div class="input">
+                <label for="email">Email: </label>
+                <input type="email" formControlName="email" id="email" placeholder="Enter your email" required>
+            </div>
 
-            <label for="password">Password: </label>
-            <input type="password" formControlName="password" id="password" placeholder="Enter your password" required>
+            <div class="input">
+                <label for="password">Password: </label>
+                <input type="password" formControlName="password" id="password" placeholder="Enter your password"
+                    required>
+            </div>
 
             <button type="submit" class="signin-button">Login</button>
+
+            <!-- Error message for invalid login -->
+            <p *ngIf="loginError" class="error-message">{{ loginError }}</p>
 
             <p class="signup">Don't have an account? <a routerLink="/auth/signup">Sign up for free</a></p>
         </form>
