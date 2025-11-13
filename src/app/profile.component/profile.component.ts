@@ -13,7 +13,7 @@ import { HeaderComponent } from '@app/header/header';
 
 @Component({
   selector: 'app-profile.component',
-  imports: [ Sidebar, RouterLink, CommonModule, FormsModule,HeaderComponent ],
+  imports: [ Sidebar, RouterLink, CommonModule, FormsModule, HeaderComponent ],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.css'
 })
@@ -30,6 +30,7 @@ export class ProfileComponent implements OnInit
   services: Service[] | null = null;
   isEmbedded = false;
   isImageLoading = true;
+  showBackBtn: boolean = false;
 
   newSkill = '';
   deletedCertificates: number[] = [];
@@ -60,7 +61,8 @@ export class ProfileComponent implements OnInit
     if (!token) return;
     this.decodedToken = jwtDecode(token);
     const cachedImage = localStorage.getItem('profileImage');
-    if (cachedImage) {
+    if (cachedImage)
+    {
       this.currentUserInfo.profileImage = cachedImage;
       this.isImageLoading = false;
     }
@@ -70,15 +72,19 @@ export class ProfileComponent implements OnInit
       if (this.activatedRoute.snapshot.paramMap.has("userId"))
       {
         this.loadOtherUserProfile();
-      } else
+        this.showBackBtn = true;
+      }
+      else
       {
         this.loadCurrentUserProfile();
+        this.showBackBtn = false;
       }
     });
   }
-private emitProfileImageChange(url: string | null) {
-  window.dispatchEvent(new CustomEvent('profile-image-changed', { detail: url }));
-}
+  private emitProfileImageChange(url: string | null)
+  {
+    window.dispatchEvent(new CustomEvent('profile-image-changed', { detail: url }));
+  }
   // ===== LOAD USER DATA =====
   loadOtherUserProfile()
   {
@@ -101,26 +107,28 @@ private emitProfileImageChange(url: string | null) {
     this.http.get<Service[]>(`${environment.apiUrl}/service/user/${userId}`).subscribe((res) => (this.services = res));
   }
 
-setUserData(user: User)
-{
-  this.currentUser = user;
-  this.currentUserInfo.username = `${user.first_name} ${user.last_name}`;
-  this.currentUserInfo.email = user.email;
-  this.currentUserInfo.skills = user.skills || [];
-  this.currentUserInfo.profileImage = user.profileImage || '';
-  this.currentUserInfo.role = user.role === "admin" ? "Admin" : "Developer";
+  setUserData(user: User)
+  {
+    this.currentUser = user;
+    this.currentUserInfo.username = `${user.first_name} ${user.last_name}`;
+    this.currentUserInfo.email = user.email;
+    this.currentUserInfo.skills = user.skills || [];
+    this.currentUserInfo.profileImage = user.profileImage || '';
+    this.currentUserInfo.role = user.role === "admin" ? "Admin" : "Developer";
 
-if (user.profileImage) {
-  const full = this.fixImage(user.profileImage);
-  localStorage.setItem('profileImage', full);
-  this.emitProfileImageChange(full);
-} else {
-  localStorage.removeItem('profileImage');
-  this.emitProfileImageChange(null);
-}
+    if (user.profileImage)
+    {
+      const full = this.fixImage(user.profileImage);
+      localStorage.setItem('profileImage', full);
+      this.emitProfileImageChange(full);
+    } else
+    {
+      localStorage.removeItem('profileImage');
+      this.emitProfileImageChange(null);
+    }
 
-  this.isImageLoading = false;
-}
+    this.isImageLoading = false;
+  }
 
 
   // ===== EDIT MODE =====
@@ -297,12 +305,13 @@ if (user.profileImage) {
       this.originalImage = this.currentUserInfo.profileImage;
       this.showImageOptions = false;
       this.loadCurrentUserProfile();
-      this.http.get<User>(`${environment.apiUrl}/user/${userId}`).subscribe(fresh => {
-  const finalUrl = fresh.profileImage ? this.fixImage(fresh.profileImage) : null;
-  if (finalUrl) localStorage.setItem('profileImage', finalUrl);
-  else localStorage.removeItem('profileImage');
-  this.emitProfileImageChange(finalUrl);
-});
+      this.http.get<User>(`${environment.apiUrl}/user/${userId}`).subscribe(fresh =>
+      {
+        const finalUrl = fresh.profileImage ? this.fixImage(fresh.profileImage) : null;
+        if (finalUrl) localStorage.setItem('profileImage', finalUrl);
+        else localStorage.removeItem('profileImage');
+        this.emitProfileImageChange(finalUrl);
+      });
 
     } catch (err)
     {
@@ -317,10 +326,16 @@ if (user.profileImage) {
     window.scrollTo(0, 0);
   }
   // Fix image path like in header
-fixImage(path: string | null | undefined): string {
-  if (!path) return 'images/user.png';
-  if (path.startsWith('http')) return path;
-  return `${environment.apiUrl.replace('/api','')}/${path}`.replace(/\/+/g, '/');
-}
+  fixImage(path: string | null | undefined): string
+  {
+    if (!path) return 'images/user.png';
+    if (path.startsWith('http')) return path;
+    return `${environment.apiUrl.replace('/api', '')}/${path}`.replace(/\/+/g, '/');
+  }
+
+  goBack()
+  {
+    window.history.back();
+  }
 
 }

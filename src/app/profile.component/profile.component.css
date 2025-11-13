@@ -14,12 +14,30 @@ app-sidebar {
 .profile-wrapper {
   margin-left: 240px; /* space for sidebar */
   margin-top: 90px; /* space for header */
-  padding: 50px 20px;
+  /* padding: 50px 20px; */
   display: flex;
   justify-content: center;
   box-sizing: border-box;
   width: calc(100% - 240px);
 }
+
+.back-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  color: #6b7280;
+  font-size: 16px;
+  cursor: pointer;
+  margin: 10px 0 20px;
+  padding: 4px 0;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+.back-btn i { font-size: 18px; }
+.back-btn:hover,
+.back-btn:hover i { color: #dc2626; }
 
 /* ✅ Mobile responsive layout */
 @media (max-width: 1100px) {

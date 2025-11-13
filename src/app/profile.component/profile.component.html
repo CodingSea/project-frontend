@@ -4,6 +4,11 @@
 
 <div class="profile-wrapper">
   <div class="profile-box">
+
+    <button class="back-btn" (click)="goBack()" *ngIf="showBackBtn">
+      <i class="fa-solid fa-arrow-left"></i> Back
+    </button>
+
     <!-- ===== Top Header with Edit Button ===== -->
     <div class="profile-header">
       <div class="profile-top">
