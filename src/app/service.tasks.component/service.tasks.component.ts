@@ -46,10 +46,8 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit {
   showCreateModal = false;
   showEditModal = false;
 
-  // only assigned users for this service
   users: User[] = [];
 
-  // Role flags
   currentUser: User | null | undefined = null;
   isChief = false;
   isManager = false;
@@ -76,7 +74,6 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit {
     assignedUserIds: [] as number[]
   };
 
-  // Dropdown flags
   dropdownOpenCreate = false;
   dropdownOpenEdit = false;
 
@@ -100,7 +97,7 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit {
     private route: ActivatedRoute,
     private location: Location,
     private router: Router,
-    private userService: UserService // still injected if you need it elsewhere
+    private userService: UserService
   ) {}
 
   ngOnInit(): void {
@@ -128,21 +125,12 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit {
         localStorage.getItem('token') ||
         localStorage.getItem('jwt');
 
-      if (!token) {
-        console.warn('No JWT token found in localStorage');
-        return null;
-      }
+      if (!token) return null;
 
-      const parts = token.split('.');
-      if (parts.length !== 3) {
-        console.error('Invalid JWT token format');
-        return null;
-      }
-
-      const payloadJson = atob(parts[1].replace(/-/g, '+').replace(/_/g, '/'));
+      const payloadJson = atob(token.split('.')[1]);
       const payload: any = JSON.parse(payloadJson);
 
-      const user: User = {
+      return {
         id: Number(payload.id || payload.userId || payload.sub),
         first_name: payload.first_name || payload.firstName || '',
         last_name: payload.last_name || payload.lastName || '',
@@ -150,13 +138,6 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit {
         role: payload.role || payload.userType || '',
         skills: []
       };
-
-      if (!user.id) {
-        console.warn('JWT payload did not contain a valid user id');
-        return null;
-      }
-
-      return user;
     } catch (e) {
       console.error('Failed to decode JWT token', e);
       return null;
@@ -166,47 +147,23 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit {
   async loadCurrentUserAndRoles(): Promise<void> {
     try {
       this.currentUser = this.getUserFromToken();
-      console.log('🟢 currentUser from JWT:', this.currentUser);
-
-      if (!this.currentUser) {
-        this.isAdmin = this.isChief = this.isManager = this.isResource = false;
-        return;
-      }
+      if (!this.currentUser) return;
 
       const service = await this.http
         .get<Service>(`${environment.apiUrl}/service/${this.serviceId}`)
         .toPromise();
 
-      console.log('🟣 full service object:', service);
-
-      if (!service) {
-        this.isAdmin = this.isChief = this.isManager = this.isResource = false;
-        return;
-      }
-
       const userId = Number(this.currentUser.id);
       const role = (this.currentUser.role || '').toLowerCase();
 
       this.isAdmin = role === 'admin';
-
-      this.isChief = !!service.chief && Number(service.chief.id) === userId;
-
-      this.isManager =
-        !!service.projectManager && Number(service.projectManager.id) === userId;
-
+      this.isChief = !!service?.chief && Number(service.chief.id) === userId;
+      this.isManager = !!service?.projectManager && Number(service.projectManager.id) === userId;
       this.isResource =
-        Array.isArray(service.assignedResources) &&
+        Array.isArray(service?.assignedResources) &&
         service.assignedResources.some((r: any) => Number(r.id) === userId);
-
-      console.log('Role flags:', {
-        isAdmin: this.isAdmin,
-        isChief: this.isChief,
-        isManager: this.isManager,
-        isResource: this.isResource
-      });
     } catch (err) {
-      console.error('❌ loadCurrentUserAndRoles error:', err);
-      this.isAdmin = this.isChief = this.isManager = this.isResource = false;
+      console.error('loadCurrentUserAndRoles error:', err);
     }
   }
 
@@ -221,22 +178,16 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit {
 
   private colorToPriority(color?: string): 'low' | 'medium' | 'high' {
     switch ((color || '').toLowerCase()) {
-      case '#dc2626':
-        return 'high';
-      case '#eab308':
-        return 'medium';
-      default:
-        return 'low';
+      case '#dc2626': return 'high';
+      case '#eab308': return 'medium';
+      default: return 'low';
     }
   }
 
   textToArray(text: string | string[]): string[] {
     if (Array.isArray(text)) return text;
     if (typeof text !== 'string') return [' '];
-    return text
-      .split(',')
-      .map(t => t.trim())
-      .filter(t => t.length > 0);
+    return text.split(',').map(t => t.trim()).filter(t => t.length > 0);
   }
 
   arrayToString(arr: string[] | string | undefined): string {
@@ -249,7 +200,7 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit {
     const r = Math.round(num * 10) / 10;
     const s = String(r);
     return s.endsWith('.0') ? s.slice(0, -2) : s;
-    }
+  }
 
   // ==================== LOAD ASSIGNED USERS ====================
 
@@ -265,21 +216,13 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit {
       }
 
       const assigned: User[] = [];
-
-      if ((service as any).chief) assigned.push((service as any).chief);
-      if ((service as any).projectManager) assigned.push((service as any).projectManager);
-      if (Array.isArray((service as any).assignedResources)) {
-        assigned.push(...(service as any).assignedResources);
-      }
-      if (Array.isArray((service as any).backup)) {
-        assigned.push(...(service as any).backup);
-      }
+      if (service.chief) assigned.push(service.chief);
+      if (service.projectManager) assigned.push(service.projectManager);
+      if (Array.isArray(service.assignedResources)) assigned.push(...service.assignedResources);
+      if (Array.isArray(service.backup)) assigned.push(...service.backup);
 
       const uniqueUsers = new Map<number, User>();
-      assigned.forEach(u => {
-        if (u && u.id) uniqueUsers.set(u.id, u);
-      });
-
+      assigned.forEach(u => { if (u && u.id) uniqueUsers.set(u.id, u); });
       this.users = Array.from(uniqueUsers.values());
     } catch (err) {
       console.error('Error loading assigned users:', err);
@@ -287,7 +230,7 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit {
     }
   }
 
-  // ==================== SERVICE INFO / PROGRESS ====================
+  // ==================== SERVICE INFO ====================
 
   async getCurrentServiceInfo(): Promise<void> {
     this.servicesInfo = {
@@ -303,27 +246,22 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit {
       .get<TaskBoard>(`${environment.apiUrl}/tasks/task-board/${this.taskBoardId}`)
       .subscribe(res => {
         this.taskBoard = res;
-        if (!this.taskBoard) return;
+        if (!res?.service) return;
 
-        const service: any = this.taskBoard.service;
-        if (!service) return;
-
-        this.servicesInfo.totalServices = 1;
-
-        const uniqueMembers = new Set<number>();
-        if (service.chief) uniqueMembers.add(service.chief.id);
-        if (service.projectManager) uniqueMembers.add(service.projectManager.id);
-        service.assignedResources?.forEach((r: any) => uniqueMembers.add(r.id));
-        service.backup?.forEach((b: any) => uniqueMembers.add(b.id));
-
-        this.servicesInfo.totalMembers = uniqueMembers.size;
+        const service: any = res.service;
+        const members = new Set<number>();
+        if (service.chief) members.add(service.chief.id);
+        if (service.projectManager) members.add(service.projectManager.id);
+        service.assignedResources?.forEach((r: any) => members.add(r.id));
+        service.backup?.forEach((b: any) => members.add(b.id));
+        this.servicesInfo.totalMembers = members.size;
 
         let total = 0;
         this.servicesInfo.backloggedTasks = 0;
         this.servicesInfo.activeTasks = 0;
         this.servicesInfo.completedTasks = 0;
 
-        this.taskBoard.cards?.forEach((t: any) => {
+        res.cards?.forEach((t: any) => {
           total++;
           if (t.column === 'new') this.servicesInfo.backloggedTasks++;
           else if (t.column === 'work') this.servicesInfo.activeTasks++;
@@ -335,44 +273,7 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit {
       });
   }
 
-  async checkServiceStatus() {
-    try {
-      if (
-        !this.dataAdapter?.localData ||
-        this.dataAdapter.localData.length === 0 ||
-        this.dataAdapter.localData[0].status === 's'
-      ) {
-        await this.http
-          .patch<Service>(`${environment.apiUrl}/service/${this.serviceId}/status`, {
-            status: ServiceStatus.New
-          })
-          .toPromise();
-        return;
-      }
-
-      if (this.taskBoard?.service.status == 'On Hold') return;
-
-      if (this.servicesInfo.completionRate === 100) {
-        if (this.taskBoard?.service.status === 'Pending Approval') return;
-
-        await this.http
-          .patch<Service>(`${environment.apiUrl}/service/${this.serviceId}/status`, {
-            status: ServiceStatus.Completed
-          })
-          .toPromise();
-      } else {
-        await this.http
-          .patch<Service>(`${environment.apiUrl}/service/${this.serviceId}/status`, {
-            status: ServiceStatus.InProgress
-          })
-          .toPromise();
-      }
-    } catch (err) {
-      console.error('Error checking service status:', err);
-    }
-  }
-
-  // ==================== BOARD DATA (TASKS) ====================
+  // ==================== BOARD DATA ====================
 
   async getBoardCards(): Promise<void> {
     try {
@@ -388,11 +289,7 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit {
       this.data = response.map(task => {
         const assignedUserIds =
           Array.isArray(task.users) && task.users.length
-            ? task.users.map(u => u.id)
-            : task.assignedUserIds && task.assignedUserIds.length
-            ? task.assignedUserIds
-            : task.assignedUserId
-            ? [Number(task.assignedUserId)]
+            ? task.users.map(u => (typeof u === 'object' ? u.id : u))
             : [];
 
         return {
@@ -413,22 +310,6 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit {
 
   async initializeKanbanDataSource(): Promise<void> {
     await this.getBoardCards();
-
-    if (this.data.length === 0) {
-      this.data = [
-        {
-          id: '1',
-          status: 's',
-          text: 'eee',
-          tags: 'ss',
-          description: 'ssssee',
-          assignee: 'John sp',
-          color: '#C21A25',
-          assignedUserIds: []
-        }
-      ];
-    }
-
     this.dataAdapter = new (window as any).jqx.dataAdapter({
       localData: this.data,
       dataType: 'array',
@@ -443,239 +324,7 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit {
         { name: 'assignedUserIds', type: 'array' }
       ]
     });
-
     this.dataAdapter.localData = this.data;
-
-    await this.rebuildKanban();
-    await this.checkServiceStatus();
-  }
-
-  async rebuildKanban() {
-    if (this.kanban) this.kanban.destroy();
-    this.showKanban = false;
-
-    await this.getBoardCards();
-
-    setTimeout(() => {
-      this.dataAdapter = new (window as any).jqx.dataAdapter({
-        localData: this.data,
-        dataType: 'array',
-        dataFields: [
-          { name: 'id', type: 'string' },
-          { name: 'status', type: 'string' },
-          { name: 'text', type: 'string' },
-          { name: 'tags', type: 'string' },
-          { name: 'description', type: 'string' },
-          { name: 'assignee', type: 'string' },
-          { name: 'color', type: 'string' },
-          { name: 'assignedUserIds', type: 'array' }
-        ]
-      });
-
-      this.showKanban = true;
-
-      setTimeout(() => {
-        if (this.kanban && this.kanban.host) {
-          (this.kanban as any).itemRenderer = this.kanbanItemRenderer;
-        }
-      }, 50);
-    }, 0);
-  }
-
-  // ==================== MODALS ====================
-
-  openCreateModal() {
-    this.createModel = {
-      title: '',
-      description: '',
-      tags: '',
-      priority: 'low',
-      color: '#16a34a',
-      assignedUserIds: []
-    };
-    this.showCreateModal = true;
-  }
-
-  closeCreateModal() {
-    this.showCreateModal = false;
-  }
-
-  openEditModal(item: any) {
-    if (!this.isChief && !this.isAdmin) return;
-
-    const t = this.data.find(x => String(x.id) === String(item.id));
-    if (!t) return;
-
-    const priority = this.colorToPriority(t.color);
-    const assignedUserIds: number[] = t.assignedUserIds && t.assignedUserIds.length
-      ? t.assignedUserIds
-      : [];
-
-    this.editModel = {
-      id: Number(t.id),
-      title: t.text,
-      description: t.description || '',
-      tags: typeof t.tags === 'string' ? t.tags : this.arrayToString(t.tags),
-      priority,
-      color: t.color || '#16a34a',
-      column: (t.status as 'new' | 'work' | 'done') || 'new',
-      assignedUserIds
-    };
-
-    this.showEditModal = true;
-  }
-
-  closeEditModal() {
-    this.showEditModal = false;
-  }
-
-  // ==================== CREATE / UPDATE / DELETE ====================
-
-  async submitCreateTask() {
-    if (!(this.isChief || this.isManager || this.isResource || this.isAdmin)) return;
-
-    this.updatePriorityColor(this.createModel);
-
-    await this.createTask(
-      this.createModel.title,
-      'new',
-      this.createModel.tags,
-      this.createModel.description,
-      this.createModel.color,
-      this.createModel.assignedUserIds
-    );
-
-    this.closeCreateModal();
-  }
-
-  async submitEditTask() {
-    if (!(this.isChief || this.isAdmin)) return;
-
-    this.updatePriorityColor(this.editModel);
-
-    const payload: any = {
-      id: this.editModel.id,
-      status: this.editModel.column,
-      text: this.editModel.title,
-      description: this.editModel.description,
-      tags: this.editModel.tags,
-      color: this.editModel.color,
-      assignedUserIds: this.editModel.assignedUserIds || [],
-      order: this.data.findIndex(d => Number(d.id) === this.editModel.id)
-    };
-
-    await this.updateTask(payload);
-    await this.rebuildKanban();
-    await this.getCurrentServiceInfo();
-    await this.checkServiceStatus();
-    this.closeEditModal();
-  }
-
-  confirmDelete() {
-    if (!this.editModel?.id || !(this.isChief || this.isAdmin)) return;
-    this.deleteTask(this.editModel.id);
-    this.closeEditModal();
-  }
-
-  async createTask(
-    taskText: string,
-    column: string,
-    tagsText: string,
-    description: string,
-    color: string,
-    assignedUserIds: number[]
-  ): Promise<void> {
-    const formattedTags = tagsText.length === 0 ? [' '] : this.textToArray(tagsText);
-    const newTaskOrder = this.data.filter(task => task.status === 'new').length;
-
-    const newTask: any = {
-      title: taskText,
-      column,
-      description,
-      tags: formattedTags,
-      order: newTaskOrder,
-      color,
-      users: assignedUserIds
-    };
-
-    try {
-      const response = await this.http
-        .post<TaskCard>(
-          `${environment.apiUrl}/service/${this.taskBoardId}/cards`,
-          newTask,
-          { headers: { 'Content-Type': 'application/json' } }
-        )
-        .toPromise();
-
-      const created = response!;
-      this.data.push({
-        id: String(created?.id),
-        status: column,
-        text: taskText,
-        description,
-        tags: formattedTags,
-        order: newTaskOrder,
-        color,
-        assignedUserIds
-      });
-
-      this.dataAdapter.localData = this.data;
-      await this.rebuildKanban();
-      await this.getCurrentServiceInfo();
-    } catch (error) {
-      console.error('Error creating task:', error);
-    }
-  }
-
-  async updateTask(task: any): Promise<void> {
-    if (!task || !task.id) return;
-
-    const payload: any = {
-      column: task.status,
-      title: task.text,
-      description: task.description || '',
-      tags: Array.isArray(task.tags)
-        ? task.tags
-        : this.textToArray(task.tags) || [],
-      order: task.order,
-      color: task.color || '#16a34a',
-      users: task.assignedUserIds
-    };
-
-    try {
-      await this.http
-        .patch<TaskCard>(
-          `${environment.apiUrl}/service/${this.taskBoardId}/tasks/${task.id}`,
-          payload,
-          { headers: { 'Content-Type': 'application/json' } }
-        )
-        .toPromise();
-
-      const idx = this.data.findIndex(x => String(x.id) === String(task.id));
-      if (idx !== -1) {
-        this.data[idx] = { ...this.data[idx], ...payload };
-      }
-
-      this.dataAdapter.localData = this.data;
-    } catch (error) {
-      console.error('Error updating task:', error);
-    }
-  }
-
-  async deleteTask(taskId: number): Promise<void> {
-    try {
-      await this.http
-        .delete(`${environment.apiUrl}/service/${this.taskBoardId}/tasks/${taskId}`)
-        .toPromise();
-
-      this.data = this.data.filter(task => Number(task.id) !== Number(taskId));
-      this.dataAdapter.localData = this.data;
-
-      await this.rebuildKanban();
-      await this.initializeKanbanDataSource();
-    } catch (error) {
-      console.error('Error deleting task:', error);
-    }
   }
 
   // ==================== DRAG & DROP ====================
@@ -692,7 +341,6 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit {
       await this.updateTaskOrder(newStatus);
       await this.updateTask(t);
       await this.getCurrentServiceInfo();
-      await this.checkServiceStatus();
     }
   }
 
@@ -705,58 +353,157 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit {
     }
   }
 
-  // ==================== NAVIGATION ====================
+  // ==================== MODALS ====================
 
-  goBack() {
-    this.location.back();
+  openCreateModal() {
+    this.createModel = {
+      title: '',
+      description: '',
+      tags: '',
+      priority: 'low',
+      color: '#16a34a',
+      assignedUserIds: []
+    };
+    this.showCreateModal = true;
   }
 
-  selectSection(isTaskboard: boolean) {
-    this.isTaskboardSelected = isTaskboard;
-    this.initializeKanbanDataSource();
+  closeCreateModal() { this.showCreateModal = false; }
+
+  openEditModal(item: any) {
+    if (!this.isChief && !this.isAdmin) return;
+    const t = this.data.find(x => String(x.id) === String(item.id));
+    if (!t) return;
+    const priority = this.colorToPriority(t.color);
+    const assignedUserIds: number[] = t.assignedUserIds && t.assignedUserIds.length
+      ? t.assignedUserIds : [];
+    this.editModel = {
+      id: Number(t.id),
+      title: t.text,
+      description: t.description || '',
+      tags: typeof t.tags === 'string' ? t.tags : this.arrayToString(t.tags),
+      priority,
+      color: t.color || '#16a34a',
+      column: (t.status as 'new' | 'work' | 'done') || 'new',
+      assignedUserIds
+    };
+    this.showEditModal = true;
   }
 
-  toggleEdit() {
-    this.router.navigate([
-      `/projects/${this.taskBoard?.service.project.projectID}/services/${this.taskBoard?.service.serviceID}/edit`
-    ]);
+  closeEditModal() { this.showEditModal = false; }
+
+  confirmDelete() {
+    if (!this.editModel?.id || !(this.isChief || this.isAdmin)) return;
+    this.deleteTask(this.editModel.id);
+    this.closeEditModal();
   }
 
-  // ==================== KANBAN RENDERER ====================
+  // ==================== CREATE / UPDATE / DELETE ====================
 
-  kanbanItemRenderer = (element: any, item: any) => {
-    const tags = (item.tags || '').split(',').filter((x: string) => x.trim());
-    const priority =
-      item.color === '#dc2626'
-        ? 'high'
-        : item.color === '#eab308'
-        ? 'medium'
-        : 'low';
+  async submitCreateTask() {
+    if (!(this.isChief || this.isManager || this.isResource || this.isAdmin)) return;
+    this.updatePriorityColor(this.createModel);
+    await this.createTask(
+      this.createModel.title,
+      'new',
+      this.createModel.tags,
+      this.createModel.description,
+      this.createModel.color,
+      this.createModel.assignedUserIds
+    );
+    this.closeCreateModal();
+  }
 
-    element.innerHTML = `
-      <div class="kanban-card">
-        <div class="k-card-top">
-          <span class="k-card-title">${item.text}</span>
-          <span class="k-priority ${priority}">${priority}</span>
-        </div>
-        <div class="k-card-desc">${item.description || ''}</div>
-        <div class="k-tags">
-          ${tags
-            .map((t: string) => `<span class="k-tag">${t.trim()}</span>`)
-            .join('')}
-        </div>
-      </div>`;
+  async submitEditTask() {
+    if (!(this.isChief || this.isAdmin)) return;
+    this.updatePriorityColor(this.editModel);
+    const payload: any = {
+      id: this.editModel.id,
+      status: this.editModel.column,
+      text: this.editModel.title,
+      description: this.editModel.description,
+      tags: this.editModel.tags,
+      color: this.editModel.color,
+      assignedUserIds: this.editModel.assignedUserIds || [],
+      order: this.data.findIndex(d => Number(d.id) === this.editModel.id)
+    };
+    await this.updateTask(payload);
+    await this.getCurrentServiceInfo();
+    this.closeEditModal();
+  }
+
+async createTask(
+  taskText: string,
+  column: string,
+  tagsText: string,
+  description: string,
+  color: string,
+  assignedUserIds: number[]
+): Promise<void> {
+  const formattedTags = tagsText.length === 0 ? [' '] : this.textToArray(tagsText);
+  const newTask = {
+    title: taskText,
+    column,
+    description,
+    tags: formattedTags,
+    color,
+    users: assignedUserIds,
+    order: this.data.length + 1
   };
+
+  try {
+    const created: any = await this.http
+      .post(`${environment.apiUrl}/service/${this.taskBoardId}/cards`, newTask)
+      .toPromise();
+
+    const newCard = {
+      id: String(created.id),
+      status: created.column,
+      text: created.title,
+      tags: this.arrayToString(created.tags),
+      description: created.description || '',
+      color: created.color || '#16a34a',
+      assignedUserIds: created.users?.map((u: any) => u.id) || []
+    };
+
+    this.data.push(newCard);
+
+if (this.kanban) {
+  (this.kanban as any).source(this.data);
+  (this.kanban as any).update();
+}
+
+
+    await this.getCurrentServiceInfo();
+  } catch (error) {
+    console.error('Error creating task:', error);
+  }
+}
+
+
+  async updateTask(task: any): Promise<void> {
+    const payload = {
+      column: task.status,
+      title: task.text,
+      description: task.description || '',
+      tags: Array.isArray(task.tags) ? task.tags : this.textToArray(task.tags),
+      color: task.color || '#16a34a',
+      users: task.assignedUserIds
+    };
+    await this.http.patch(`${environment.apiUrl}/service/${this.taskBoardId}/tasks/${task.id}`, payload).toPromise();
+  }
+
+  async deleteTask(taskId: number): Promise<void> {
+    await this.http.delete(`${environment.apiUrl}/service/${this.taskBoardId}/tasks/${taskId}`).toPromise();
+    this.data = this.data.filter(task => Number(task.id) !== Number(taskId));
+    this.dataAdapter.localData = this.data;
+  }
 
   // ==================== DROPDOWNS ====================
 
   @HostListener('document:click', ['$event'])
   handleClickOutside(event: Event) {
     const target = event.target as HTMLElement;
-    if (
-      !target.closest('.dropdown-select') &&
-      !target.closest('.dropdown-list')
-    ) {
+    if (!target.closest('.dropdown-select') && !target.closest('.dropdown-list')) {
       this.dropdownOpenCreate = false;
       this.dropdownOpenEdit = false;
     }
@@ -793,8 +540,21 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit {
 
   getUserNameById(id: number): string {
     const user = this.users.find(u => u.id === id);
-    return user
-      ? `${user.first_name} ${user.last_name}`
-      : 'Unknown';
+    return user ? `${user.first_name} ${user.last_name}` : 'Unknown';
+  }
+
+  // ==================== NAVIGATION ====================
+
+  goBack() { this.location.back(); }
+
+  selectSection(isTaskboard: boolean) {
+    this.isTaskboardSelected = isTaskboard;
+    this.initializeKanbanDataSource();
+  }
+
+  toggleEdit() {
+    this.router.navigate([
+      `/projects/${this.taskBoard?.service.project.projectID}/services/${this.taskBoard?.service.serviceID}/edit`
+    ]);
   }
 }

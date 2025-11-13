@@ -1,0 +1,16 @@
+input[type="file"]::file-selector-button {
+    background-color: #C21A25;
+    /* Example background color */
+    color: white;
+    /* Example text color */
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    /* Add other CSS properties as needed */
+}
+
+input[type="file"]::file-selector-button:hover {
+    filter: brightness(0.8);
+    /* Example hover effect */
+}

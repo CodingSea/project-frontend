@@ -1,0 +1,102 @@
+<div class="container">
+    <app-header></app-header>
+    <app-sidebar></app-sidebar>
+
+    <div class="content">
+        <div class="dashboard-container">
+            <!-- Header -->
+            <div class="dashboard-header">
+                <h2>Developers Dashboard</h2>
+                <app-excel-developer-importer (importComplete)="getDevelopersFromDB()"></app-excel-developer-importer>
+            </div>
+
+            <!-- Search Section -->
+            <div class="search-section">
+                <div class="search-bar">
+                    <input type="text" placeholder="Search developers by name"
+                        [(ngModel)]="searchTerm" (keyup.enter)="getDevelopersFromDB()" [disabled]="showAdvancedSearch" />
+                    <button (click)="toggleAdvancedSearch()">
+                        <i class="icon">⚙️</i> Advanced Search
+                    </button>
+                </div>
+
+                <div class="advanced-search" *ngIf="showAdvancedSearch">
+                    <div class="advanced-field">
+                        <label>Name:</label>
+                        <input type="text" [(ngModel)]="advName" (keyup.enter)="getDevelopersFromDB()"
+                            placeholder="Enter developer name" />
+                    </div>
+
+                    <div class="advanced-field">
+                        <label>Skills:</label>
+                        <input type="text" [(ngModel)]="advSkills" (keyup.enter)="getDevelopersFromDB()"
+                            placeholder="Enter developer skills" />
+                    </div>
+
+                    <div class="advanced-field">
+                        <label>Services:</label>
+                        <input type="text" [(ngModel)]="advServices" (keyup.enter)="getDevelopersFromDB()"
+                            placeholder="Enter related services" />
+                    </div>
+
+                    <div class="advanced-field">
+                        <label>Tasks:</label>
+                        <input type="text" [(ngModel)]="advTasks" (keyup.enter)="getDevelopersFromDB()"
+                            placeholder="Enter related tasks" />
+                    </div>
+
+                    <div class="reset-container">
+                        <button class="reset-btn" (click)="resetAdvanced()">Reset Filters</button>
+                    </div>
+                </div>
+            </div>
+
+            <p class="total-developers-text">Total Developers: {{ totalDevelopers }}</p>
+
+            <!-- Developers Grid -->
+            <div class="developers-grid">
+                <div class="dev-card" *ngFor="let dev of developers">
+                    <div class="dev-header">
+                        <img [src]="dev.profileImage || 'images/user.png'" alt="Profile" />
+                        <h3>{{ dev.first_name }} {{ dev.last_name }}</h3>
+                    </div>
+                    <div class="dev-skills">
+                        <span class="skill" *ngFor="let skill of dev.skills">{{ skill }}</span>
+                    </div>
+
+                    <div class="dev-tasks" *ngIf="dev.services && dev.services.length > 0">
+                        <h4>Services:</h4>
+                        <ul>
+                            <li *ngFor="let service of dev.services" [routerLink]="`/projects/${service.project.projectID}/services`" class="dev-link">{{ service.name }}</li>
+                        </ul>
+                    </div>
+
+                    <div class="dev-tasks" *ngIf="dev.cards && dev.cards.length > 0">
+                        <h4>Tasks:</h4>
+                        <ul>
+                            <li *ngFor="let task of dev.cards" 
+                            [routerLink]="`/services/${task.taskBoard?.service?.serviceID}/taskboard/${task.taskBoard?.id}`"
+                             class="dev-link">{{ task.title }}</li>
+                        </ul>
+                    </div>
+
+                    <button class="view-btn" (click)="viewProfile(dev.id)">View Profile</button>
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination">
+                <button (click)="jumpToPage(true)" [disabled]="currentPage === 1">&lt;&lt;</button>
+                <button (click)="changePage(currentPage - 1)" [disabled]="currentPage === 1">&lt;</button>
+
+                <button *ngFor="let page of pageNumbers" (click)="changePage(page)"
+                    [class.active]="currentPage === page">
+                    {{ page }}
+                </button>
+
+                <button (click)="changePage(currentPage + 1)" [disabled]="currentPage >= getTotalPages()">&gt;</button>
+                <button (click)="jumpToPage(false)" [disabled]="currentPage >= getTotalPages()">&gt;&gt;</button>
+            </div>
+        </div>
+    </div>
+</div>

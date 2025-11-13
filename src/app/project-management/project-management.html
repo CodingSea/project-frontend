@@ -10,14 +10,18 @@
             <div class="div_33-96">
               <div class="main_div">
 
-                <!-- ===== Page Header Section (aligned with cards) ===== -->
                 <div class="page-header-wrapper">
                   <header class="page-header">
-                    <div class="page-header-left">
-                      <h1>Projects</h1>
-                      <app-excel-importer></app-excel-importer>
-                      <input type="file" id="fileUpload" (change)="onFileSelected($event)" hidden />
-                    </div>
+<div class="page-header-left">
+  <h1>Projects</h1>
+
+  <!-- ✅ Show Excel importer + file input only for admin -->
+  <ng-container *ngIf="isAdmin">
+    <app-excel-importer></app-excel-importer>
+    <input type="file" id="fileUpload" (change)="onFileSelected($event)" hidden />
+  </ng-container>
+</div>
+
 
                     <div class="page-header-right">
                       <div class="search-box">
@@ -41,14 +45,8 @@
                   </div>
                 </div>
 
-                <!-- ===== Project Cards ===== -->
                 <div class="pm-cards">
-                  <!-- Add New Project (Admin only) -->
-                  <article
-                    class="pm-card add-new"
-                    *ngIf="isAdmin"
-                    (click)="openNewProject()"
-                  >
+                  <article class="pm-card add-new" *ngIf="isAdmin" (click)="openNewProject()">
                     <div class="pm-plus-circle">
                       <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
                         <path
@@ -63,25 +61,14 @@
                     <p>Start a new project and invite your team members</p>
                   </article>
 
-                  <!-- Dynamic Project Cards -->
                   <article class="pm-card" *ngFor="let p of projects" (click)="onCardClick(p)">
                     <header class="pm-card-header">
-                      @if (p.name.length <= 25) {
-                        <h3>{{ p.name }}</h3>
-                      } @else {
-                        <h3>{{ getLimitedString(p.name, 25) }}</h3>
-                      }
-
+                      <h3>{{ getLimitedString(p.name, 25) }}</h3>
                       <span class="pm-pill" [attr.data-status]="p.status">
                         {{ p.status || 'Unknown' }}
                       </span>
 
-                      <!-- Menu visible only for Admin -->
-                      <div
-                        class="pm-card-menu"
-                        *ngIf="isAdmin"
-                        (click)="$event.stopPropagation()"
-                      >
+                      <div class="pm-card-menu" *ngIf="isAdmin" (click)="$event.stopPropagation()">
                         <button
                           class="dots"
                           type="button"
@@ -115,10 +102,7 @@
                         Due: {{ p.deadline | date: 'MMM d' }}
                       </span>
                       <div class="pm-progress">
-                        <div
-                          class="pm-progress-fill"
-                          [style.width.%]="p.progress || 0"
-                        ></div>
+                        <div class="pm-progress-fill" [style.width.%]="p.progress || 0"></div>
                       </div>
                       <span class="pm-progress-label">
                         {{ formatDecimal(p.progress || 0) }}%
@@ -127,11 +111,9 @@
                   </article>
                 </div>
 
-                <!-- ===== Pagination ===== -->
                 <div class="pagination" *ngIf="projects.length">
                   <button (click)="jumpToPage(true)" [disabled]="currentPage === 1">«</button>
                   <button (click)="changePage(currentPage - 1)" [disabled]="currentPage === 1">‹</button>
-
                   <button
                     *ngFor="let page of pageNumbers"
                     (click)="changePage(page)"
@@ -139,7 +121,6 @@
                   >
                     {{ page }}
                   </button>
-
                   <button
                     (click)="changePage(currentPage + 1)"
                     [disabled]="currentPage >= getTotalPages()"
@@ -148,11 +129,8 @@
                     (click)="jumpToPage(false)"
                     [disabled]="currentPage >= getTotalPages()"
                   >»</button>
-
-
                 </div>
 
-                <!-- ===== Members Modal ===== -->
                 <div
                   class="pm-modal-backdrop"
                   *ngIf="showMembersModal"
@@ -198,7 +176,6 @@
                   </div>
                 </div>
 
-                <!-- ✅ ===== Services Modal ===== -->
                 <div
                   class="pm-modal-backdrop"
                   *ngIf="showServicesModal"
@@ -231,16 +208,10 @@
                             {{ s.name }}
                           </td>
                           <td>{{ s.deadline | date: 'MMM d, yyyy' }}</td>
-                          <td
-                            class="clickable"
-                            (click)="goToUserProfile(s.chief?.id)"
-                          >
+                          <td class="clickable" (click)="goToUserProfile(s.chief?.id)">
                             {{ s.chief?.first_name }} {{ s.chief?.last_name }}
                           </td>
-                          <td
-                            class="clickable"
-                            (click)="goToUserProfile(s.projectManager?.id)"
-                          >
+                          <td class="clickable" (click)="goToUserProfile(s.projectManager?.id)">
                             {{ s.projectManager?.first_name }} {{ s.projectManager?.last_name }}
                           </td>
                         </tr>
@@ -249,7 +220,6 @@
                   </div>
                 </div>
 
-                <!-- ===== New Project Modal ===== -->
                 <ng-container *ngIf="showNewProject">
                   <div class="pm-modal-backdrop" (click)="closeNewProject()"></div>
                   <div
@@ -271,10 +241,7 @@
                       </button>
                     </header>
 
-                    <form
-                      #projectForm="ngForm"
-                      (ngSubmit)="saveNewProject(projectForm)"
-                    >
+                    <form #projectForm="ngForm" (ngSubmit)="saveNewProject(projectForm)">
                       <label class="pm-label">
                         Project name<span class="req">*</span>
                       </label>
@@ -289,17 +256,11 @@
                         placeholder="e.g., Website Revamp"
                       />
                       <div
-                        *ngIf="
-                          nameField.invalid && (nameField.dirty || nameField.touched)
-                        "
+                        *ngIf="nameField.invalid && (nameField.dirty || nameField.touched)"
                         class="pm-error"
                       >
-                        <small *ngIf="nameField.errors?.['required']"
-                          >Project name is required.</small
-                        >
-                        <small *ngIf="nameField.errors?.['pattern']"
-                          >Invalid name format.</small
-                        >
+                        <small *ngIf="nameField.errors?.['required']">Project name is required.</small>
+                        <small *ngIf="nameField.errors?.['pattern']">Invalid name format.</small>
                       </div>
 
                       <label class="pm-label">Description</label>
@@ -314,11 +275,7 @@
                       <div class="pm-row-2">
                         <div>
                           <label class="pm-label">Status</label>
-                          <select
-                            class="pm-input"
-                            name="status"
-                            [(ngModel)]="newProject.status"
-                          >
+                          <select class="pm-input" name="status" [(ngModel)]="newProject.status">
                             <option value="Active">Active</option>
                             <option value="On Hold">On Hold</option>
                           </select>
@@ -326,11 +283,7 @@
                       </div>
 
                       <div class="pm-actions">
-                        <button
-                          type="button"
-                          class="pm-btn"
-                          (click)="closeNewProject()"
-                        >
+                        <button type="button" class="pm-btn" (click)="closeNewProject()">
                           Cancel
                         </button>
                         <button
@@ -345,7 +298,6 @@
                   </div>
                 </ng-container>
 
-                <!-- ===== Edit Project Modal ===== -->
                 <ng-container *ngIf="showEditProject">
                   <div class="pm-modal-backdrop" (click)="closeEditProject()"></div>
                   <div
@@ -367,10 +319,7 @@
                       </button>
                     </header>
 
-                    <form
-                      #projectForm2="ngForm"
-                      (ngSubmit)="updateProject(projectForm2)"
-                    >
+                    <form #projectForm2="ngForm" (ngSubmit)="updateProject(projectForm2)">
                       <label class="pm-label">
                         Project name<span class="req">*</span>
                       </label>
@@ -396,11 +345,7 @@
                       <div class="pm-row-2">
                         <div>
                           <label class="pm-label">Status</label>
-                          <select
-                            class="pm-input"
-                            name="status"
-                            [(ngModel)]="editProject.status"
-                          >
+                          <select class="pm-input" name="status" [(ngModel)]="editProject.status">
                             <option value="Active">Active</option>
                             <option value="On Hold">On Hold</option>
                           </select>
@@ -408,11 +353,7 @@
                       </div>
 
                       <div class="pm-actions">
-                        <button
-                          type="button"
-                          class="pm-btn"
-                          (click)="closeEditProject()"
-                        >
+                        <button type="button" class="pm-btn" (click)="closeEditProject()">
                           Cancel
                         </button>
                         <button type="submit" class="pm-btn pm-btn-primary">

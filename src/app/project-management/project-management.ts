@@ -1,23 +1,30 @@
 import { AfterViewInit, Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
-import { ProjectService } from '@app/services/project.service';
-import { Sidebar } from '@app/sidebar/sidebar';
 import { Router } from '@angular/router';
-import { Project } from '@app/project';
 import { HttpClient } from '@angular/common/http';
-import { environment } from '@environments/environment';
+import { ProjectService } from '@app/services/project.service';
+import { Project } from '@app/project';
+import { Sidebar } from '@app/sidebar/sidebar';
 import { ExcelImporter } from '@app/excel-importer/excel-importer';
 import { HeaderComponent } from '@app/header/header';
+import { environment } from '@environments/environment';
 
 @Component({
   selector: 'app-project-management',
   standalone: true,
-  imports: [CommonModule, FormsModule, Sidebar, ExcelImporter, HeaderComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    Sidebar,
+    ExcelImporter,
+    HeaderComponent
+  ],
   templateUrl: './project-management.html',
   styleUrls: ['./project-management.scss'],
 })
 export class ProjectManagement implements OnInit, AfterViewInit {
+
   projects: Project[] = [];
   currentPage = 1;
   pageSize = 11;
@@ -39,11 +46,9 @@ export class ProjectManagement implements OnInit, AfterViewInit {
   showMembersModal = false;
   selectedMembers: { id?: number; name: string; role: string; image: string }[] = [];
 
-  // ✅ Services modal
   showServicesModal = false;
   selectedServices: any[] = [];
 
-  // ✅ Role-based variables
   currentUser: any = null;
   isAdmin = false;
   userId: number | null = null;
@@ -65,7 +70,7 @@ export class ProjectManagement implements OnInit, AfterViewInit {
     this.loadProjects();
   }
 
-  /** ✅ Decode JWT to get current user and role */
+  /** ===== Decode JWT and get user info ===== */
   private loadCurrentUser(): void {
     try {
       const token =
@@ -90,98 +95,93 @@ export class ProjectManagement implements OnInit, AfterViewInit {
     if (file) this.selectedFile = file;
   }
 
-/** ===== Load Projects (role-based with correct pagination) ===== */
-loadProjects(): void {
-  const options = this.buildQueryOptions();
+  /** ===== Load Projects ===== */
+  loadProjects(): void {
+    const options = this.buildQueryOptions();
 
-  // Admin: backend handles pagination & count
-  if (this.isAdmin) {
-    this.projectService
-      .getProjectsCount({ status: options.status, search: options.search })
-      .subscribe((count) => {
-        this.totalProjects = count;
-        this.projectsInfo.totalProjects = count;
-        this.updatePageNumbers();
+    if (this.isAdmin) {
+      this.projectService
+        .getProjectsCount({ status: options.status, search: options.search })
+        .subscribe((count) => {
+          this.totalProjects = count;
+          this.projectsInfo.totalProjects = count;
+          this.updatePageNumbers();
 
-        this.projectService.getProjects(options).subscribe((data) => {
-          this.projects = data.map((p) => this.transformProject(p));
+          this.projectService.getProjects(options).subscribe((data) => {
+            this.projects = data.map((p) => this.transformProject(p));
+          });
         });
+      return;
+    }
+
+    this.projectService
+      .getProjects({ ...options, page: 1, limit: 9999 })
+      .subscribe((data) => {
+        const filtered = data.filter((p) =>
+          (p.services || []).some(
+            (s: any) =>
+              (s.assignedResources || []).some((r: any) => Number(r.id) === this.userId) ||
+              (s.backup || []).some((b: any) => Number(b.id) === this.userId) ||
+              (s.chief && Number(s.chief.id) === this.userId) ||
+              (s.projectManager && Number(s.projectManager.id) === this.userId)
+          )
+        );
+
+        this.totalProjects = filtered.length;
+        this.projectsInfo.totalProjects = filtered.length;
+
+        const start = (this.currentPage - 1) * this.pageSize;
+        const end = start + this.pageSize;
+        const paginated = filtered.slice(start, end);
+
+        this.projects = paginated.map((p) => this.transformProject(p));
+        this.updatePageNumbers();
       });
-    return;
   }
 
-  // Non-admin: load all, filter locally, then paginate manually
-  this.projectService
-    .getProjects({ ...options, page: 1, limit: 9999 })
-    .subscribe((data) => {
-      // 1️⃣ Filter only assigned projects
-      const filtered = data.filter((p) =>
-        (p.services || []).some((s: any) =>
-          (s.assignedResources || []).some((r: any) => Number(r.id) === this.userId) ||
-          (s.backup || []).some((b: any) => Number(b.id) === this.userId) ||
-          (s.chief && Number(s.chief.id) === this.userId) ||
-          (s.projectManager && Number(s.projectManager.id) === this.userId)
-        )
-      );
+  /** ===== Transform project ===== */
+  private transformProject(p: any): any {
+    let totalCardsCount = 0;
+    let completedCardsCount = 0;
+    const uniqueMembers = new Set<number>();
+    let closestDeadline: Date | null = null;
 
-      // 2️⃣ Calculate total count & pages for pagination
-      this.totalProjects = filtered.length;
-      this.projectsInfo.totalProjects = filtered.length;
+    (p.services || []).forEach((s: any) => {
+      if (s.chief) uniqueMembers.add(s.chief.id);
+      if (s.projectManager) uniqueMembers.add(s.projectManager.id);
+      (s.assignedResources || []).forEach((r: any) => uniqueMembers.add(r.id));
+      (s.backup || []).forEach((b: any) => uniqueMembers.add(b.id));
 
-      const start = (this.currentPage - 1) * this.pageSize;
-      const end = start + this.pageSize;
-      const paginated = filtered.slice(start, end);
+      if (s.taskBoard?.cards) {
+        totalCardsCount += s.taskBoard.cards.length;
+        completedCardsCount += s.taskBoard.cards.filter(
+          (card: any) => card.column === 'done'
+        ).length;
+      }
 
-      // 3️⃣ Transform only paginated subset for display
-      this.projects = paginated.map((p) => this.transformProject(p));
-
-      this.updatePageNumbers();
+      if (s.deadline) {
+        const d = new Date(s.deadline);
+        if (!closestDeadline || d < closestDeadline) closestDeadline = d;
+      }
     });
-}
 
-/** ===== Helper for per-project calculations ===== */
-private transformProject(p: any): any {
-  let totalCardsCount = 0;
-  let completedCardsCount = 0;
-  const uniqueMembers = new Set<number>();
-  let closestDeadline: Date | null = null;
+    const progress = totalCardsCount > 0 ? (completedCardsCount / totalCardsCount) * 100 : 0;
 
-  (p.services || []).forEach((s: any) => {
-    if (s.chief) uniqueMembers.add(s.chief.id);
-    if (s.projectManager) uniqueMembers.add(s.projectManager.id);
-    (s.assignedResources || []).forEach((r: any) => uniqueMembers.add(r.id));
-    (s.backup || []).forEach((b: any) => uniqueMembers.add(b.id));
+    return {
+      ...p,
+      members: uniqueMembers.size,
+      deadline: closestDeadline || null,
+      progress,
+    } as any;
+  }
 
-    if (s.taskBoard?.cards) {
-      totalCardsCount += s.taskBoard.cards.length;
-      completedCardsCount += s.taskBoard.cards.filter(
-        (card: any) => card.column === 'done'
-      ).length;
-    }
-
-    if (s.deadline) {
-      const d = new Date(s.deadline);
-      if (!closestDeadline || d < closestDeadline) closestDeadline = d;
-    }
-  });
-
-  const progress = totalCardsCount > 0 ? (completedCardsCount / totalCardsCount) * 100 : 0;
-
-  return {
-    ...p,
-    members: uniqueMembers.size,
-    deadline: closestDeadline || null,
-    progress,
-  } as any;
-}
-
-/** ===== Query Options ===== */
-private buildQueryOptions() {
-  const status = this.getSelectedStatusForApi();
-  const search = this.searchQuery?.trim() || undefined;
-  return { page: this.currentPage, limit: this.pageSize, status, search };
-}
-
+  /** ===== Query Options ===== */
+  private buildQueryOptions() {
+    const status = this.getSelectedStatusForApi();
+    const search =
+      this.searchQuery && this.searchQuery.trim().length ? this.searchQuery.trim() : undefined;
+    return { page: this.currentPage, limit: this.pageSize, status, search };
+  }
 
   private getSelectedStatusForApi(): string {
     switch (this.selectedFilter) {
@@ -193,7 +193,6 @@ private buildQueryOptions() {
         return 'all';
     }
   }
-
 
   /** ===== Pagination ===== */
   onFilterChange(): void {
@@ -238,7 +237,7 @@ private buildQueryOptions() {
 
   /** ===== New Project ===== */
   openNewProject(): void {
-    if (!this.isAdmin) return; // 🔒 Non-admin users can't open modal
+    if (!this.isAdmin) return;
     this.showNewProject = true;
     this.newProject = this.blankNewProject();
   }
@@ -252,7 +251,7 @@ private buildQueryOptions() {
   }
 
   saveNewProject(form: NgForm): void {
-    if (form.invalid || !this.isAdmin) return; // 🔒 Admin only
+    if (form.invalid || !this.isAdmin) return;
     this.projectService.createProject(this.newProject).subscribe(() => {
       this.closeNewProject();
       this.currentPage = 1;
@@ -260,8 +259,9 @@ private buildQueryOptions() {
     });
   }
 
+  /** ===== Edit Project ===== */
   openEditProject(): void {
-    if (!this.isAdmin) return; // 🔒 Admin only
+    if (!this.isAdmin) return;
     this.showEditProject = true;
     this.editProject = this.blankNewProject();
   }
@@ -273,13 +273,13 @@ private buildQueryOptions() {
   }
 
   toggleMenu(id: number, event: Event): void {
-    if (!this.isAdmin) return; // 🔒 Hide menu for non-admins
+    if (!this.isAdmin) return;
     event.stopPropagation();
     this.openMenuId = this.openMenuId === id ? null : id;
   }
 
   goToEdit(p: Project, event: Event): void {
-    if (!this.isAdmin) return; // 🔒 Admin only
+    if (!this.isAdmin) return;
     event.stopPropagation();
     this.lastEditProject = { ...p };
     this.openEditProject();
@@ -287,7 +287,7 @@ private buildQueryOptions() {
   }
 
   updateProject(form: NgForm): void {
-    if (!this.isAdmin || !this.editProject.projectID) return; // 🔒 Admin only
+    if (!this.isAdmin || !this.editProject.projectID) return;
     const payload: Partial<Project> = {
       name: this.editProject.name,
       description: this.editProject.description,
@@ -303,7 +303,7 @@ private buildQueryOptions() {
   }
 
   deleteProject(p: Project): void {
-    if (!this.isAdmin || !p.projectID) return; // 🔒 Admin only
+    if (!this.isAdmin || !p.projectID) return;
     this.http
       .delete(`${environment.apiUrl}/project/${p.projectID}`)
       .subscribe(() => this.loadProjects(), (err) => console.error(err));
@@ -350,9 +350,7 @@ private buildQueryOptions() {
           return m;
         }
         try {
-          const updated = await this.http
-            .get<any>(`${environment.apiUrl}/user/${m.id}`)
-            .toPromise();
+          const updated = await this.http.get<any>(`${environment.apiUrl}/user/${m.id}`).toPromise();
           if (updated?.profileImage) {
             const img = updated.profileImage.startsWith('http')
               ? updated.profileImage
@@ -400,7 +398,7 @@ private buildQueryOptions() {
     this.showServicesModal = false;
   }
 
-  /** ✅ Navigation (same behavior as profile.component) */
+  /** ===== Navigation ===== */
   goToUserProfile(userId?: number): void {
     if (!userId) return;
     this.closeMembersModal();
@@ -409,15 +407,9 @@ private buildQueryOptions() {
   }
 
   goToService(service: any): void {
-    console.log('Navigating to service:', service);
     const serviceId = service.id || service.serviceID || service.serviceId;
     const taskBoardId = service.taskBoardId || service.taskboard_id || service.taskBoard?.id;
-
-    if (!serviceId || !taskBoardId) {
-      console.warn('⚠️ Missing serviceId or taskBoardId', service);
-      return;
-    }
-
+    if (!serviceId || !taskBoardId) return;
     this.closeServicesModal();
     this.router.navigate([`/services/${serviceId}/taskboard/${taskBoardId}`]);
     window.scrollTo(0, 0);
