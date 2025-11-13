@@ -45,10 +45,10 @@ export class ExcelDeveloperImporter
       for (let i = 1; i < this.excelData.length; i++)
       {
         const row = this.excelData[ i ];
-        const firstName = row[ headers.indexOf('First Name') ];
-        const lastName = row[ headers.indexOf('Last Name') ];
-        const email = row[ headers.indexOf('Email') ];
-        const password = row[ headers.indexOf('Password') ];
+        const firstName = row[ headers.indexOf('First Name') ]?.toLowerCase() || '';
+        const lastName = row[ headers.indexOf('Last Name') ]?.toLowerCase() || '';
+        const email = row[ headers.indexOf('Email') ]?.toLowerCase() || '';
+        const password = row[ headers.indexOf('Password') ]?.toLowerCase() || '';
 
         if (firstName && lastName && email && password)
         {
@@ -56,8 +56,8 @@ export class ExcelDeveloperImporter
         }
       }
 
-      this.ImportInDB();
-      
+       this.ImportInDB();
+
     };
 
     reader.readAsBinaryString(target.files[ 0 ]);
@@ -95,9 +95,10 @@ export class ExcelDeveloperImporter
       // ✅ Send only new users to the backend
       const imported = await firstValueFrom(
         await this.http.post(`${environment.apiUrl}/user/import`, newUsers)
-      ).finally(() => {this.importComplete.emit()});
+      ).then(async () => { await this.importComplete.emit(); });
 
-      
+
+
     } catch (err)
     {
       console.error('❌ Import failed:', err);

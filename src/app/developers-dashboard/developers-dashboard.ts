@@ -48,7 +48,7 @@ export class DevelopersDashboard implements OnInit
     this.getDevelopersFromDB();
   }
 
-  async getDevelopersFromDB()
+  async getDevelopersFromDB(): Promise<void>
   {
     try
     {
@@ -109,39 +109,6 @@ export class DevelopersDashboard implements OnInit
     {
       console.log(err);
     }
-  }
-
-  updateFilteredDevelopers()
-  {
-    const term = this.searchTerm.toLowerCase();
-
-    this.filteredDevelopers = this.developers.filter(dev =>
-    {
-      const matchesMain =
-        dev.first_name.toLowerCase().includes(term) ||
-        dev.last_name.toLowerCase().includes(term) ||
-        dev.skills.some(skill => skill.toLowerCase().includes(term));
-
-      const matchesAdvName = this.advName
-        ? `${dev.first_name} ${dev.last_name}`.toLowerCase().includes(this.advName.toLowerCase())
-        : true;
-
-      const matchesAdvSkills = this.advSkills
-        ? dev.skills.some(skill => skill.toLowerCase().includes(this.advSkills.toLowerCase()))
-        : true;
-
-      const matchesAdvServices = this.advServices
-        ? dev.services?.some(service => service.name.toLowerCase().includes(this.advServices.toLowerCase()))
-        : true;
-
-      const matchesAdvTasks = this.advTasks
-        ? dev.cards?.some(task => task.title.toLowerCase().includes(this.advTasks.toLowerCase()))
-        : true;
-
-      return matchesMain && matchesAdvName && matchesAdvSkills && matchesAdvServices && matchesAdvTasks;
-    });
-
-    this.updatePageNumbers();
   }
 
   updatePageNumbers(): void
