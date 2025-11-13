@@ -2,12 +2,9 @@ import { HttpClient } from '@angular/common/http';
 import { Component, EventEmitter, Output } from '@angular/core';
 import { environment } from '@environments/environment';
 import * as XLSX from 'xlsx';
-import { firstValueFrom } from 'rxjs'; // ✅ recommended over .toPromise()
-import { DevelopersDashboard } from '@app/developers-dashboard/developers-dashboard';
-import { CommonModule } from '@angular/common';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
-  imports: [ CommonModule ],
   selector: 'app-excel-developer-importer',
   templateUrl: './excel-developer-importer.html',
   styleUrls: [ './excel-developer-importer.css' ]
@@ -30,11 +27,10 @@ export class ExcelDeveloperImporter
     }
 
     const reader: FileReader = new FileReader();
-    reader.onload = (e: any) =>
+    reader.onload = async (e: any) =>
     {
       const bstr: string = e.target.result;
       const wb: XLSX.WorkBook = XLSX.read(bstr, { type: 'binary' });
-
       const wsname: string = wb.SheetNames[ 0 ];
       const ws: XLSX.WorkSheet = wb.Sheets[ wsname ];
 
@@ -45,10 +41,10 @@ export class ExcelDeveloperImporter
       for (let i = 1; i < this.excelData.length; i++)
       {
         const row = this.excelData[ i ];
-        const firstName = row[ headers.indexOf('First Name') ];
-        const lastName = row[ headers.indexOf('Last Name') ];
-        const email = row[ headers.indexOf('Email') ];
-        const password = row[ headers.indexOf('Password') ];
+        const firstName = row[ headers.indexOf('First Name') ]?.toLowerCase() || '';
+        const lastName = row[ headers.indexOf('Last Name') ]?.toLowerCase() || '';
+        const email = row[ headers.indexOf('Email') ]?.toLowerCase() || '';
+        const password = row[ headers.indexOf('Password') ]?.toLowerCase() || '';
 
         if (firstName && lastName && email && password)
         {
@@ -56,8 +52,7 @@ export class ExcelDeveloperImporter
         }
       }
 
-      this.ImportInDB();
-      
+      await this.ImportInDB();
     };
 
     reader.readAsBinaryString(target.files[ 0 ]);
@@ -67,7 +62,6 @@ export class ExcelDeveloperImporter
   {
     try
     {
-      // ✅ Convert to API user format
       const users = this.groupedData.map((element) => ({
         first_name: element.firstName,
         last_name: element.lastName,
@@ -75,29 +69,30 @@ export class ExcelDeveloperImporter
         password: element.password
       }));
 
-      // ✅ Fetch all existing users (you can optimize this endpoint)
-      const existingUsers: any[] = await firstValueFrom(
-        this.http.get<any[]>(`${environment.apiUrl}/user`)
-      );
-
-      // ✅ Build a set of existing emails for faster lookup
+      // Fetch existing users
+      const existingUsers: any[] = await firstValueFrom(this.http.get<any[]>(`${environment.apiUrl}/user`));
       const existingEmails = new Set(existingUsers.map((u) => u.email.toLowerCase()));
-
-      // ✅ Filter out duplicates
       const newUsers = users.filter((u) => !existingEmails.has(u.email.toLowerCase()));
 
       if (newUsers.length === 0)
       {
         console.warn('All users already exist — nothing to import.');
-        return;
+        return; // Exit if no new users
       }
 
-      // ✅ Send only new users to the backend
-      const imported = await firstValueFrom(
-        await this.http.post(`${environment.apiUrl}/user/import`, newUsers)
-      ).finally(() => {this.importComplete.emit()});
-
-      
+      // Send new users to the backend and wait for the response
+      const importResponse = await this.http.post(`${environment.apiUrl}/user/import`, newUsers).subscribe(
+        {
+          next: async (res) =>
+          {
+            await this.importComplete.emit();
+          },
+          error: (err) =>
+          {
+            console.log(err);
+          }
+        }
+      )
     } catch (err)
     {
       console.error('❌ Import failed:', err);
