@@ -39,7 +39,7 @@ export class DevelopersDashboard implements OnInit
 
   // Pagination
   totalDevelopers: number = 0; // Total count from API
-  pageSize: number = 8; // Developers per page
+  pageSize: number = 12; // Developers per page
   currentPage: number = 1;
   pageNumbers: number[] = [];
 
