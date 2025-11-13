@@ -6,16 +6,19 @@ import { Observable } from 'rxjs';
 import { AuthService } from "../auth"
 import { ActivatedRoute, ParamMap, Router, RouterLink } from '@angular/router';
 import { environment } from '@environments/environment';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'user-component',
-  imports: [ ReactiveFormsModule, RouterLink ],
+  imports: [ ReactiveFormsModule, RouterLink, CommonModule ],
   templateUrl: './user.component.html',
-  styleUrl: './user.component.css'
+  styleUrls: [ './user.component.css' ]  // Ensure this is styleUrls
 })
 export class UserComponent
 {
   createMode: boolean = true;
+  loginError: string | null = null; // To hold the error message
+  signupError: string | null = null; // To hold signup error messages
 
   constructor(private http: HttpClient, private activatedRoute: ActivatedRoute, private router: Router, private authService: AuthService) { }
 
@@ -24,47 +27,43 @@ export class UserComponent
     this.activatedRoute.paramMap.subscribe((params: ParamMap) =>
     {
       const mode = this.activatedRoute.snapshot.paramMap.get("mode");
-      if (mode == "signup")
-      {
-        this.createMode = true;
-      }
-      else
-      {
-        this.createMode = false;
-      }
+      this.createMode = (mode === "signup");
     });
   }
 
-  signupForm = new FormGroup(
-    {
-      first_name: new FormControl<string>("", Validators.required),
-      last_name: new FormControl<string>("", Validators.required),
-      email: new FormControl<string>("", [ Validators.required, Validators.email ]),
-      password: new FormControl<string>("", Validators.required),
-    }
-  )
+  signupForm = new FormGroup({
+    first_name: new FormControl<string>("", Validators.required),
+    last_name: new FormControl<string>("", Validators.required),
+    email: new FormControl<string>("", [ Validators.required, Validators.email ]),
+    password: new FormControl<string>("", [ Validators.required, Validators.minLength(5) ]),
+  });
 
-  loginForm = new FormGroup(
-    {
-      email: new FormControl<string>("", [ Validators.required, Validators.email ]),
-      password: new FormControl<string>("", Validators.required),
-    }
-  )
+  loginForm = new FormGroup({
+    email: new FormControl<string>("", [ Validators.required, Validators.email ]),
+    password: new FormControl<string>("", Validators.required),
+  });
 
   signup()
   {
-    const user = this.signupForm.value as User;
+    if (this.signupForm.valid)
+    {
+      const user = this.signupForm.value as User;
 
-    this.addUser(user).subscribe(
-      (response) =>
-      {
-        this.router.navigate([ '/login' ])
-      },
-      (error) =>
-      {
-        console.log(error);
-      }
-    )
+      this.addUser(user).subscribe(
+        (response) =>
+        {
+          this.router.navigate([ '/login' ]);
+        },
+        (error) =>
+        {
+          this.signupError = 'Signup failed. Please try again later.'; // Handle signup errors
+          console.log(error);
+        }
+      );
+    } else
+    {
+      this.signupError = 'Please provide a valid email and a password with at least 5 characters.';
+    }
   }
 
   addUser(newUser: User): Observable<User>
@@ -78,12 +77,16 @@ export class UserComponent
     const password = this.loginForm.value.password ?? '';
 
     this.authService.login(email, password).subscribe({
-      next: () => this.router.navigate([ '/profile' ]),
+      next: () =>
+      {
+        this.router.navigate([ '/profile' ]);
+        this.loginError = null; // Clear error on successful login
+      },
       error: (err) =>
       {
+        this.loginError = 'Invalid email or password.'; // Set error message
         console.error(err);
       }
     });
   }
-
 }

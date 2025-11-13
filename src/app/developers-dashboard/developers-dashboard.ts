@@ -13,9 +13,9 @@ import { Router, RouterLink } from '@angular/router';
 @Component({
   selector: 'app-developers-dashboard',
   standalone: true,
-  imports: [HeaderComponent, CommonModule, FormsModule, ExcelDeveloperImporter, Sidebar, RouterLink],
+  imports: [ HeaderComponent, CommonModule, FormsModule, ExcelDeveloperImporter, Sidebar, RouterLink ],
   templateUrl: './developers-dashboard.html',
-  styleUrls: ['./developers-dashboard.css']
+  styleUrls: [ './developers-dashboard.css' ]
 })
 export class DevelopersDashboard implements OnInit
 {
@@ -39,7 +39,7 @@ export class DevelopersDashboard implements OnInit
 
   // Pagination
   totalDevelopers: number = 0; // Total count from API
-  pageSize: number = 8; // Developers per page
+  pageSize: number = 12; // Developers per page
   currentPage: number = 1;
   pageNumbers: number[] = [];
 
@@ -69,6 +69,11 @@ export class DevelopersDashboard implements OnInit
 
       // Fetch developers based on advanced filters
       this.developers = await this.http.get<DeveloperCard[]>(`${environment.apiUrl}/user/developers-card?${params.toString()}`).toPromise() || [];
+
+      this.developers.forEach(developer =>
+      {
+        developer.cards = developer.cards?.filter(task => task.column !== "done");
+      });
 
       this.developers.forEach((d) =>
       {
@@ -197,12 +202,12 @@ export class DevelopersDashboard implements OnInit
 
   onFileSelected(event: any): void
   {
-    const file = event.target.files[0];
+    const file = event.target.files[ 0 ];
     if (file) this.selectedFile = file;
   }
 
   viewProfile(id: number)
   {
-    this.router.navigate([`/profile/user/${id}`])
+    this.router.navigate([ `/profile/user/${id}` ])
   }
 }
