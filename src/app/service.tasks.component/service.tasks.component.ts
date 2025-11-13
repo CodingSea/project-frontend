@@ -161,7 +161,7 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit {
       this.isManager = !!service?.projectManager && Number(service.projectManager.id) === userId;
       this.isResource =
         Array.isArray(service?.assignedResources) &&
-        service.assignedResources.some((r: any) => Number(r.id) === userId);
+        service!.assignedResources.some((r: any) => Number(r.id) === userId);
     } catch (err) {
       console.error('loadCurrentUserAndRoles error:', err);
     }
