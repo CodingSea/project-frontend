@@ -21,7 +21,7 @@ export class DevelopersDashboard implements OnInit
 {
   constructor(private http: HttpClient, private cdr: ChangeDetectorRef, private router: Router) { }
 
-  @ViewChild(ExcelDeveloperImporter) importer!: ExcelDeveloperImporter;
+  @ViewChild('importComplete') importer!: ExcelDeveloperImporter;
 
   searchTerm: string = '';
   showAdvancedSearch: boolean = false;
@@ -69,7 +69,8 @@ export class DevelopersDashboard implements OnInit
 
       // Fetch developers based on advanced filters
       this.developers = await this.http.get<DeveloperCard[]>(`${environment.apiUrl}/user/developers-card?${params.toString()}`).toPromise() || [];
-
+      console.log('Developers fetched:', this.developers.length);
+      
       this.developers.forEach(developer =>
       {
         developer.cards = developer.cards?.filter(task => task.column !== "done");

@@ -7,14 +7,14 @@
             <!-- Header -->
             <div class="dashboard-header">
                 <h2>Developers Dashboard</h2>
-                <app-excel-developer-importer (importComplete)="getDevelopersFromDB()" (change)="getDevelopersFromDB()"></app-excel-developer-importer>
+                <app-excel-developer-importer (importComplete)="getDevelopersFromDB()"></app-excel-developer-importer>
             </div>
 
             <!-- Search Section -->
             <div class="search-section">
                 <div class="search-bar">
-                    <input type="text" placeholder="Search developers by name"
-                        [(ngModel)]="searchTerm" (keyup.enter)="getDevelopersFromDB()" [disabled]="showAdvancedSearch" />
+                    <input type="text" placeholder="Search developers by name" [(ngModel)]="searchTerm"
+                        (keyup.enter)="getDevelopersFromDB()" [disabled]="showAdvancedSearch" />
                     <button (click)="toggleAdvancedSearch()">
                         <i class="icon">⚙️</i> Advanced Search
                     </button>
@@ -67,16 +67,18 @@
                     <div class="dev-tasks" *ngIf="dev.services && dev.services.length > 0">
                         <h4>Services:</h4>
                         <ul>
-                            <li *ngFor="let service of dev.services" [routerLink]="`/projects/${service.project.projectID}/services`" class="dev-link">{{ service.name }}</li>
+                            <li *ngFor="let service of dev.services"
+                                [routerLink]="`/projects/${service.project.projectID}/services`" class="dev-link">{{
+                                service.name }}</li>
                         </ul>
                     </div>
 
                     <div class="dev-tasks" *ngIf="dev.cards && dev.cards.length > 0">
                         <h4>Tasks:</h4>
                         <ul>
-                            <li *ngFor="let task of dev.cards" 
-                            [routerLink]="`/services/${task.taskBoard?.service?.serviceID}/taskboard/${task.taskBoard?.id}`"
-                             class="dev-link">{{ task.title }}</li>
+                            <li *ngFor="let task of dev.cards"
+                                [routerLink]="`/services/${task.taskBoard?.service?.serviceID}/taskboard/${task.taskBoard?.id}`"
+                                class="dev-link">{{ task.title }}</li>
                         </ul>
                     </div>
 
