@@ -262,37 +262,45 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
       completionRate: 0.0
     };
 
-    this.http
+    await this.http
       .get<TaskBoard>(`${environment.apiUrl}/tasks/task-board/${this.taskBoardId}`)
-      .subscribe(res =>
+      .subscribe((res) =>
       {
         this.taskBoard = res;
-        if (!res?.service) return;
 
-        const service: any = res.service;
-        const members = new Set<number>();
-        if (service.chief) members.add(service.chief.id);
-        if (service.projectManager) members.add(service.projectManager.id);
-        service.assignedResources?.forEach((r: any) => members.add(r.id));
-        service.backup?.forEach((b: any) => members.add(b.id));
-        this.servicesInfo.totalMembers = members.size;
 
-        let total = 0;
-        this.servicesInfo.backloggedTasks = 0;
-        this.servicesInfo.activeTasks = 0;
-        this.servicesInfo.completedTasks = 0;
-
-        res.cards?.forEach((t: any) =>
+        if (res?.service)
         {
-          total++;
-          if (t.column === 'new') this.servicesInfo.backloggedTasks++;
-          else if (t.column === 'work') this.servicesInfo.activeTasks++;
-          else if (t.column === 'done') this.servicesInfo.completedTasks++;
-        });
+          const service: any = res.service;
+          const members = new Set<number>();
+          if (service.chief) members.add(service.chief.id);
+          if (service.projectManager) members.add(service.projectManager.id);
+          service.assignedResources?.forEach((r: any) => members.add(r.id));
+          service.backup?.forEach((b: any) => members.add(b.id));
+          this.servicesInfo.totalMembers = members.size;
 
-        this.servicesInfo.completionRate =
-          total > 0 ? (this.servicesInfo.completedTasks / total) * 100 : 0;
+          let total = 0;
+          this.servicesInfo.backloggedTasks = 0;
+          this.servicesInfo.activeTasks = 0;
+          this.servicesInfo.completedTasks = 0;
+
+          res.cards?.forEach((t: any) =>
+          {
+            total++;
+            if (t.column === 'new') this.servicesInfo.backloggedTasks++;
+            else if (t.column === 'work') this.servicesInfo.activeTasks++;
+            else if (t.column === 'done') this.servicesInfo.completedTasks++;
+          });
+
+          this.servicesInfo.completionRate =
+            total > 0 ? (this.servicesInfo.completedTasks / total) * 100 : 0;
+        }
+
       });
+
+
+
+    // this.checkServiceStatus();
   }
 
   // ==================== BOARD DATA ====================
@@ -381,11 +389,10 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
   {
     try
     {
-      if (
-        !this.dataAdapter?.localData ||
-        this.dataAdapter.localData.length === 0 ||
-        this.dataAdapter.localData[ 0 ].status === 's'
-      )
+      // Wait for the service info to be fetched
+      await this.getCurrentServiceInfo();
+
+      if (!this.dataAdapter?.localData || this.dataAdapter.localData.length === 0)
       {
         await this.http
           .patch<Service>(`${environment.apiUrl}/service/${this.serviceId}/status`, {
@@ -395,18 +402,21 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
         return;
       }
 
+      console.log(this.servicesInfo); // Now this should reflect the updated taskBoard
+
       if (this.taskBoard?.service.status == 'On Hold') return;
 
-      if (this.servicesInfo.completionRate === 100)
+      if (this.servicesInfo.completionRate == 100)
       {
-        if (this.taskBoard?.service.status === 'Pending Approval') return;
+        // if (this.taskBoard?.service.status === 'Pending Approval') return;
 
         await this.http
           .patch<Service>(`${environment.apiUrl}/service/${this.serviceId}/status`, {
             status: ServiceStatus.Completed
           })
           .toPromise();
-      } else
+      } 
+      else
       {
         await this.http
           .patch<Service>(`${environment.apiUrl}/service/${this.serviceId}/status`, {
@@ -435,7 +445,6 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
       t.status = newStatus;
       await this.updateTaskOrder(newStatus);
       await this.updateTask(t);
-      await this.getCurrentServiceInfo();
       await this.checkServiceStatus();
     }
   }
