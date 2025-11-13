@@ -408,7 +408,7 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit
 
       if (this.servicesInfo.completionRate == 100)
       {
-        // if (this.taskBoard?.service.status === 'Pending Approval') return;
+        if (this.taskBoard?.service.status === 'Pending Approval') return;
 
         await this.http
           .patch<Service>(`${environment.apiUrl}/service/${this.serviceId}/status`, {
