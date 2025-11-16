@@ -105,20 +105,27 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit {
     private userService: UserService
   ) {}
 
-  async ngOnInit(): Promise<void> {
-    window.scroll({ top: 0, left: 0 });
+async ngOnInit(): Promise<void> {
+  window.scroll({ top: 0, left: 0 });
 
-    this.route.params.subscribe(async params => {
-      this.serviceId = params['serviceId'];
-      this.taskBoardId = params['taskBoardId'];
+  this.route.params.subscribe(async params => {
+    this.serviceId = params['serviceId'];
+    this.taskBoardId = params['taskBoardId'];
 
-      await this.loadCurrentUserAndRoles();
-      await this.initializeKanbanDataSource();
-this.recalculateServiceInfoFromLocal();
-      await this.loadAssignedUsers();
-      await this.checkServiceStatus();
-    });
-  }
+    await this.loadCurrentUserAndRoles();
+
+    await this.initializeKanbanDataSource();
+
+    await new Promise(res => setTimeout(res, 150));
+
+    this.recalculateServiceInfoFromLocal();
+
+    await this.loadAssignedUsers();
+
+    await this.checkServiceStatus();
+  });
+}
+
 
   ngAfterViewInit() {}
 
@@ -317,36 +324,74 @@ this.servicesInfo.completedTasks = 0;
     }, 100);
   }
 
-  async checkServiceStatus(): Promise<void> {
-this.recalculateServiceInfoFromLocal();
+async checkServiceStatus(): Promise<void> {
+  // 🔹 0) Always get the latest service from backend
+  const service = await this.http
+    .get<Service>(`${environment.apiUrl}/service/${this.serviceId}`)
+    .toPromise();
 
-    if (!this.data || this.data.length === 0) {
+  if (!service) return;
+
+  // 🔹 1) If service is On Hold → NEVER touch the status
+  if (service.status === ServiceStatus.OnHold) {
+    // keep local copy in sync (optional)
+    if (this.taskBoard?.service) {
+      this.taskBoard.service.status = service.status;
+    }
+    return;
+  }
+
+  // 🔹 2) Recalculate completion from local tasks
+  this.recalculateServiceInfoFromLocal();
+
+  const hasTasks = this.data && this.data.length > 0;
+
+  // 🔹 3) No tasks at all → set to New
+  if (!hasTasks) {
+    if (service.status !== ServiceStatus.New) {
       await this.http
         .patch(`${environment.apiUrl}/service/${this.serviceId}/status`, {
           status: ServiceStatus.New
         })
         .toPromise();
-      return;
     }
 
-    if (this.taskBoard?.service.status === 'On Hold') return;
+    await this.reloadTaskBoard();
+    return;
+  }
 
-    if (this.servicesInfo.completionRate === 100) {
-      if (this.taskBoard?.service.status === 'Pending Approval') return;
-
-      await this.http
-        .patch(`${environment.apiUrl}/service/${this.serviceId}/status`, {
-          status: ServiceStatus.Completed
-        })
-        .toPromise();
-    } else {
+  // 🔹 4) There ARE tasks but NOT all completed → In Progress
+  if (this.servicesInfo.completionRate < 100) {
+    // do NOT override Pending Approval
+    if (service.status !== 'Pending Approval' && service.status !== ServiceStatus.InProgress) {
       await this.http
         .patch(`${environment.apiUrl}/service/${this.serviceId}/status`, {
           status: ServiceStatus.InProgress
         })
         .toPromise();
     }
+
+    await this.reloadTaskBoard();
+    return;
   }
+
+  // 🔹 5) All tasks completed (100%) → Completed (unless Pending Approval)
+  if (
+    this.servicesInfo.completionRate === 100 &&
+    service.status !== 'Pending Approval' &&
+    service.status !== ServiceStatus.Completed
+  ) {
+    await this.http
+      .patch(`${environment.apiUrl}/service/${this.serviceId}/status`, {
+        status: ServiceStatus.Completed
+      })
+      .toPromise();
+
+    await this.reloadTaskBoard();
+  }
+}
+
+
 async onItemMoved(event: any): Promise<void> {
   const item = event.args.itemData;
   if (!item) return;
@@ -383,33 +428,32 @@ this.recalculateServiceInfoFromLocal();
     }
   }
 
-  async submitCreateTask(): Promise<void> {
-if (!(this.isChief || this.isManager || this.isAdmin)) return;
+async submitCreateTask(): Promise<void> {
+  if (!(this.isChief || this.isManager || this.isAdmin)) return;
 
-    this.updatePriorityColor(this.createModel);
+  this.updatePriorityColor(this.createModel);
 
-    await this.createTask(
-      this.createModel.title,
-      'new',
-      this.createModel.tags,
-      this.createModel.description,
-      this.createModel.color,
-      this.createModel.assignedUserIds
-    );
-    // 🔥 Refresh local progress bar
-this.recalculateServiceInfoFromLocal();
+  await this.createTask(
+    this.createModel.title,
+    'new',
+    this.createModel.tags,
+    this.createModel.description,
+    this.createModel.color,
+    this.createModel.assignedUserIds
+  );
 
-// 🔥 Refresh backend service info
-await this.reloadTaskBoard();
+  // 🔥 DO NOT RELOAD TASK BOARD HERE!!
+  // await this.reloadTaskBoard();  ❌ REMOVE THIS
 
-// 🔥 Force HTML to detect changes
-if (this.taskBoard?.service) {
-  this.taskBoard.service.completionRate = this.servicesInfo.completionRate;
+  // 🔥 Refresh local progress bar
+  this.recalculateServiceInfoFromLocal();
+
+  // 🔥 Correctly detect status based on local data (the same mechanism used in Completed updates)
+  await this.checkServiceStatus();
+
+  this.closeCreateModal();
 }
 
-
-    this.closeCreateModal();
-  }
 
 async createTask(
   taskText: string,
@@ -447,46 +491,32 @@ async createTask(
       assignedUserIds: created.users?.map((u: any) => u.id) || []
     };
 
+    // push to local
     this.data.push(newCard);
 
     if (this.kanban) {
       (this.kanban as any).source(this.data);
       (this.kanban as any).update();
     }
-// Wait for backend to finish writing the new task
-await new Promise(res => setTimeout(res, 300));
 
-// DON'T reload from backend — backend is slow
-this.data.push(newCard);
+    // IMPORTANT: do NOT reload from backend here
+    this.recalculateServiceInfoFromLocal();
 
-// Update UI directly
-if (this.kanban) {
-  (this.kanban as any).source(this.data);
-  (this.kanban as any).update();
-}
+    // FIX: Directly force service status to In Progress
+    await this.http.patch(
+      `${environment.apiUrl}/service/${this.serviceId}/status`,
+      { status: ServiceStatus.InProgress }
+    ).toPromise();
 
-this.recalculateServiceInfoFromLocal();
-await this.checkServiceStatus();
-
-// refresh from backend AFTER 1 second (backend delay)
-setTimeout(async () => {
-  await this.initializeKanbanDataSource();
-  await this.reloadTaskBoard();
-  this.recalculateServiceInfoFromLocal();
-}, 1000);
-this.recalculateServiceInfoFromLocal();
-await this.checkServiceStatus();
-await this.reloadTaskBoard();
-
-
-    await new Promise(r => setTimeout(r));
-
-
+    // now load updated service info
+    await this.reloadTaskBoard();
 
   } catch (error) {
     console.error('Error creating task:', error);
   }
 }
+
+
 
 
   openEditModal(item: any) {
@@ -586,7 +616,14 @@ private async reloadTaskBoard() {
     .toPromise();
 
   this.taskBoard = updated || null;
+
+  // 🔥 FORCE UPDATE SERVICE STATUS IN UI
+  if (this.taskBoard && updated && updated.service) {
+    this.taskBoard.service.status = updated.service.status;
+    this.taskBoard.service.completionRate = updated.service.completionRate;
+  }
 }
+
 
 
   confirmDelete() {
