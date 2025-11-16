@@ -114,7 +114,7 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit {
 
       await this.loadCurrentUserAndRoles();
       await this.initializeKanbanDataSource();
-      await this.getCurrentServiceInfo();
+this.recalculateServiceInfoFromLocal();
       await this.loadAssignedUsers();
       await this.checkServiceStatus();
     });
@@ -318,7 +318,7 @@ this.servicesInfo.completedTasks = 0;
   }
 
   async checkServiceStatus(): Promise<void> {
-    await this.getCurrentServiceInfo();
+this.recalculateServiceInfoFromLocal();
 
     if (!this.data || this.data.length === 0) {
       await this.http
@@ -368,8 +368,9 @@ async onItemMoved(event: any): Promise<void> {
   // 🔥 DO NOT REBUILD KANBAN HERE (fixes glitch)
   // await this.initializeKanbanDataSource();
 
-  await this.getCurrentServiceInfo();
+this.recalculateServiceInfoFromLocal();
   await this.checkServiceStatus();
+  await this.reloadTaskBoard();
 }
 
 
@@ -395,6 +396,17 @@ if (!(this.isChief || this.isManager || this.isAdmin)) return;
       this.createModel.color,
       this.createModel.assignedUserIds
     );
+    // 🔥 Refresh local progress bar
+this.recalculateServiceInfoFromLocal();
+
+// 🔥 Refresh backend service info
+await this.reloadTaskBoard();
+
+// 🔥 Force HTML to detect changes
+if (this.taskBoard?.service) {
+  this.taskBoard.service.completionRate = this.servicesInfo.completionRate;
+}
+
 
     this.closeCreateModal();
   }
@@ -441,8 +453,35 @@ async createTask(
       (this.kanban as any).source(this.data);
       (this.kanban as any).update();
     }
+// Wait for backend to finish writing the new task
+await new Promise(res => setTimeout(res, 300));
 
-    await this.getCurrentServiceInfo();
+// DON'T reload from backend — backend is slow
+this.data.push(newCard);
+
+// Update UI directly
+if (this.kanban) {
+  (this.kanban as any).source(this.data);
+  (this.kanban as any).update();
+}
+
+this.recalculateServiceInfoFromLocal();
+await this.checkServiceStatus();
+
+// refresh from backend AFTER 1 second (backend delay)
+setTimeout(async () => {
+  await this.initializeKanbanDataSource();
+  await this.reloadTaskBoard();
+  this.recalculateServiceInfoFromLocal();
+}, 1000);
+this.recalculateServiceInfoFromLocal();
+await this.checkServiceStatus();
+await this.reloadTaskBoard();
+
+
+    await new Promise(r => setTimeout(r));
+
+
 
   } catch (error) {
     console.error('Error creating task:', error);
@@ -497,7 +536,7 @@ async submitEditTask(): Promise<void> {
 
   await this.updateTask(payload);
   await this.checkServiceStatus();
-
+await this.reloadTaskBoard();
   this.closeEditModal();
 }
 
@@ -532,13 +571,22 @@ async updateTask(task: any, skipRebuild = false): Promise<void> {
     .patch(`${environment.apiUrl}/service/${this.taskBoardId}/tasks/${task.id}`, payload)
     .toPromise();
 
-  if (!skipRebuild) {
-    await this.initializeKanbanDataSource();
-    await this.getCurrentServiceInfo(); // 🔁 refresh progress bar numbers
-  }
+await this.initializeKanbanDataSource();
+this.recalculateServiceInfoFromLocal();
+await this.checkServiceStatus();
+await this.reloadTaskBoard();      // <===== ADD THIS
+
+
 }
 
 
+private async reloadTaskBoard() {
+  const updated = await this.http
+    .get<TaskBoard>(`${environment.apiUrl}/tasks/task-board/${this.taskBoardId}`)
+    .toPromise();
+
+  this.taskBoard = updated || null;
+}
 
 
   confirmDelete() {
@@ -556,7 +604,7 @@ async deleteTask(taskId: number): Promise<void> {
   this.dataAdapter.localData = this.data;
 
   await this.initializeKanbanDataSource();
-  await this.getCurrentServiceInfo();
+this.recalculateServiceInfoFromLocal();
 await this.checkServiceStatus();
 
 }
@@ -674,6 +722,22 @@ openCreateModal() {
 closeCreateModal() {
   this.showCreateModal = false;
 }
+private recalculateServiceInfoFromLocal() {
+  this.servicesInfo.backloggedTasks = this.data.filter(t => t.status === 'new').length;
+  this.servicesInfo.activeTasks     = this.data.filter(t => t.status === 'work').length;
+  this.servicesInfo.completedTasks  = this.data.filter(t => t.status === 'done').length;
+
+  const total = this.data.length;
+
+  this.servicesInfo.completionRate =
+    total > 0 ? (this.servicesInfo.completedTasks / total) * 100 : 0;
+
+  // 🔥 FIX PROGRESS BAR (UI reads from taskBoard.service)
+  if (this.taskBoard?.service) {
+    this.taskBoard.service.completionRate = this.servicesInfo.completionRate;
+  }
+}
+
 
 
 }

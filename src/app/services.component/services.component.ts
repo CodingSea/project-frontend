@@ -46,6 +46,7 @@ export class ServicesComponent implements OnInit, AfterViewInit {
     'Not Started Yet',
     'In-Progress',
     'Completed',
+    'On Hold',
 
   ];
 
