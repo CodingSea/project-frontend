@@ -223,14 +223,10 @@ export class ServiceTasksComponent implements OnInit, AfterViewInit {
 
     this.taskBoard = res || null;
 
-    this.servicesInfo = {
-      totalServices: 0,
-      backloggedTasks: 0,
-      activeTasks: 0,
-      completedTasks: 0,
-      totalMembers: 0,
-      completionRate: 0
-    };
+this.servicesInfo.backloggedTasks = 0;
+this.servicesInfo.activeTasks = 0;
+this.servicesInfo.completedTasks = 0;
+
 
     if (!res || !res.service) return;
 
@@ -560,6 +556,9 @@ async deleteTask(taskId: number): Promise<void> {
   this.dataAdapter.localData = this.data;
 
   await this.initializeKanbanDataSource();
+  await this.getCurrentServiceInfo();
+await this.checkServiceStatus();
+
 }
 
 
