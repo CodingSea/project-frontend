@@ -44,12 +44,10 @@ export class ServicesComponent implements OnInit, AfterViewInit {
   hasTasksFilter = ''; // 🟩 NEW FILTER
   statuses: string[] = [
     'Not Started Yet',
-    'Pending Approval',
     'In-Progress',
     'Completed',
     'On Hold',
-    'At Risk',
-    'Overdue',
+
   ];
 
   currentPage = 1;

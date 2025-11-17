@@ -64,6 +64,9 @@ export class ServiceFormComponent implements OnInit, OnDestroy
   showManagerModal = false;
   selectedChief: User | null = null;
   selectedManager: User | null = null;
+originalStatus: string | null = null;
+hasTasks: boolean = false;
+isCompleted: boolean = false;
 
   status: string[] = Object.values(ServiceStatusForEdit);
   showStatus: boolean = true;
@@ -98,7 +101,7 @@ Validators.pattern(/^[A-Za-z\u0600-\u06FF0-9 ()\-]{3,50}$/)
   chiefId: [ null, Validators.required ],
   managerId: [ null ],
   resources: this.fb.array<number>([] as number[]),
-  status: [ ServiceStatus.New || DefaultStatus.Default, Validators.required ],
+status: [ null as string | null, Validators.required ],
 });
 
   }
@@ -135,48 +138,99 @@ Validators.pattern(/^[A-Za-z\u0600-\u06FF0-9 ()\-]{3,50}$/)
     const day = String(d.getDate()).padStart(2, '0');
     return `${d.getFullYear()}-${m}-${day}`;
   }
+private loadServiceForEdit(id: number): void {
+  this.serviceService.getService(id).subscribe({
+    next: (svc: Service) => {
+this.originalStatus = svc.status ?? null;
+      // =========================
+      // CHECK TASK COMPLETION
+      // =========================
 
-  private loadServiceForEdit(id: number): void
-  {
-    this.serviceService.getService(id).subscribe({
-      next: (svc: Service) =>
-      {
+      let isCompleted = false;
+let cards: any[] = [];   // << FIXED: declare cards OUTSIDE so we can use it later
 
-        if (svc.status == "In-Progress" || svc.status == "Not Started Yet")
-        {
-          // this.showStatus = false;
-          this.status = Object.values(DefaultStatus);
-          svc.status = DefaultStatus.Default;
+      if (svc.taskBoard && Array.isArray((svc.taskBoard as any).cards)) {
+cards = (svc.taskBoard as any).cards;
+
+        if (cards.length > 0) {
+          isCompleted = cards.every(card => {
+            const value =
+              (card.state?.toLowerCase?.()) ||
+              (card.status?.toLowerCase?.()) ||
+              (card.column?.toLowerCase?.()) ||
+              (card.type?.toLowerCase?.()) ||
+              (card?.data?.status?.toLowerCase?.());
+
+            return (
+              value === 'done' ||
+              value === 'completed' ||
+              value === 'complete' ||
+              value === 'finished' ||
+              value === 'finish' ||
+              value === '3'
+            );
+          });
         }
-        else if (svc.status == "Completed")
-        {
-          svc.status = ServiceStatus.Completed;
-          this.showStatus = true;
-        }
+      }
+this.hasTasks = cards.length > 0;   // now REAL count
+this.isCompleted = isCompleted;
 
-        this.form.patchValue({
-          name: svc.name ?? '',
-          deadline: this.toYmd(svc.deadline),
-          description: svc.description ?? '',
-          chiefId: svc.chief?.id ?? null,
-          managerId: svc.projectManager?.id ?? null,
-          status: svc.status
-        });
 
-        this.existingFiles = svc.files ? svc.files.map((f) => ({ name: f.name, url: f.url })) : [];
+      // =========================
+      // APPLY STATUS OPTIONS (NO OVERRIDE)
+      // =========================
 
-        if (svc.chief) this.selectedChief = svc.chief as User;
-        if (svc.projectManager) this.selectedManager = svc.projectManager as User;
+      if (isCompleted) {
+        this.status = [
+          ServiceStatus.Completed,
+          "Pending Approval",
+          "On Hold"
+        ];
+      } else {
+        this.status = [
+          DefaultStatus.Default,
+          DefaultStatus.OnHold
+        ];
+      }
 
-        this.resourcesFA.clear();
-        (svc.assignedResources ?? []).forEach((r) =>
-        {
-          this.resourcesFA.push(new FormControl(r.id));
-        });
-      },
-      error: (e) => console.error('❌ Failed to load service for edit', e),
-    });
-  }
+      // =========================
+      // PATCH FORM WITH REAL STATUS
+      // =========================
+
+      this.form.patchValue({
+        name: svc.name ?? '',
+        deadline: this.toYmd(svc.deadline),
+        description: svc.description ?? '',
+        chiefId: svc.chief?.id ?? null,
+        managerId: svc.projectManager?.id ?? null,
+status: svc.status ?? DefaultStatus.Default
+      });
+// === FORCE DEFAULT WHEN SERVICE IS NOT ON HOLD AND STATUS IS NOT IN ALLOWED LIST ===
+if (svc.status !== ServiceStatus.OnHold && !this.status.includes(svc.status ?? "")) {
+  this.form.patchValue({ status: DefaultStatus.Default });
+}
+
+      // =========================
+      // FILES + USERS + RESOURCES
+      // =========================
+
+      this.existingFiles = svc.files
+        ? svc.files.map((f) => ({ name: f.name, url: f.url }))
+        : [];
+
+      if (svc.chief) this.selectedChief = svc.chief as User;
+      if (svc.projectManager) this.selectedManager = svc.projectManager as User;
+
+      this.resourcesFA.clear();
+      (svc.assignedResources ?? []).forEach((r) => {
+        this.resourcesFA.push(new FormControl(r.id));
+      });
+    },
+
+    error: (e) => console.error('❌ Failed to load service for edit', e),
+  });
+}
+
 
   loadUsers(): void
   {
@@ -298,10 +352,9 @@ Validators.pattern(/^[A-Za-z\u0600-\u06FF0-9 ()\-]{3,50}$/)
       formData.append('filesToDelete', JSON.stringify(this.filesToDelete));
 
 
-      if (this.form.get("status")?.value != DefaultStatus.Default.valueOf())
-      {
-        formData.append('status', this.form.get("status")?.value);
-      }
+const mapped = this.mapStatusToBackend(this.form.get("status")?.value);
+formData.append('status', mapped);
+
 
       this.serviceService.updateServiceWithFiles(this.serviceId, formData).subscribe({
         next: () =>
@@ -340,6 +393,38 @@ Validators.pattern(/^[A-Za-z\u0600-\u06FF0-9 ()\-]{3,50}$/)
       });
     }
   }
+private mapStatusToBackend(uiValue: string): string {
+
+  // 1) Default logic based ONLY on tasks status
+  if (uiValue === DefaultStatus.Default) {
+
+    // If service has tasks but not completed → In Progress
+    if (this.hasTasks && !this.isCompleted) {
+      return ServiceStatus.InProgress;
+    }
+
+    // If service has no tasks → New
+    if (!this.hasTasks) {
+      return ServiceStatus.New;
+    }
+
+    // If completed → Completed
+    if (this.isCompleted) {
+      return ServiceStatus.Completed;
+    }
+  }
+
+  // 2) On Hold → always On Hold
+  if (uiValue === DefaultStatus.OnHold) {
+    return ServiceStatus.OnHold;
+  }
+
+  // 3) Completed-mode statuses
+  return uiValue;
+}
+
+
+
 
   // ========= MODALS WITH SCROLL LOCK =========
   private lockBodyScroll()
