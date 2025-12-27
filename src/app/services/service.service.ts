@@ -53,6 +53,8 @@ export class ServiceService
     data.resources.forEach((r) => formData.append('resources', String(r)));
     files.forEach((file) => formData.append('files', file));
 
+    console.log("55555555555555555555")
+
     return this.http.post(this.apiUrl, formData);
   }
 

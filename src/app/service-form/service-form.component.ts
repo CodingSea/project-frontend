@@ -106,24 +106,34 @@ status: [ null as string | null, Validators.required ],
 
   }
 
-  ngOnInit(): void
+  ngOnInit(): void 
   {
-    if (!this.projectId)
+    if (!this.projectId) 
     {
-      this.projectId = Number(this.route.snapshot.paramMap.get('projectId')) || 1;
+      this.projectId = Number(this.route.snapshot.paramMap.get('projectId'));
     }
 
-    const sid = this.route.snapshot.paramMap.get('serviceId');
-    this.isEditMode = !!sid;
+    const sidParam = this.route.snapshot.paramMap.get('serviceId');
+    const sid = sidParam !== null ? Number(sidParam) : NaN;
 
-    if (sid)
+    this.isEditMode = this.route.snapshot.routeConfig?.path?.includes('edit') ?? false;
+
+
+    if (this.isEditMode) 
     {
-      this.serviceId = Number(sid);
-      this.loadServiceForEdit(this.serviceId);
+      this.serviceId = sid;
+      this.loadServiceForEdit(sid);
     }
+
+    if (!this.isEditMode) {
+    this.form.get('status')?.clearValidators();
+    this.form.get('status')?.updateValueAndValidity();
+  }
 
     this.loadUsers();
-  }
+}
+
+
 
   ngOnDestroy(): void
   {
@@ -333,6 +343,8 @@ if (svc.status !== ServiceStatus.OnHold && !this.status.includes(svc.status ?? "
     };
 
     this.isSubmitting = true;
+
+    console.log("sdsdsdsa")
 
     if (this.isEditMode)
     {
