@@ -116,6 +116,8 @@ export class ProfileComponent implements OnInit
     this.currentUserInfo.profileImage = user.profileImage || '';
     this.currentUserInfo.role = user.role === "admin" ? "Admin" : "Developer";
 
+    console.log(this.currentUserInfo.profileImage)
+
     if (user.profileImage)
     {
       const full = this.fixImage(user.profileImage);

@@ -57,7 +57,7 @@
             <div class="developers-grid">
                 <div class="dev-card" *ngFor="let dev of developers">
                     <div class="dev-header">
-                        <img [src]="dev.profileImage || 'images/user.png'" alt="Profile" />
+                        <img [src]="fixImage(dev.profileImage)" alt="Profile" />
                         <h3>{{ dev.first_name }} {{ dev.last_name }}</h3>
                     </div>
                     <div class="dev-skills">

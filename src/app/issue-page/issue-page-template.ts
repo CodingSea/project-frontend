@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import Prism from 'prismjs';
-import 'prismjs/themes/prism.css';
+//import 'prismjs/themes/prism.css';
 import { IssueService, Issue } from '../services/issue.service';
 import { marked } from 'marked';
 import { ActivatedRoute } from '@angular/router';

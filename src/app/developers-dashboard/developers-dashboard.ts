@@ -13,9 +13,9 @@ import { Router, RouterLink } from '@angular/router';
 @Component({
   selector: 'app-developers-dashboard',
   standalone: true,
-  imports: [ HeaderComponent, CommonModule, FormsModule, ExcelDeveloperImporter, Sidebar, RouterLink ],
+  imports: [HeaderComponent, CommonModule, FormsModule, ExcelDeveloperImporter, Sidebar, RouterLink],
   templateUrl: './developers-dashboard.html',
-  styleUrls: [ './developers-dashboard.css' ]
+  styleUrls: ['./developers-dashboard.css']
 })
 export class DevelopersDashboard implements OnInit
 {
@@ -70,7 +70,7 @@ export class DevelopersDashboard implements OnInit
       // Fetch developers based on advanced filters
       this.developers = await this.http.get<DeveloperCard[]>(`${environment.apiUrl}/user/developers-card?${params.toString()}`).toPromise() || [];
       console.log('Developers fetched:', this.developers.length);
-      
+
       this.developers.forEach(developer =>
       {
         developer.cards = developer.cards?.filter(task => task.column !== "done");
@@ -170,12 +170,31 @@ export class DevelopersDashboard implements OnInit
 
   onFileSelected(event: any): void
   {
-    const file = event.target.files[ 0 ];
+    const file = event.target.files[0];
     if (file) this.selectedFile = file;
   }
 
   viewProfile(id: number)
   {
-    this.router.navigate([ `/profile/user/${id}` ])
+    this.router.navigate([`/profile/user/${id}`])
   }
+
+  fixImage(path: string | null | undefined): string
+  {
+    // 1. Fallback for null/empty paths
+    if (!path) return 'images/user.png';
+
+    // 2. If it's a full S3/External URL, return it exactly as is
+    if (path.startsWith('http')) return path;
+
+    // 3. Prepare the base URL (remove /api so it points to http://localhost:3000)
+    const baseUrl = environment.apiUrl.replace('/api', '');
+
+    // 4. Join them and clean up double slashes safely
+    // This regex replaces "//" with "/" ONLY if it's NOT preceded by a colon ":"
+    const fullPath = `${baseUrl}/${path}`;
+    return fullPath.replace(/(?<!:)\/+/g, '/');
+  }
+
+
 }
